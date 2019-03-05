@@ -148,9 +148,13 @@ class SE_MODEL(object):
         outputs, fw_final_states, bw_final_states = result
 
     with tf.variable_scope('fullconnectOut'):
+      in_size = PARAM.RNN_SIZE
       if self._model_type.upper()[0] == 'B':  # bidirection
-        outputs = tf.reshape(outputs, [-1, 2*PARAM.LSTM_num_proj])
-        in_size = 2*PARAM.LSTM_num_proj
+        rnn_output_num = PARAM.RNN_SIZE*2
+        if PARAM.MODEL_TYPE == 'BLSTM' and (not (PARAM.LSTM_num_proj is None)):
+          rnn_output_num = 2*PARAM.LSTM_num_proj
+        outputs = tf.reshape(outputs, [-1, rnn_output_num])
+        in_size = rnn_output_num
       out_size = PARAM.OUTPUT_SIZE
       weights = tf.get_variable('weights1', [in_size, out_size],
                                 initializer=tf.random_normal_initializer(stddev=0.01))
