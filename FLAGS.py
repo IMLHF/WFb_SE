@@ -7,7 +7,7 @@ class base_config:
   FS = 8000
   AUDIO_BITS = 16
   MASK_TYPE = "PSM"  # "PSM" or "IRM"
-  LOSS_FUNC = loss.reduce_sum_frame_batchsize_MSE_LOW_FS_IMPROVE
+  LOSS_FUNC = loss.reduce_sum_frame_batchsize_MSE
   MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
   INPUT_SIZE = 129
   OUTPUT_SIZE = 129
