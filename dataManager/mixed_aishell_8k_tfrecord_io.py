@@ -25,9 +25,9 @@ def _ini_data(close_condition_wav_dir, open_condition_wav_dir, noise_dir, out_di
   os.makedirs(data_dict_dir)
   cc_clean_wav_speaker_set_dir = close_condition_wav_dir
   oc_clean_wav_speaker_set_dir = open_condition_wav_dir
-  os.makedirs(os.path.join(data_dict_dir, '/train'))
-  os.makedirs(os.path.join(data_dict_dir, '/validation'))
-  os.makedirs(os.path.join(data_dict_dir, '/test_cc'))
+  os.makedirs(os.path.join(data_dict_dir, 'train'))
+  os.makedirs(os.path.join(data_dict_dir, 'validation'))
+  os.makedirs(os.path.join(data_dict_dir, 'test_cc'))
   os.makedirs(os.path.join(data_dict_dir, 'test_oc'))
   cwl_train_file = open(
     os.path.join(data_dict_dir,'train','clean_wav_dir.list'), 'a+')
@@ -132,7 +132,7 @@ def _ini_data(close_condition_wav_dir, open_condition_wav_dir, noise_dir, out_di
     #     mixed_wave_list.append([utt1_dir, utt2_dir])
     mixed_wav_list_file.close()
     scipy.io.savemat(
-        os.path.join(data_dict_dir, dataset_names[j], '/mixed_wav_dir.mat'),
+        os.path.join(data_dict_dir, dataset_names[j], 'mixed_wav_dir.mat'),
         {"mixed_wav_dir": mixed_wave_list})
     all_mixed += len(mixed_wave_list)
     print(dataset_names[j]+' data preparation over,\nMixed num: ' +
@@ -290,13 +290,19 @@ def _gen_tfrecord_minprocess(
 
 
 def generate_tfrecord(gen=True):
+  '''
+  if gen == True : generate Tfrecord and return Tfrecord list
+  else : return Tfrecord list
+  '''
   tfrecords_dir = PARAM.TFRECORDS_DIR
   train_tfrecords_dir = os.path.join(tfrecords_dir, 'train')
   val_tfrecords_dir = os.path.join(tfrecords_dir, 'validation')
   testcc_tfrecords_dir = os.path.join(tfrecords_dir, 'test_cc')
+  testoc_tfrecords_dir = os.path.join(tfrecords_dir, 'test_oc')
   dataset_dir_list = [train_tfrecords_dir,
                       val_tfrecords_dir,
-                      testcc_tfrecords_dir]
+                      testcc_tfrecords_dir,
+                      testoc_tfrecords_dir]
 
   if gen:
     _ini_data(PARAM.CLOSE_CONDATION_SPEAKER_LIST_DIR,
@@ -309,25 +315,27 @@ def generate_tfrecord(gen=True):
       shutil.rmtree(val_tfrecords_dir)
     if os.path.exists(testcc_tfrecords_dir):
       shutil.rmtree(testcc_tfrecords_dir)
+    if os.path.exists(testoc_tfrecords_dir):
+      shutil.rmtree(testoc_tfrecords_dir)
     os.makedirs(train_tfrecords_dir)
     os.makedirs(val_tfrecords_dir)
     os.makedirs(testcc_tfrecords_dir)
+    os.makedirs(testoc_tfrecords_dir)
 
     gen_start_time = time.time()
     pool = multiprocessing.Pool(PARAM.PROCESS_NUM_GENERATE_TFERCORD)
     for dataset_dir in dataset_dir_list:
       # start_time = time.time()
-      dataset_index_list = None
-      if dataset_dir[-2:] == 'in':
-        # continue
-        dataset_index_list = scipy.io.loadmat(
-            '_data/mixed_aishell/train/mixed_wav_dir.mat')["mixed_wav_dir"]
-      elif dataset_dir[-2:] == 'on':
-        dataset_index_list = scipy.io.loadmat(
-            '_data/mixed_aishell/validation/mixed_wav_dir.mat')["mixed_wav_dir"]
-      elif dataset_dir[-2:] == 'cc':
-        dataset_index_list = scipy.io.loadmat(
-            '_data/mixed_aishell/test_cc/mixed_wav_dir.mat')["mixed_wav_dir"]
+      data_set_name = {
+          'in': 'train',
+          'on': 'validation',
+          'cc': 'test_cc',
+          'oc': 'test_oc',
+      }[dataset_dir[-2:]]
+      dataset_index_list = scipy.io.loadmat(
+          os.path.join(PARAM.DATA_DICT_DIR,
+                       data_set_name,
+                       'mixed_wav_dir.mat'))["mixed_wav_dir"]
 
       # 使用.mat，字符串长度会强制对齐，所以去掉空格
       dataset_index_list = [[index_[0].replace(' ', ''),
@@ -363,7 +371,8 @@ def generate_tfrecord(gen=True):
   train_set = os.path.join(train_tfrecords_dir, '*.tfrecords')
   val_set = os.path.join(val_tfrecords_dir, '*.tfrecords')
   testcc_set = os.path.join(testcc_tfrecords_dir, '*.tfrecords')
-  return train_set, val_set, testcc_set
+  testoc_set = os.path.join(testoc_tfrecords_dir, '*.tfrecords')
+  return train_set, val_set, testcc_set, testoc_set
 
 
 def get_batch_use_tfdata(tfrecords_list, get_theta=False):

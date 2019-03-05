@@ -11,7 +11,7 @@ import wave
 import gc
 from FLAGS import PARAM
 from tensorflow.python import debug as tf_debug
-from dataManager.mixed_aishell_tfrecord_io import generate_tfrecord, get_batch_use_tfdata
+from dataManager.mixed_aishell_8k_tfrecord_io import generate_tfrecord, get_batch_use_tfdata
 
 os.environ['CUDA_VISIBLE_DEVICES'] = sys.argv[1]
 
@@ -77,7 +77,7 @@ def train():
     # region TFRecord+DataSet
     with tf.device('/cpu:0'):
       with tf.name_scope('input'):
-        train_tfrecords, val_tfrecords, testcc_tfrecords = generate_tfrecord(
+        train_tfrecords, val_tfrecords, _, _ = generate_tfrecord(
             gen=PARAM.GENERATE_TFRECORD)
         if PARAM.GENERATE_TFRECORD:
           print("TFRecords preparation over.")
