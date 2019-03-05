@@ -99,10 +99,11 @@ def _ini_data(close_condition_wav_dir, open_condition_wav_dir, noise_dir, out_di
   dataset_mixedutt_num = PARAM.DATASET_SIZES
   all_mixed = 0
   all_stime = time.time()
-  for (clean_wav_list, j) in zip((clean_wav_list_train,
-                                  clean_wav_list_validation,
-                                  clean_wav_list_test_cc,
-                                  clean_wav_list_test_oc), range(3)):
+  cwl_list = [clean_wav_list_train,
+              clean_wav_list_validation,
+              clean_wav_list_test_cc,
+              clean_wav_list_test_oc]
+  for (clean_wav_list, j) in zip(cwl_list, range(len(cwl_list))):
     print('\n'+dataset_names[j]+" data preparing...")
     s_time = time.time()
     mixed_wav_list_file = open(
