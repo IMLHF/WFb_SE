@@ -6,7 +6,6 @@ import sys
 from tensorflow.contrib.rnn.python.ops import rnn
 from utils import tf_tool
 from FLAGS import PARAM
-from dataManager import mixed_aishell_tfrecord_io as data_tool
 
 DEFAULT_LOG_BIAS = 1e-12
 
