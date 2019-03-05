@@ -15,7 +15,7 @@ soundfile.write(file, data, samplerate, subtype=None, endian=None, format=None, 
 def read_audio(file):
   data, sr = librosa.load(file)
   data = librosa.resample(data, sr, FLAGS.PARAM.FS)
-  return data*32767, sr
+  return data*32767, FLAGS.PARAM.FS
 
 
 def write_audio(file, data, sr):
