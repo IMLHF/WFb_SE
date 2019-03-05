@@ -38,7 +38,8 @@ class base_config:
   RESTORE_PHASE = 'GRIFFIN_LIM'  # 'MIXED','GRIFFIN_LIM'.
   GRIFFIN_ITERNUM = 50
   minibatch_size = 400  # batch num to show
-  RAW_DATA = '/home/room/work/lhf/alldata/aishell2_speaker_list'
+  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/room/work/lhf/alldata/aishell2_90speaker_list_1'
+  OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/room/work/lhf/alldata/aishell2_90speaker_list_2'
   # NOISE_DIR = '/all_data/many_noise' # for docker
   NOISE_DIR = '/home/room/work/lhf/alldata/many_noise'
   DATA_DICT_DIR = '_data/mixed_aishell'
@@ -51,10 +52,14 @@ class base_config:
   SHUFFLE = False
 
   LEN_WAWE_PAD_TO = FS*3  # Mixed wave length (FS*3 is 3 seconds)
-  # [260,290] Separate utt to [0:260],[260,290],[290:end]
+  '''
+  UTT_SEG_FOR_MIX:(for close condition)
+  [260,290] Separate utt to [0:260],[260,290],[290:end]
+  to generate train_set, valildation_set and test_cc_set, respectively.
+  '''
   UTT_SEG_FOR_MIX = [400, 460]
-  DATASET_NAMES = ['train', 'validation', 'test_cc']
-  DATASET_SIZES = [48000, 12000, 6000]
+  DATASET_NAMES = ['train', 'validation', 'test_cc', 'test_oc']
+  DATASET_SIZES = [48000, 12000, 6000, 6000]
 
   INPUT_TYPE = None  # 'mag' or 'logmag'
   LABEL_TYPE = None  # 'mag' or 'logmag'
