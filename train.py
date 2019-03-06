@@ -183,7 +183,7 @@ def train():
         msg = ("Train Iteration %03d: \n"
                "    Train.LOSS %.4f, lrate %e, Val.LOSS %.4f, log_bias %f,\n"
                "    %s, ckpt(%s) saved,\n"
-               "    EPOCH DURATION: %.2fs") % (
+               "    EPOCH DURATION: %.2fs\n") % (
             epoch + 1,
             tr_loss, model_lr, val_loss, log_bias,
             "NNET Accepted", ckpt_name, end_time - start_time)
@@ -194,7 +194,7 @@ def train():
         msg = ("Train Iteration %03d: \n"
                "    Train.LOSS %.4f, lrate%e, Val.LOSS %.4f, log_bias %f,\n"
                "    %s, ckpt(%s) abandoned,\n"
-               "    EPOCH DURATION: %.2fs") % (
+               "    EPOCH DURATION: %.2fs\n") % (
             epoch + 1,
             tr_loss, model_lr, val_loss, log_bias,
             "NNET Rejected", ckpt_name, end_time - start_time)
