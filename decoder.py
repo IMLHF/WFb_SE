@@ -57,7 +57,9 @@ def decode_one_wav(sess, model, wavedata):
         model.lengths: lengths,
       })
 
-  cleaned = np.array(cleaned)
+  cleaned = np.array(cleaned[0])
+  mask = np.array(mask[0])
+  print(np.shape(cleaned),np.shape(mask))
   if PARAM.RESTORE_PHASE == 'MIXED':
     cleaned = cleaned*np.exp(1j*spectrum_tool.phase_spectrum_librosa_stft(wavedata,
                                                                           PARAM.NFFT,
@@ -69,28 +71,31 @@ def decode_one_wav(sess, model, wavedata):
                                     PARAM.OVERLAP,
                                     PARAM.GRIFFIN_ITERNUM,
                                     wavedata)
-  return reY
+  return reY, mask
 
 if __name__=='__main__':
-  ckpt='nnet_C001' # don't forget to change FLAGS.PARAM
+  ckpt= PARAM.CHECK_POINT # don't forget to change FLAGS.PARAM
   decode_ans_file = os.path.join(PARAM.SAVE_DIR,'decode_'+ckpt)
   if not os.path.exists(decode_ans_file):
     os.makedirs(decode_ans_file)
   sess, model = build_session(ckpt)
 
   decode_file_list = ['../IRM_Speech_Enhancement/exp/data_for_ac/mixed_wav_c11_50_snr_0/2_00_MIX_1_clapping.wav',
-                      'exp/rnn_speech_enhancement/speech5_16k.wav',
-                      'exp/rnn_speech_enhancement/speech0_16k.wav',]
+                      '../IRM_Speech_Enhancement/_decode_index/speech5_16k.wav',
+                      '../IRM_Speech_Enhancement/_decode_index/speech0_16k.wav',]
 
   for i, mixed_dir in enumerate(decode_file_list):
     print(i+1,mixed_dir)
     waveData, sr = audio_tool.read_audio(mixed_dir)
-    reY = decode_one_wav(sess,model,waveData*32767)/32767
+    reY, mask = decode_one_wav(sess,model,waveData)
     utils.audio_tool.write_audio(os.path.join(decode_ans_file,
                                               ('%3d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
                                  reY,
-                                 sr,
-                                 PARAM.AUDIO_BITS, 'wav')
+                                 sr)
+    file_name = mixed_dir[mixed_dir.rfind('/')+1:mixed_dir.rfind('.')]
+    spectrum_tool.picture_spec(mask[0],
+                               os.path.join(decode_ans_file,
+                                            ('%3d_' % (i+1))+file_name))
 
 
 
