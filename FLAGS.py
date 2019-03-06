@@ -12,16 +12,16 @@ class base_config:
   INPUT_SIZE = 129
   OUTPUT_SIZE = 129
   LSTM_num_proj = None
-  RNN_SIZE = 896
+  RNN_SIZE = 512
   LSTM_ACTIVATION = 'tanh'
   KEEP_PROB = 0.8
-  RNN_LAYER = 3
+  RNN_LAYER = 2
   CLIP_NORM = 5.0
   SAVE_DIR = 'exp/rnn_speech_enhancement'
   CHECK_POINT = None
 
   GPU_RAM_ALLOW_GROWTH = True
-  batch_size = 128
+  batch_size = 64
   learning_rate = 0.001
   start_halving_impr = 0.0003
   resume_training = 'false'  # set start_epoch = final model ID
@@ -89,6 +89,7 @@ class C001(base_config): #
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  GENERATE_TFRECORD = True
   '''
   iter4 PESQ:
   '''
