@@ -78,8 +78,10 @@ class SE_MODEL(object):
       self._norm_y_logmag_spec = norm_logmag_spec(self._y_mag_spec, self._log_bias)
 
     self._lengths = lengths_batch
-
     self.batch_size = tf.shape(self._lengths)[0]
+
+    self._x_theta = theta_x_batch
+    self._y_theta = theta_y_batch
     self._model_type = PARAM.MODEL_TYPE
 
     if PARAM.INPUT_TYPE == 'mag':
@@ -180,7 +182,7 @@ class SE_MODEL(object):
     elif PARAM.TRAINING_MASK_POSITION == 'logmag':
       self._cleaned = self._mask*self._norm_x_logmag_spec
     if PARAM.MASK_TYPE == 'PSIRM':
-      self._labels *= tf.cos(theta_x_batch-theta_y_batch)
+      self._labels *= tf.cos(self._x_theta-self._y_theta)
 
     if PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE:
       if PARAM.LABEL_TYPE == 'mag':
@@ -220,7 +222,7 @@ class SE_MODEL(object):
     '''
     description: model outputs
     type: enhanced spectrum
-    dims: [None,time,frequence]
+    dims: [batch,time,frequence]
     '''
     return self._cleaned
 
@@ -229,7 +231,7 @@ class SE_MODEL(object):
     '''
     description: model inputs
     type: mixture spectrum
-    dims: [None,time,frequence]
+    dims: [batch,time,frequence]
     '''
     return self._inputs
 
@@ -238,7 +240,7 @@ class SE_MODEL(object):
     '''
     description: trainning reference
     type: clean spectrum
-    dims: [None,time,frequence]
+    dims: [batch,time,frequence]
     '''
     return self._labels
 
@@ -250,6 +252,24 @@ class SE_MODEL(object):
     dims: same to spectrum
     '''
     return self._mask
+
+  @property
+  def x_theta(self):
+    '''
+    description: angle of inputs
+    type:
+    dims: [batch, time, frequence]
+    '''
+    return self._x_theta
+
+  @property
+  def y_theta(self):
+    '''
+    description: angle of labels
+    type:
+    dims: [batch, time, frequence]
+    '''
+    return self._y_theta
 
   @property
   def lengths(self):
