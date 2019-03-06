@@ -376,7 +376,7 @@ def generate_tfrecord(gen=True):
   return train_set, val_set, testcc_set, testoc_set
 
 
-def get_batch_use_tfdata(tfrecords_list, get_theta=False):
+def get_batch_use_tfdata(tfrecords_list, get_theta=True):
   files = tf.data.Dataset.list_files(tfrecords_list)
   files = files.take(PARAM.MAX_TFRECORD_FILES_USED)
   if PARAM.SHUFFLE:
