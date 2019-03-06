@@ -27,7 +27,7 @@ class base_config:
   resume_training = 'false'  # set start_epoch = final model ID
   start_epoch = 0
   min_epochs = 10  # Min number of epochs to run trainer without halving.
-  max_epochs = 50  # Max number of epochs to run trainer totally.
+  max_epochs = 15  # Max number of epochs to run trainer totally.
   halving_factor = 0.7  # Factor for halving.
   # Halving when ralative loss is lower than start_halving_impr.
   start_halving_impr = 0.003
