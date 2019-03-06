@@ -2,18 +2,18 @@ from losses import loss
 
 
 class base_config:
+  AUDIO_BITS = 16
   NFFT = 256
   OVERLAP = 128
   FS = 8000
-  AUDIO_BITS = 16
-  MASK_TYPE = "PSM"  # "PSM" or "IRM"
-  LOSS_FUNC = loss.reduce_sum_frame_batchsize_MSE
-  MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
   INPUT_SIZE = 129
   OUTPUT_SIZE = 129
   LSTM_num_proj = None
   RNN_SIZE = 512
+  MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
   LSTM_ACTIVATION = 'tanh'
+  MASK_TYPE = "PSM"  # "PSM" or "IRM"
+  LOSS_FUNC = loss.reduce_sum_frame_batchsize_MSE
   KEEP_PROB = 0.8
   RNN_LAYER = 2
   CLIP_NORM = 5.0
@@ -44,7 +44,7 @@ class base_config:
   NOISE_DIR = '/home/room/work/lhf/alldata/many_noise'
   DATA_DICT_DIR = '_data/mixed_aishell'
   # TFRECORDS_DIR = '/all_data/feature_tfrecords' # for docker
-  TFRECORDS_DIR = '/home/room/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_span32767'
+  TFRECORDS_DIR = '/home/room/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_linear_span32767'
   GENERATE_TFRECORD = False
   PROCESS_NUM_GENERATE_TFERCORD = 16
   TFRECORDS_NUM = 160  # 提多少，后面设置MAX_TFRECORD_FILES_USED表示用多少
@@ -70,7 +70,7 @@ class base_config:
   #LOG_NORM_MAX = log(LOG_BIAS+MAG_NORM_MAX)
   #LOG_NORM_MIN = log(LOG_BIAS)
   # MAG_NORM_MAX = 70
-  MAG_NORM_MAX = 1e6
+  MAG_NORM_MAX = 5e4
   # MAG_NORM_MIN = 0
 
   AUDIO_VOLUME_AMP = False
