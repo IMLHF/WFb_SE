@@ -103,4 +103,3 @@ if __name__=='__main__':
     spectrum_tool.picture_spec(mask,
                                os.path.join(decode_ans_file,
                                             ('%3d_' % (i+1))+file_name))
-
