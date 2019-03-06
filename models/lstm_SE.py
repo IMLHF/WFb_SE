@@ -60,6 +60,10 @@ class SE_MODEL(object):
                theta_x_batch=None,
                theta_y_batch=None,
                infer=False):
+    if infer is False:
+      assert(y_mag_spec_batch is not None)
+      assert(theta_x_batch is not None)
+      assert(theta_y_batch is not None)
     self._log_bias = tf.get_variable('logbias', [1], trainable=PARAM.LOG_BIAS_TRAINABEL,
                                      initializer=tf.constant_initializer(PARAM.INIT_LOG_BIAS))
     self._real_logbias = self._log_bias + DEFAULT_LOG_BIAS
@@ -68,7 +72,7 @@ class SE_MODEL(object):
     self._norm_x_mag_spec = norm_mag_spec(self._x_mag_spec)
     self._norm_x_logmag_spec = norm_logmag_spec(self._x_mag_spec, self._log_bias)
 
-    if not infer:
+    if y_mag_spec_batch is not None:
       self._y_mag_spec = y_mag_spec_batch
       self._norm_y_mag_spec = norm_mag_spec(self._y_mag_spec)
       self._norm_y_logmag_spec = norm_logmag_spec(self._y_mag_spec, self._log_bias)
@@ -82,8 +86,7 @@ class SE_MODEL(object):
       self.net_input = self._norm_x_mag_spec
     elif PARAM.INPUT_TYPE == 'logmag':
       self.net_input = self._norm_x_logmag_spec
-
-    if not infer:
+    if y_mag_spec_batch is not None:
       if PARAM.LABEL_TYPE == 'mag':
         self._labels = self._norm_y_mag_spec
       elif PARAM.LABEL_TYPE == 'logmag':
