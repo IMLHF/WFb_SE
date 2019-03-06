@@ -89,7 +89,7 @@ class C001(base_config): #
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  GENERATE_TFRECORD = True
+  GENERATE_TFRECORD = False
   '''
   iter4 PESQ:
   '''
