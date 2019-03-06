@@ -67,8 +67,7 @@ class SE_MODEL(object):
     self._log_bias = tf.get_variable('logbias', [1], trainable=PARAM.LOG_BIAS_TRAINABEL,
                                      initializer=tf.constant_initializer(PARAM.INIT_LOG_BIAS))
     self._real_logbias = self._log_bias + DEFAULT_LOG_BIAS
-    self._inputs = x_mag_spec_batch
-    self._x_mag_spec = self.inputs
+    self._x_mag_spec = x_mag_spec_batch
     self._norm_x_mag_spec = norm_mag_spec(self._x_mag_spec)
     self._norm_x_logmag_spec = norm_logmag_spec(self._x_mag_spec, self._log_bias)
 
@@ -227,22 +226,22 @@ class SE_MODEL(object):
     return self._cleaned
 
   @property
-  def inputs(self):
+  def x_mag(self):
     '''
     description: model inputs
     type: mixture spectrum
     dims: [batch,time,frequence]
     '''
-    return self._inputs
+    return self._x_mag_spec
 
   @property
-  def labels(self):
+  def y_mag(self):
     '''
     description: trainning reference
     type: clean spectrum
     dims: [batch,time,frequence]
     '''
-    return self._labels
+    return self._y_mag_spec
 
   @property
   def mask(self):

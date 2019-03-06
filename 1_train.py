@@ -60,7 +60,7 @@ def eval_one_epoch(sess, val_model):
     try:
       loss, current_batchsize = sess.run(
           [val_model.loss, val_model.batch_size])
-      # print(inputss)
+      # print(inputs)
       # exit(0)
       val_loss += loss
       data_len += current_batchsize

@@ -50,10 +50,11 @@ def decode_one_wav(sess, model, wavedata):
   length = np.shape(x_spec_t)[0]
   x_spec = np.array([x_spec_t], dtype=np.float32)
   lengths = np.array([length], dtype=np.int32)
-  cleaned, mask = sess.run(
-      [model.cleaned, model.mask],
+  cleaned, mask, x_mag, norm_x_mag, norm_logmag = sess.run(
+      [model.cleaned, model.mask,
+       model._x_mag_spec, model._norm_x_mag_spec, model._norm_x_logmag_spec],
       feed_dict={
-        model.inputs: x_spec,
+        model.x_mag: x_spec,
         model.lengths: lengths,
       })
 
@@ -71,6 +72,12 @@ def decode_one_wav(sess, model, wavedata):
                                     PARAM.OVERLAP,
                                     PARAM.GRIFFIN_ITERNUM,
                                     wavedata)
+
+  print(np.shape(mask), np.max(mask), np.min(mask))
+  print(np.shape(x_mag), np.max(x_mag), np.min(x_mag))
+  print(np.shape(norm_x_mag), np.max(norm_x_mag), np.min(norm_x_mag))
+  print(np.shape(norm_logmag), np.max(norm_logmag), np.min(norm_logmag))
+  # spectrum_tool.picture_spec(mask[0],"233")
   return reY, mask
 
 if __name__=='__main__':
@@ -93,9 +100,7 @@ if __name__=='__main__':
                                  reY,
                                  sr)
     file_name = mixed_dir[mixed_dir.rfind('/')+1:mixed_dir.rfind('.')]
-    spectrum_tool.picture_spec(mask[0],
+    spectrum_tool.picture_spec(mask,
                                os.path.join(decode_ans_file,
                                             ('%3d_' % (i+1))+file_name))
-
-
 

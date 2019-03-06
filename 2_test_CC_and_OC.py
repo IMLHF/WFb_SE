@@ -72,9 +72,9 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir):
       i += 1
       print("Testing batch %03d/%03d: " % (i,all_batch))
       mask, x_mag, x_theta, y_mag, y_theta, y_mag_est = sess.run([model.mask,
-                                                                  model.inputs,
+                                                                  model.x_mag,
                                                                   model.x_theta,
-                                                                  model.labels,
+                                                                  model.y_mag,
                                                                   model.y_theta,
                                                                   model.cleaned])
       x_wav = spectrum_tool.librosa_istft(x_mag*np.exp(1j*x_theta), PARAM.NFFT, PARAM.OVERLAP)
