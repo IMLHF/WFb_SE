@@ -144,7 +144,6 @@ def _ini_data(close_condition_wav_dir, open_condition_wav_dir, noise_dir, out_di
 
 def _get_padad_waveData(file):
   waveData, sr = audio_tool.read_audio(file)
-  waveData *= 32767.0
   if(sr != PARAM.FS):
     print("Audio samplerate error.")
     exit(-1)
@@ -203,12 +202,15 @@ def _extract_feature_x_y_xtheta_ytheta(utt_dir1, utt_dir2):
   # name1 = utt_dir1[utt_dir1.rfind('/')+1:utt_dir1.rfind('.')]
   # name2 = utt_dir2[utt_dir2.rfind('/')+1:]
   # utils.audio_tool.write_audio('mixwave/mixed_'+name1+"_"+name2,
-  #                              mixedData,16000,16,'wav')
+  #                              mixedData,16000)
 
   X = _extract_mag_spec(mixedData)
   Y = _extract_mag_spec(waveData1)
   x_theta = _extract_phase(mixedData)
   y_theta = _extract_phase(waveData1)
+  # print('-------------------------------------------')
+  # print(np.max(X),'----',np.min(X),'----',np.mean(X),'----',np.sqrt(np.var(X)))
+  # print(np.max(Y),'----',np.max(Y),'----',np.mean(Y),'----',np.sqrt(np.var(Y)))
 
   return [X, Y, x_theta, y_theta]
 
