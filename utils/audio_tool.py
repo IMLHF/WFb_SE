@@ -19,6 +19,7 @@ def read_audio(file):
   data, sr = librosa.load(file)
   if sr != FLAGS.PARAM.FS:
     data = librosa.resample(data, sr, FLAGS.PARAM.FS, res_type='kaiser_fast')
+    print('resample wav :', file)
   # librosa.output.write_wav(file, data, FLAGS.PARAM.FS)
   return data*32767, FLAGS.PARAM.FS
 
