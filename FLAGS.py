@@ -44,7 +44,7 @@ class base_config:
   NOISE_DIR = '/home/room/work/lhf/alldata/many_noise'
   DATA_DICT_DIR = '_data/mixed_aishell'
   # TFRECORDS_DIR = '/all_data/feature_tfrecords' # for docker
-  TFRECORDS_DIR = '/home/room/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_linear_span32767'
+  TFRECORDS_DIR = '/home/room/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_snrmix_wavespan32767'
   GENERATE_TFRECORD = False
   PROCESS_NUM_GENERATE_TFERCORD = 16
   TFRECORDS_NUM = 160  # 提多少，后面设置MAX_TFRECORD_FILES_USED表示用多少
@@ -70,7 +70,7 @@ class base_config:
   #LOG_NORM_MAX = log(LOG_BIAS+MAG_NORM_MAX)
   #LOG_NORM_MIN = log(LOG_BIAS)
   # MAG_NORM_MAX = 70
-  MAG_NORM_MAX = 5e4
+  MAG_NORM_MAX = 5e5
   # MAG_NORM_MIN = 0
 
   AUDIO_VOLUME_AMP = False
