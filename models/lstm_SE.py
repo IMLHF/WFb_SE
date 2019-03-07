@@ -11,7 +11,7 @@ DEFAULT_LOG_BIAS = 1e-12
 
 # trunc mag and dispersion to [0,1]
 def norm_mag_spec(mag_spec):
-  mag_spec = tf.clip_by_value(mag_spec, 0, PARAM.MAG_NORM_MAX)
+  # mag_spec = tf.clip_by_value(mag_spec, 0, PARAM.MAG_NORM_MAX)
   normed_mag = mag_spec / (PARAM.MAG_NORM_MAX - 0)
   return normed_mag
 
@@ -20,7 +20,7 @@ def norm_logmag_spec(mag_spec, log_bias):
   LOG_NORM_MIN = tf.log(tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS) / tf.log(10.0)
   LOG_NORM_MAX = tf.log(tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS+PARAM.MAG_NORM_MAX) / tf.log(10.0)
 
-  mag_spec = tf.clip_by_value(mag_spec, 0, PARAM.MAG_NORM_MAX)
+  # mag_spec = tf.clip_by_value(mag_spec, 0, PARAM.MAG_NORM_MAX)
   logmag_spec = tf.log(mag_spec+tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS)/tf.log(10.0)
   logmag_spec -= LOG_NORM_MIN
   normed_logmag = logmag_spec / (LOG_NORM_MAX - LOG_NORM_MIN)
@@ -305,3 +305,4 @@ class SE_MODEL(object):
     dims:
     '''
     return self._train_op
+
