@@ -87,18 +87,18 @@ if __name__=='__main__':
     os.makedirs(decode_ans_file)
   sess, model = build_session(ckpt)
 
-  decode_file_list = ['../IRM_Speech_Enhancement/exp/data_for_ac/mixed_wav_c11_50_snr_0/2_00_MIX_1_clapping.wav',
-                      '../IRM_Speech_Enhancement/_decode_index/speech5_16k.wav',
-                      '../IRM_Speech_Enhancement/_decode_index/speech0_16k.wav',]
+  decode_file_list = ['exp/rnn_speech_enhancement/2_00_MIX_1_clapping.wav',
+                      'exp/rnn_speech_enhancement/speech5_8k.wav',
+                      'exp/rnn_speech_enhancement/speech0_8k.wav',]
 
   for i, mixed_dir in enumerate(decode_file_list):
     print(i+1,mixed_dir)
     waveData, sr = audio_tool.read_audio(mixed_dir)
     reY, mask = decode_one_wav(sess,model,waveData)
-    utils.audio_tool.write_audio(os.path.join(decode_ans_file,
-                                              ('%3d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
-                                 reY,
-                                 sr)
+    audio_tool.write_audio(os.path.join(decode_ans_file,
+                                        ('%3d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
+                           reY,
+                           sr)
     file_name = mixed_dir[mixed_dir.rfind('/')+1:mixed_dir.rfind('.')]
     spectrum_tool.picture_spec(mask,
                                os.path.join(decode_ans_file,
