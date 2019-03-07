@@ -38,13 +38,13 @@ class base_config:
   RESTORE_PHASE = 'GRIFFIN_LIM'  # 'MIXED','GRIFFIN_LIM'.
   GRIFFIN_ITERNUM = 50
   minibatch_size = 400  # batch num to show
-  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/room/work/lhf/alldata/aishell2_100speaker_list_1'
-  OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/room/work/lhf/alldata/aishell2_100speaker_list_2'
+  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/room/work/lhf/alldata/aishell2_100speaker_list_1_8k'
+  OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/room/work/lhf/alldata/aishell2_100speaker_list_2_8k'
   # NOISE_DIR = '/all_data/many_noise' # for docker
-  NOISE_DIR = '/home/room/work/lhf/alldata/many_noise'
+  NOISE_DIR = '/home/room/work/lhf/alldata/many_noise_8k'
   DATA_DICT_DIR = '_data/mixed_aishell'
   # TFRECORDS_DIR = '/all_data/feature_tfrecords' # for docker
-  TFRECORDS_DIR = '/home/room/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_snrmix_wavespan32767'
+  TFRECORDS_DIR = '/home/room/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_8k_snrmix_wavespan32767'
   GENERATE_TFRECORD = False
   PROCESS_NUM_GENERATE_TFERCORD = 16
   TFRECORDS_NUM = 160  # 提多少，后面设置MAX_TFRECORD_FILES_USED表示用多少
