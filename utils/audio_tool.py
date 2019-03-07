@@ -17,7 +17,9 @@ soundfile.write(file, data, samplerate, subtype=None, endian=None, format=None, 
 
 def read_audio(file):
   data, sr = librosa.load(file)
-  data = librosa.resample(data, sr, FLAGS.PARAM.FS, res_type='kaiser_fast')
+  if sr != FLAGS.PARAM.FS:
+    data = librosa.resample(data, sr, FLAGS.PARAM.FS, res_type='kaiser_fast')
+  # librosa.output.write_wav(file, data, FLAGS.PARAM.FS)
   return data*32767, FLAGS.PARAM.FS
 
 
