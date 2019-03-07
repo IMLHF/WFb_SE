@@ -4,6 +4,7 @@ import librosa.output
 import numpy as np
 from pypesq import pesq
 from pystoi.stoi import stoi
+import soundfile as sf
 import FLAGS
 
 '''
@@ -16,17 +17,17 @@ soundfile.write(file, data, samplerate, subtype=None, endian=None, format=None, 
 
 
 def read_audio(file):
-  data, sr = librosa.load(file)
+  data, sr = sf.read(file)
   if sr != FLAGS.PARAM.FS:
     data = librosa.resample(data, sr, FLAGS.PARAM.FS, res_type='kaiser_fast')
-    print('resample wav :', file)
-  # librosa.output.write_wav(file, data, FLAGS.PARAM.FS)
+    print('resample wav(%d to %d) :' % (sr, FLAGS.PARAM.FS), file)
+    # librosa.output.write_wav(file, data, FLAGS.PARAM.FS)
   return data*32767, FLAGS.PARAM.FS
 
 
 def write_audio(file, data, sr):
   data /= 32767
-  return librosa.output.write_wav(file, data, sr)
+  return sf.write(file, data, sr)
 
 
 def get_batch_pesq_improvement(x_wav,y_wav,y_wav_est):
