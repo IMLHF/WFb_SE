@@ -72,6 +72,7 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
       print("-Testing batch %03d/%03d: " % (i,all_batch))
       time_save = time.time()
       print('  |-Decoding...')
+      sys.stdout.flush()
       mask, x_mag, x_theta, y_mag, y_theta, y_mag_est, batch_size = sess.run([model.mask,
                                                                               model.x_mag,
                                                                               model.x_theta,
@@ -98,6 +99,7 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
       print('      |-Decode cost time:',(time.time()-time_save))
       time_save = time.time()
       print('  |-Calculating PESQ...')
+      sys.stdout.flush()
       pesq_mat_t = audio_tool.get_batch_pesq_improvement(x_wav, y_wav, y_wav_est, i, set_name)
       pesq_ans_t = np.mean(pesq_mat_t,axis=-1)
       print('      |-Batch average mix-ref     PESQ :',pesq_ans_t[0])
@@ -107,6 +109,7 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
 
       time_save = time.time()
       print('  |-Calculating STOI...')
+      sys.stdout.flush()
       stoi_mat_t = audio_tool.get_batch_stoi_improvement(x_wav, y_wav, y_wav_est)
       stoi_ans_t = np.mean(stoi_mat_t,axis=-1)
       print('      |-Batch average mix-ref     STOI :',stoi_ans_t[0])
@@ -116,6 +119,7 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
 
       time_save = time.time()
       print('  |-Calculating SDR...')
+      sys.stdout.flush()
       sdr_mat_t = audio_tool.get_batch_sdr_improvement(x_wav, y_wav, y_wav_est)
       sdr_ans_t = np.mean(sdr_mat_t,axis=-1)
       # print(np.shape(sdr_mat_t),np.shape(sdr_ans_t))
@@ -123,6 +127,7 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
       print('      |-Batch average enhance-ref SDR :',sdr_ans_t[1])
       print('      |-Batch average improved    SDR :',sdr_ans_t[2])
       print('      |-Calculate SDR cost time:',(time.time()-time_save))
+      sys.stdout.flush()
 
       if pesq_mat is None:
         pesq_mat = pesq_mat_t
