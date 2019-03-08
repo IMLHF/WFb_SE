@@ -10,7 +10,9 @@ from models.lstm_SE import SE_MODEL
 from FLAGS import PARAM
 import math
 from dataManager.mixed_aishell_8k_tfrecord_io import generate_tfrecord, get_batch_use_tfdata
+import time
 
+os.environ['CUDA_VISIBLE_DEVICES'] = sys.argv[1]
 tf.logging.set_verbosity(tf.logging.INFO)
 
 def _build_model_use_tfdata(test_set_tfrecords_dir, ckpt_dir):
@@ -68,6 +70,8 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
     try:
       i += 1
       print("-Testing batch %03d/%03d: " % (i,all_batch))
+      time_save = time.time()
+      print('  |-Decoding...')
       mask, x_mag, x_theta, y_mag, y_theta, y_mag_est, batch_size = sess.run([model.mask,
                                                                               model.x_mag,
                                                                               model.x_theta,
@@ -90,26 +94,35 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
                                                PARAM.OVERLAP,
                                                PARAM.GRIFFIN_ITERNUM,
                                                x_wav_t) for y_mag_est_t, x_wav_t in zip(y_mag_est, x_wav)]
+
+      print('      |-Decode cost time:',(time.time()-time_save))
+      time_save = time.time()
       print('  |-Calculating PESQ...')
       pesq_mat_t = audio_tool.get_batch_pesq_improvement(x_wav, y_wav, y_wav_est, i, set_name)
       pesq_ans_t = np.mean(pesq_mat_t,axis=-1)
       print('      |-Batch average mix-ref     PESQ :',pesq_ans_t[0])
       print('      |-Batch average enhance-ref PESQ :',pesq_ans_t[1])
       print('      |-Batch average improved    PESQ :',pesq_ans_t[2])
+      print('      |-Calculate PESQ cost time:',(time.time()-time_save))
 
+      time_save = time.time()
       print('  |-Calculating STOI...')
       stoi_mat_t = audio_tool.get_batch_stoi_improvement(x_wav, y_wav, y_wav_est)
       stoi_ans_t = np.mean(stoi_mat_t,axis=-1)
       print('      |-Batch average mix-ref     STOI :',stoi_ans_t[0])
       print('      |-Batch average enhance-ref STOI :',stoi_ans_t[1])
       print('      |-Batch average improved    STOI :',stoi_ans_t[2])
+      print('      |-Calculate STOI cost time:',(time.time()-time_save))
 
+      time_save = time.time()
       print('  |-Calculating SDR...')
       sdr_mat_t = audio_tool.get_batch_sdr_improvement(x_wav, y_wav, y_wav_est)
       sdr_ans_t = np.mean(sdr_mat_t,axis=-1)
+      # print(np.shape(sdr_mat_t),np.shape(sdr_ans_t))
       print('      |-Batch average mix-ref     SDR :',sdr_ans_t[0])
       print('      |-Batch average enhance-ref SDR :',sdr_ans_t[1])
       print('      |-Batch average improved    SDR :',sdr_ans_t[2])
+      print('      |-Calculate SDR cost time:',(time.time()-time_save))
 
       if pesq_mat is None:
         pesq_mat = pesq_mat_t
