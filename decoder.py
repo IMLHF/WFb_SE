@@ -104,6 +104,9 @@ if __name__=='__main__':
     waveData, sr = audio_tool.read_audio(mixed_dir)
     reY, mask = decode_one_wav(sess,model,waveData)
     print(np.max(reY))
+    abs_max = (2 ** PARAM.AUDIO_BITS-1)
+    reY = np.where(reY>abs_max,abs_max,reY)
+    reY = np.where(reY<-abs_max,-abs_max,reY)
     audio_tool.write_audio(os.path.join(decode_ans_file,
                                         ('%3d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
                            reY,

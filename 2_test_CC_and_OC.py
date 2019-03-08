@@ -98,6 +98,9 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
 
       # Prevent overflow
       abs_max = (2 ** PARAM.AUDIO_BITS-1)
+      x_wav = np.array(x_wav)
+      y_wav = np.array(y_wav)
+      y_wav_est = np.array(y_wav_est)
       x_wav = np.where(x_wav>abs_max,abs_max,x_wav)
       x_wav = np.where(x_wav<-abs_max,-abs_max,x_wav)
       y_wav = np.where(y_wav>abs_max,abs_max,y_wav)
