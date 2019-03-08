@@ -38,6 +38,7 @@ def picture_wave(wave_t, name, framerate):
 
 def magnitude_spectrum_librosa_stft(signal, NFFT, overlap):
   '''
+  signal: [wave_len]
   return mag_spec:[time,fft_dot]
   '''
   signal = np.array(signal, dtype=np.float32)
@@ -51,6 +52,7 @@ def magnitude_spectrum_librosa_stft(signal, NFFT, overlap):
 
 def phase_spectrum_librosa_stft(signal, NFFT, overlap):
   '''
+  signal: [wave_len]
   return theta:[time, angle_vector]
   '''
   signal = np.array(signal, dtype=np.float)
@@ -65,6 +67,7 @@ def phase_spectrum_librosa_stft(signal, NFFT, overlap):
 def librosa_istft(magnitude_complex, NFFT, overlap):
   '''
   magnitude_complex:[time,frequence]
+  return: [wave_len]
   '''
   tmp = librosa.core.istft(magnitude_complex.T,
                            win_length=NFFT,
