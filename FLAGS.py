@@ -98,7 +98,7 @@ class C001(base_config): #
 class C002(base_config):  #
   INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'log_mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   INIT_LOG_BIAS = 0
 
