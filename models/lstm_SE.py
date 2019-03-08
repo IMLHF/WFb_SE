@@ -77,7 +77,7 @@ class SE_MODEL(object):
       self._norm_y_logmag_spec = norm_logmag_spec(self._y_mag_spec, self._log_bias)
 
     self._lengths = lengths_batch
-    self.batch_size = tf.shape(self._lengths)[0]
+    self._batch_size = tf.shape(self._lengths)[0]
 
     self._x_theta = theta_x_batch
     self._y_theta = theta_y_batch
@@ -166,7 +166,7 @@ class SE_MODEL(object):
                                initializer=tf.constant_initializer(0.0))
       mask = tf.nn.relu(tf.matmul(outputs, weights) + biases)
       self._mask = tf.reshape(
-          mask, [self.batch_size, -1, PARAM.OUTPUT_SIZE])
+          mask, [self._batch_size, -1, PARAM.OUTPUT_SIZE])
 
     self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
     if infer:
@@ -212,7 +212,7 @@ class SE_MODEL(object):
     '''
     description: logbias of log(x+logbias)
     type: >0
-    dims: [1]
+    dims: [0]
     '''
     return self._real_logbias
 
@@ -273,18 +273,27 @@ class SE_MODEL(object):
   @property
   def lengths(self):
     '''
-    description: dynamic batch_size
-    type: an int number
-    dims: [1]
+    description: dynamic time length
+    type: an int list
+    dims: [batch]
     '''
     return self._lengths
+
+  @property
+  def batch_size(self):
+    '''
+    description: dynamic batch_size
+    type: an int number
+    dims: [0]
+    '''
+    return self._batch_size
 
   @property
   def lr(self):
     '''
     description: learning rate
     type:
-    dims: [1]
+    dims: [0]
     '''
     return self._lr
 
@@ -293,7 +302,7 @@ class SE_MODEL(object):
     '''
     description: model loss
     type:
-    dims: [1]
+    dims: [0]
     '''
     return self._loss
 
