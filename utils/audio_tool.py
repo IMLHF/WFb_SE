@@ -7,6 +7,7 @@ from pystoi.stoi import stoi
 import soundfile as sf
 import FLAGS
 import time
+import os
 
 '''
 soundfile.info(file, verbose=False)
@@ -30,13 +31,24 @@ def write_audio(file, data, sr):
   return sf.write(file, data/(2 ^ FLAGS.PARAM.AUDIO_BITS-1), sr)
 
 
-def get_batch_pesq_improvement(x_wav,y_wav,y_wav_est):
+def get_batch_pesq_improvement(x_wav,y_wav,y_wav_est,batch_num,set_name):
   '''
   inputs:
     x_wav, y_wav, y_wav_est: [batch,wave]
   return:
      mixture pesq, enhanced pesq, pesq improvement: [batch]
   '''
+  if FLAGS.PARAM.GET_AUDIO_IN_TEST:
+    decode_ans_file = os.path.join(FLAGS.PARAM.SAVE_DIR,'decode_'+FLAGS.PARAM.CHECK_POINT, set_name)
+    if not os.path.exists(decode_ans_file):
+      os.makedirs(decode_ans_file)
+    for i, ref, cleaned, mixed in zip(range(len(y_wav)), y_wav, y_wav_est, x_wav):
+      write_audio(os.path.join(decode_ans_file, "%04d_%03d_ref.wav" % (batch_num, i)),
+                  ref, FLAGS.PARAM.FS)
+      write_audio(os.path.join(decode_ans_file, "%04d_%03d_cleaned.wav" % (batch_num, i)),
+                  cleaned, FLAGS.PARAM.FS)
+      write_audio(os.path.join(decode_ans_file, "%04d_%03d_mixed.wav" % (batch_num, i)),
+                  mixed, FLAGS.PARAM.FS)
   # calculate PESQ improvement
   pesq_ref_cleaned_list = [pesq(ref/(2 ^ FLAGS.PARAM.AUDIO_BITS-1),
                                 cleaned/(2 ^ FLAGS.PARAM.AUDIO_BITS-1),
@@ -75,4 +87,4 @@ def get_batch_stoi_improvement(x_wav,y_wav,y_wav_est):
 
 
 def get_batch_sdr_improvement(x_wav,y_wav,y_wav_est):
-  return np.array([0])
+  return np.array([[1,1],[2,2],[3,3]])
