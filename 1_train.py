@@ -42,7 +42,7 @@ def train_one_epoch(sess, tr_model):
                            "DURATION %06dS") % (
                                i + 1, avg_loss, lr, log_bias, costtime)
         tf.logging.info(train_epoch_msg)
-        with open(os.path.join(PARAM.SAVE_DIR, 'train_'+PARAM.CHECK_POINT+'.log'), 'a+') as f:
+        with open(os.path.join(PARAM.SAVE_DIR, PARAM.CHECK_POINT+'_train.log'), 'a+') as f:
           f.writelines(train_epoch_msg+'\n')
         sys.stdout.flush()
       i += 1
@@ -124,11 +124,11 @@ def train():
         best_path = ckpt.model_checkpoint_path
       else:
         tf.logging.fatal("checkpoint not found")
-      with open(os.path.join(PARAM.SAVE_DIR, 'train_'+PARAM.CHECK_POINT+'.log'), 'a+') as f:
+      with open(os.path.join(PARAM.SAVE_DIR, PARAM.CHECK_POINT+'_train.log'), 'a+') as f:
         f.writelines('Training resumed.\n')
     else:
-      if os.path.exists(os.path.join(PARAM.SAVE_DIR, 'train.log')):
-        os.remove(os.path.join(PARAM.SAVE_DIR, 'train.log'))
+      if os.path.exists(os.path.join(PARAM.SAVE_DIR, PARAM.CHECK_POINT+'_train.log')):
+        os.remove(os.path.join(PARAM.SAVE_DIR, PARAM.CHECK_POINT+'_train.log'))
     # endregion
 
     # region validation before training.
@@ -139,7 +139,7 @@ def train():
     cross_val_msg = "CROSSVAL PRERUN AVG.LOSS %.4F  costime %dS" % (
         loss_prev, time.time()-valstart_time)
     tf.logging.info(cross_val_msg)
-    with open(os.path.join(PARAM.SAVE_DIR, 'train_'+PARAM.CHECK_POINT+'.log'), 'a+') as f:
+    with open(os.path.join(PARAM.SAVE_DIR, PARAM.CHECK_POINT+'_train.log'), 'a+') as f:
       f.writelines(cross_val_msg+'\n')
 
     tr_model.assign_lr(sess, PARAM.learning_rate)
@@ -199,7 +199,7 @@ def train():
             tr_loss, model_lr, val_loss, log_bias,
             "NNET Rejected", ckpt_name, end_time - start_time)
         tf.logging.info(msg)
-      with open(os.path.join(PARAM.SAVE_DIR, 'train_'+PARAM.CHECK_POINT+'.log'), 'a+') as f:
+      with open(os.path.join(PARAM.SAVE_DIR, PARAM.CHECK_POINT+'_train.log'), 'a+') as f:
         f.writelines(msg+'\n')
 
       # Start halving when improvement is lower than start_halving_impr
