@@ -116,6 +116,14 @@ class C003(base_config):
 
 # 002和003对比看mask最佳位置，001和003对比看对数谱和幅度谱哪个做loss较好
 
+class C004(base_config):  #
+  CHECK_POINT = 'nnet_C004'
+  INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 50
+
 class CXX(base_config):  #
   INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -125,5 +133,5 @@ class CXX(base_config):  #
   LOG_BIAS_TRAINABEL = True
 
 
-PARAM = C001
+PARAM = C004
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
