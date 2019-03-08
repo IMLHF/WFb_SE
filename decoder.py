@@ -87,14 +87,17 @@ if __name__=='__main__':
     os.makedirs(decode_ans_file)
   sess, model = build_session(ckpt)
 
-  decode_file_list = ['exp/rnn_speech_enhancement/2_00_MIX_1_clapping.wav',
-                      'exp/rnn_speech_enhancement/speech5_8k.wav',
-                      'exp/rnn_speech_enhancement/speech0_8k.wav',]
+  decode_file_list = [
+      'exp/rnn_speech_enhancement/2_00_MIX_1_clapping.wav',
+      'exp/rnn_speech_enhancement/speech5_8k.wav',
+      'exp/rnn_speech_enhancement/speech0_8k.wav',
+  ]
 
   for i, mixed_dir in enumerate(decode_file_list):
     print(i+1,mixed_dir)
     waveData, sr = audio_tool.read_audio(mixed_dir)
     reY, mask = decode_one_wav(sess,model,waveData)
+    print(np.max(reY))
     audio_tool.write_audio(os.path.join(decode_ans_file,
                                         ('%3d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
                            reY,
