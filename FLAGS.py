@@ -96,6 +96,7 @@ class C001(base_config): #
 
 
 class C002(base_config):  #
+  CHECK_POINT = 'nnet_C002'
   INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
@@ -104,6 +105,7 @@ class C002(base_config):  #
 
 
 class C003(base_config):
+  CHECK_POINT = 'nnet_C003'
   INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
