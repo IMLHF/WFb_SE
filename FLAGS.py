@@ -82,6 +82,8 @@ class base_config:
   MAX_COEF = 1.0  # 以不同系数混合
   MIN_COEF = 0
 
+  GET_AUDIO_IN_TEST = False
+
 
 class C001(base_config): #
   CHECK_POINT = 'nnet_C001'
