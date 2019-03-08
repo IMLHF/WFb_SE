@@ -17,9 +17,15 @@ def build_session(ckpt_dir):
       with tf.name_scope('input'):
         x_batch = tf.placeholder(tf.float32,shape=[1,None,PARAM.INPUT_SIZE],name='x_batch')
         lengths_batch = tf.placeholder(tf.int32,shape=[1],name='lengths_batch')
+        y_batch = tf.placeholder(tf.float32,shape=[1,None,PARAM.INPUT_SIZE],name='y_batch')
+        x_theta = tf.placeholder(tf.float32,shape=[1,None,PARAM.INPUT_SIZE],name='x_theta')
+        y_theta = tf.placeholder(tf.float32,shape=[1,None,PARAM.INPUT_SIZE],name='y_theta')
     with tf.name_scope('model'):
       model = SE_MODEL(x_batch,
                        lengths_batch,
+                       y_batch,
+                       x_theta,
+                       y_theta,
                        infer=True)
 
     init = tf.group(tf.global_variables_initializer(),
