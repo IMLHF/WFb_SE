@@ -96,6 +96,15 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
                                                PARAM.GRIFFIN_ITERNUM,
                                                x_wav_t) for y_mag_est_t, x_wav_t in zip(y_mag_est, x_wav)]
 
+      # Prevent overflow
+      abs_max = (2 ** PARAM.AUDIO_BITS-1)
+      x_wav = np.where(x_wav>abs_max,abs_max,x_wav)
+      x_wav = np.where(x_wav<-abs_max,-abs_max,x_wav)
+      y_wav = np.where(y_wav>abs_max,abs_max,y_wav)
+      y_wav = np.where(y_wav<-abs_max,-abs_max,y_wav)
+      y_wav_est = np.where(y_wav_est>abs_max,abs_max,y_wav_est)
+      y_wav_est = np.where(y_wav_est<-abs_max,-abs_max,y_wav_est)
+
       print('      |-Decode cost time:',(time.time()-time_save))
       time_save = time.time()
       print('  |-Calculating PESQ...')
