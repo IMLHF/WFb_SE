@@ -8,6 +8,7 @@ import soundfile as sf
 import FLAGS
 import time
 import os
+import shutil
 
 '''
 soundfile.info(file, verbose=False)
@@ -40,6 +41,8 @@ def get_batch_pesq_improvement(x_wav,y_wav,y_wav_est,batch_num,set_name):
   '''
   if FLAGS.PARAM.GET_AUDIO_IN_TEST:
     decode_ans_file = os.path.join(FLAGS.PARAM.SAVE_DIR,'decode_'+FLAGS.PARAM.CHECK_POINT, set_name)
+    if os.path.exists(decode_ans_file) and batch_num == 1:
+      shutil.rmtree(decode_ans_file)
     if not os.path.exists(decode_ans_file):
       os.makedirs(decode_ans_file)
     for i, ref, cleaned, mixed in zip(range(len(y_wav)), y_wav, y_wav_est, x_wav):
