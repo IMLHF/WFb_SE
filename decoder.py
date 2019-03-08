@@ -97,6 +97,7 @@ if __name__=='__main__':
       'exp/rnn_speech_enhancement/2_00_MIX_1_clapping.wav',
       'exp/rnn_speech_enhancement/speech5_8k.wav',
       'exp/rnn_speech_enhancement/speech0_8k.wav',
+      'exp/rnn_speech_enhancement/speech1_8k.wav'
   ]
 
   for i, mixed_dir in enumerate(decode_file_list):
