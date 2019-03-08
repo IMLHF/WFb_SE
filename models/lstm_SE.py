@@ -305,4 +305,3 @@ class SE_MODEL(object):
     dims:
     '''
     return self._train_op
-
