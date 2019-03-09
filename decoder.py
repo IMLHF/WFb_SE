@@ -94,10 +94,13 @@ if __name__=='__main__':
   sess, model = build_session(ckpt)
 
   decode_file_list = [
-      'exp/rnn_speech_enhancement/2_00_MIX_1_clapping.wav',
+      'exp/rnn_speech_enhancement/s_2_00_MIX_1_clapping_8k.wav',
+      'exp/rnn_speech_enhancement/s_8_01_MIX_4_rainning_8k.wav',
+      'exp/rnn_speech_enhancement/s_8_21_MIX_3_factory_8k.wav',
+      'exp/rnn_speech_enhancement/speech1_8k.wav',
       'exp/rnn_speech_enhancement/speech5_8k.wav',
-      'exp/rnn_speech_enhancement/speech0_8k.wav',
-      'exp/rnn_speech_enhancement/speech1_8k.wav'
+      'exp/rnn_speech_enhancement/speech6_8k.wav',
+      'exp/rnn_speech_enhancement/speech7_8k.wav',
   ]
 
   for i, mixed_dir in enumerate(decode_file_list):
