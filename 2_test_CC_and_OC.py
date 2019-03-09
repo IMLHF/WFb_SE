@@ -156,11 +156,19 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
   sdr_ans = np.mean(sdr_mat,axis=-1)
   return {'pesq':pesq_ans, 'stoi':stoi_ans, 'sdr':sdr_ans}
 
-def test_CC_and_OC():
+def test_CC_and_OC(test_set_name):
   ckpt_dir = PARAM.CHECK_POINT
   _, _, testcc_tfrecords_dir, testoc_tfrecords_dir = generate_tfrecord(
       gen=PARAM.GENERATE_TFRECORD)
-  pesq_ans, stoi_ans, sdr_ans = get_PESQ_STOI_SDR(testcc_tfrecords_dir, ckpt_dir, set_name='test_cc')
+  if test_set_name == 'test_cc':
+    tfrecord_dir = testcc_tfrecords_dir
+  elif test_set_name == 'test_oc':
+    tfrecord_dir = testoc_tfrecords_dir
+  else:
+    print(test_set_name,'not exist.')
+    exit(-1)
+
+  pesq_ans, stoi_ans, sdr_ans = get_PESQ_STOI_SDR(tfrecord_dir, ckpt_dir, set_name=test_set_name)
   print(pesq_ans)
   print(stoi_ans)
   print(sdr_ans)
@@ -173,4 +181,6 @@ def test_CC_and_OC():
     f.write('\n')
 
 if __name__ == "__main__":
-  test_CC_and_OC()
+  test_CC_and_OC(str(sys.argv[2]))
+  # python3 2_test_CC_and_OC.py 0 test_cc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_C001_testcc.log
+  # python3 2_test_CC_and_OC.py 0 test_oc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_C001_testoc.log
