@@ -96,8 +96,8 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
                                                PARAM.GRIFFIN_ITERNUM,
                                                x_wav_t) for y_mag_est_t, x_wav_t in zip(y_mag_est, x_wav)]
 
-      # Prevent overflow
-      abs_max = (2 ** PARAM.AUDIO_BITS-1)
+      # Prevent overflow (else PESQ crashed)
+      abs_max = (2 ** (PARAM.AUDIO_BITS-1) - 1)
       x_wav = np.array(x_wav)
       y_wav = np.array(y_wav)
       y_wav_est = np.array(y_wav_est)

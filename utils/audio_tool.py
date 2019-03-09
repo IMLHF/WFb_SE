@@ -10,6 +10,8 @@ import time
 import os
 import shutil
 
+AMP_MAX = (2 ** (FLAGS.PARAM.AUDIO_BITS - 1) - 1)
+
 '''
 soundfile.info(file, verbose=False)
 soundfile.available_formats()
@@ -25,11 +27,11 @@ def read_audio(file):
     data = librosa.resample(data, sr, FLAGS.PARAM.FS, res_type='kaiser_fast')
     print('resample wav(%d to %d) :' % (sr, FLAGS.PARAM.FS), file)
     # librosa.output.write_wav(file, data, FLAGS.PARAM.FS)
-  return data*(2 ** FLAGS.PARAM.AUDIO_BITS-1), FLAGS.PARAM.FS
+  return data*AMP_MAX, FLAGS.PARAM.FS
 
 
 def write_audio(file, data, sr):
-  return sf.write(file, data/(2 ** FLAGS.PARAM.AUDIO_BITS-1), sr)
+  return sf.write(file, data/AMP_MAX, sr)
 
 
 def get_batch_pesq_improvement(x_wav,y_wav,y_wav_est,batch_num,set_name):
@@ -53,12 +55,12 @@ def get_batch_pesq_improvement(x_wav,y_wav,y_wav_est,batch_num,set_name):
       write_audio(os.path.join(decode_ans_file, "%04d_%03d_mixed.wav" % (batch_num, i)),
                   mixed, FLAGS.PARAM.FS)
   # calculate PESQ improvement
-  pesq_ref_cleaned_list = [pesq(ref/(2 ** FLAGS.PARAM.AUDIO_BITS-1),
-                                cleaned/(2 ** FLAGS.PARAM.AUDIO_BITS-1),
+  pesq_ref_cleaned_list = [pesq(ref/AMP_MAX,
+                                cleaned/AMP_MAX,
                                 FLAGS.PARAM.FS)
                            for ref, cleaned in zip(y_wav, y_wav_est)]
-  pesq_ref_mixed_list = [pesq(ref/(2 ** FLAGS.PARAM.AUDIO_BITS-1),
-                              mixed/(2 ** FLAGS.PARAM.AUDIO_BITS-1),
+  pesq_ref_mixed_list = [pesq(ref/AMP_MAX,
+                              mixed/AMP_MAX,
                               FLAGS.PARAM.FS)
                          for ref, mixed in zip(y_wav, x_wav)]
   pesq_ref_cleaned_vec = np.array(pesq_ref_cleaned_list)
@@ -75,12 +77,12 @@ def get_batch_stoi_improvement(x_wav,y_wav,y_wav_est):
      mixture stoi, enhanced stoi, stoi improvement: [batch]
   '''
   # calculate STOI improvement
-  stoi_ref_cleaned_list = [stoi(ref/(2 ** FLAGS.PARAM.AUDIO_BITS-1),
-                                cleaned/(2 ** FLAGS.PARAM.AUDIO_BITS-1),
+  stoi_ref_cleaned_list = [stoi(ref/AMP_MAX,
+                                cleaned/AMP_MAX,
                                 FLAGS.PARAM.FS)
                            for ref, cleaned in zip(y_wav, y_wav_est)]
-  stoi_ref_mixed_list = [stoi(ref/(2 ** FLAGS.PARAM.AUDIO_BITS-1),
-                              mixed/(2 ** FLAGS.PARAM.AUDIO_BITS-1),
+  stoi_ref_mixed_list = [stoi(ref/AMP_MAX,
+                              mixed/AMP_MAX,
                               FLAGS.PARAM.FS)
                          for ref, mixed in zip(y_wav, x_wav)]
   stoi_ref_cleaned_vec = np.array(stoi_ref_cleaned_list)
