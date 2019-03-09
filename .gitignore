@@ -6,3 +6,4 @@
 /.editorconfig
 /*/exclude.lst
 /.*
+/test_*
