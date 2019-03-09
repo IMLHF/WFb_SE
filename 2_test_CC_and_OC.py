@@ -56,8 +56,8 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
   '''
   x_mag : magnitude spectrum of mixed audio.
   x_theta : angle of mixed audio's complex spectrum.
-  y_ : clean(label) audio's ...
-  y_xx_est " estimate audio's ...
+  y_xxx : clean(label) audio's xxx.
+  y_xxx_est " estimate audio's xxx.
   '''
   sess, model, iter_test = _build_model_use_tfdata(test_set_tfrecords_dir, ckpt_dir)
   sess.run(iter_test.initializer)
