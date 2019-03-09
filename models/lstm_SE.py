@@ -28,8 +28,7 @@ def norm_logmag_spec(mag_spec, log_bias):
 
 # Inverse process of norm_mag_spec()
 def rm_norm_mag_spec(normed_mag):
-  normed_mag *= (PARAM.MAG_NORM_MAX - 0)
-  mag_spec = normed_mag
+  mag_spec = normed_mag * (PARAM.MAG_NORM_MAX - 0)
   return mag_spec
 
 # Inverse process of norm_logmag_spec()
@@ -37,10 +36,10 @@ def rm_norm_logmag_spec(normed_logmag, log_bias):
   LOG_NORM_MIN = tf.log(tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS) / tf.log(10.0)
   LOG_NORM_MAX = tf.log(tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS+PARAM.MAG_NORM_MAX) / tf.log(10.0)
 
-  normed_logmag *= (LOG_NORM_MAX - LOG_NORM_MIN)
-  normed_logmag += LOG_NORM_MIN
-  normed_logmag *= tf.log(10.0)
-  mag_spec = tf.exp(normed_logmag) - DEFAULT_LOG_BIAS - tf.nn.relu(log_bias)
+  mag_spec = normed_logmag * (LOG_NORM_MAX - LOG_NORM_MIN)
+  mag_spec += LOG_NORM_MIN
+  mag_spec *= tf.log(10.0)
+  mag_spec = tf.exp(mag_spec) - DEFAULT_LOG_BIAS - tf.nn.relu(log_bias)
   return mag_spec
 
 #
