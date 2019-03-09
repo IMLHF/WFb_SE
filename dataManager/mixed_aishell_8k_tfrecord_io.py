@@ -210,7 +210,9 @@ def _extract_feature_x_y_xtheta_ytheta(utt_dir1, utt_dir2):
   y_theta = _extract_phase(waveData1)
   # print('-------------------------------------------')
   # print(np.max(X),'----',np.min(X),'----',np.mean(X),'----',np.sqrt(np.var(X)))
-  # print(np.max(Y),'----',np.max(Y),'----',np.mean(Y),'----',np.sqrt(np.var(Y)))
+  # print(np.max(Y),'----',np.min(Y),'----',np.mean(Y),'----',np.sqrt(np.var(Y)))
+  # PARAM.CLIP_NORM = np.max([np.max(X),np.max(Y),PARAM.CLIP_NORM])
+  # print(PARAM.CLIP_NORM)
 
   return [X, Y, x_theta, y_theta]
 
