@@ -69,9 +69,10 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
   while True:
     try:
       i += 1
-      print("-Testing batch %03d/%03d: " % (i,all_batch))
+      if i<=all_batch:
+        print("-Testing batch %03d/%03d: " % (i,all_batch))
+        print('  |-Decoding...')
       time_save = time.time()
-      print('  |-Decoding...')
       sys.stdout.flush()
       mask, x_mag, x_theta, y_mag, y_theta, y_mag_est, batch_size = sess.run([model.mask,
                                                                               model.x_mag,
@@ -97,7 +98,7 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
                                                x_wav_t) for y_mag_est_t, x_wav_t in zip(y_mag_est, x_wav)]
 
       # Prevent overflow (else PESQ crashed)
-      abs_max = (2 ** (PARAM.AUDIO_BITS-1) - 1)
+      abs_max = (2 ** (PARAM.AUDIO_BITS - 1) - 1)
       x_wav = np.array(x_wav)
       y_wav = np.array(y_wav)
       y_wav_est = np.array(y_wav_est)
@@ -154,7 +155,16 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
   pesq_ans = np.mean(pesq_mat,axis=-1)
   stoi_ans = np.mean(stoi_mat,axis=-1)
   sdr_ans = np.mean(sdr_mat,axis=-1)
-  return {'pesq':pesq_ans, 'stoi':stoi_ans, 'sdr':sdr_ans}
+  print('avg_pesq      raw:',pesq_ans[0])
+  print('avg_pesq enhanced:',pesq_ans[1])
+  print('avg_pesq      imp:',pesq_ans[2])
+  print('avg_stoi      raw:',stoi_ans[0])
+  print('avg_stoi enhanced:',stoi_ans[1])
+  print('avg_stoi      imp:',stoi_ans[2])
+  print('avg_sdr      raw:',sdr_ans[0])
+  print('avg_sdr enhanced:',sdr_ans[1])
+  print('avg_sdr      imp:',sdr_ans[2])
+  return {'pesq':list(pesq_ans), 'stoi':list(stoi_ans), 'sdr':list(sdr_ans)}
 
 def test_CC_and_OC(test_set_name):
   ckpt_dir = PARAM.CHECK_POINT
@@ -169,16 +179,16 @@ def test_CC_and_OC(test_set_name):
     exit(-1)
 
   pesq_ans, stoi_ans, sdr_ans = get_PESQ_STOI_SDR(tfrecord_dir, ckpt_dir, set_name=test_set_name)
-  print(pesq_ans)
-  print(stoi_ans)
-  print(sdr_ans)
-  with open('test_ans.log','a+') as f:
-    f.write(pesq_ans)
-    f.write('\n')
-    f.write(stoi_ans)
-    f.write('\n')
-    f.write(sdr_ans)
-    f.write('\n')
+  # print(pesq_ans)
+  # print(stoi_ans)
+  # print(sdr_ans)
+  # with open('test_ans.log','a+') as f:
+  #   f.write(pesq_ans)
+  #   f.write('\n')
+  #   f.write(stoi_ans)
+  #   f.write('\n')
+  #   f.write(sdr_ans)
+  #   f.write('\n')
 
 if __name__ == "__main__":
   test_CC_and_OC(str(sys.argv[2]))
