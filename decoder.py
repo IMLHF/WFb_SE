@@ -3,14 +3,13 @@ import numpy as np
 import sys
 import utils
 import os
-from models.lstm_SE import SE_MODEL
 import gc
 from utils import spectrum_tool
 from FLAGS import PARAM
 from utils import audio_tool
 
 
-def build_session(ckpt_dir):
+def build_session(ckpt_dir, MODEL_CLASS):
   g = tf.Graph()
   with g.as_default():
     with tf.device('/cpu:0'):
@@ -21,12 +20,12 @@ def build_session(ckpt_dir):
         x_theta = tf.placeholder(tf.float32,shape=[1,None,PARAM.INPUT_SIZE],name='x_theta')
         y_theta = tf.placeholder(tf.float32,shape=[1,None,PARAM.INPUT_SIZE],name='y_theta')
     with tf.name_scope('model'):
-      model = SE_MODEL(x_batch,
-                       lengths_batch,
-                       y_batch,
-                       x_theta,
-                       y_theta,
-                       infer=True)
+      model = MODEL_CLASS(x_batch,
+                          lengths_batch,
+                          y_batch,
+                          x_theta,
+                          y_theta,
+                          infer=True)
 
     init = tf.group(tf.global_variables_initializer(),
                     tf.local_variables_initializer())
@@ -56,24 +55,24 @@ def decode_one_wav(sess, model, wavedata):
   length = np.shape(x_spec_t)[0]
   x_spec = np.array([x_spec_t], dtype=np.float32)
   lengths = np.array([length], dtype=np.int32)
-  cleaned, mask, x_mag, norm_x_mag, norm_logmag = sess.run(
-      [model.cleaned, model.mask,
+  y_estimation, mask, x_mag, norm_x_mag, norm_logmag = sess.run(
+      [model.y_estimation, model.mask,
        model._x_mag_spec, model._norm_x_mag_spec, model._norm_x_logmag_spec],
       feed_dict={
-        model.x_mag: x_spec,
-        model.lengths: lengths,
+          model.x_mag: x_spec,
+          model.lengths: lengths,
       })
 
-  cleaned = np.array(cleaned[0])
+  y_estimation = np.array(y_estimation[0])
   mask = np.array(mask[0])
-  print(np.shape(cleaned),np.shape(mask))
+  print(np.shape(y_estimation), np.shape(mask))
   if PARAM.RESTORE_PHASE == 'MIXED':
-    cleaned = cleaned*np.exp(1j*spectrum_tool.phase_spectrum_librosa_stft(wavedata,
-                                                                          PARAM.NFFT,
-                                                                          PARAM.OVERLAP))
-    reY = spectrum_tool.librosa_istft(cleaned, PARAM.NFFT, PARAM.OVERLAP)
-  elif PARAM.RESTORE_PHASE =='GRIFFIN_LIM':
-    reY = spectrum_tool.griffin_lim(cleaned,
+    y_estimation = y_estimation*np.exp(1j*spectrum_tool.phase_spectrum_librosa_stft(wavedata,
+                                                                                    PARAM.NFFT,
+                                                                                    PARAM.OVERLAP))
+    reY = spectrum_tool.librosa_istft(y_estimation, PARAM.NFFT, PARAM.OVERLAP)
+  elif PARAM.RESTORE_PHASE == 'GRIFFIN_LIM':
+    reY = spectrum_tool.griffin_lim(y_estimation,
                                     PARAM.NFFT,
                                     PARAM.OVERLAP,
                                     PARAM.GRIFFIN_ITERNUM,
@@ -91,7 +90,7 @@ if __name__=='__main__':
   decode_ans_file = os.path.join(PARAM.SAVE_DIR,'decode_'+ckpt)
   if not os.path.exists(decode_ans_file):
     os.makedirs(decode_ans_file)
-  sess, model = build_session(ckpt)
+  sess, model = build_session(ckpt, PARAM.SE_MODEL)
 
   decode_file_list = [
       'exp/rnn_speech_enhancement/s_2_00_MIX_1_clapping_8k.wav',
