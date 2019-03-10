@@ -13,7 +13,7 @@ import utils
 from utils import audio_tool
 from utils import spectrum_tool
 from numpy import linalg
-from FLAGS import PARAM
+import FLAGS
 
 FILE_NAME = __file__[max(__file__.rfind('/')+1, 0):__file__.rfind('.')]
 
@@ -51,18 +51,18 @@ def _ini_data(close_condition_wav_dir, open_condition_wav_dir, noise_dir, out_di
     if os.path.isdir(cc_speaker_dir):
       speaker_wav_list = os.listdir(cc_speaker_dir)
       speaker_wav_list.sort()
-      for wav in speaker_wav_list[:PARAM.UTT_SEG_FOR_MIX[0]]:
+      for wav in speaker_wav_list[:FLAGS.PARAM.UTT_SEG_FOR_MIX[0]]:
         # 清洗长度为0的数据
         wav_dir = os.path.join(cc_speaker_dir, wav)
         if wav[-4:] == ".wav" and os.path.getsize(wav_dir) > 2048:
           cwl_train_file.write(wav_dir+'\n')
           clean_wav_list_train.append(wav_dir)
-      for wav in speaker_wav_list[PARAM.UTT_SEG_FOR_MIX[0]:PARAM.UTT_SEG_FOR_MIX[1]]:
+      for wav in speaker_wav_list[FLAGS.PARAM.UTT_SEG_FOR_MIX[0]:FLAGS.PARAM.UTT_SEG_FOR_MIX[1]]:
         wav_dir = os.path.join(cc_speaker_dir, wav)
         if wav[-4:] == ".wav" and os.path.getsize(wav_dir) > 2048:
           cwl_validation_file.write(wav_dir+'\n')
           clean_wav_list_validation.append(wav_dir)
-      for wav in speaker_wav_list[PARAM.UTT_SEG_FOR_MIX[1]:]:
+      for wav in speaker_wav_list[FLAGS.PARAM.UTT_SEG_FOR_MIX[1]:]:
         wav_dir = os.path.join(cc_speaker_dir, wav)
         if wav[-4:] == ".wav" and os.path.getsize(wav_dir) > 2048:
           cwl_test_cc_file.write(wav_dir+'\n')
@@ -95,8 +95,8 @@ def _ini_data(close_condition_wav_dir, open_condition_wav_dir, noise_dir, out_di
   noise_wav_list = os.listdir(noise_dir)
   noise_wav_list = [os.path.join(noise_dir, noise) for noise in noise_wav_list]
 
-  dataset_names = PARAM.DATASET_NAMES
-  dataset_mixedutt_num = PARAM.DATASET_SIZES
+  dataset_names = FLAGS.PARAM.DATASET_NAMES
+  dataset_mixedutt_num = FLAGS.PARAM.DATASET_SIZES
   all_mixed = 0
   all_stime = time.time()
   cwl_list = [clean_wav_list_train,
@@ -144,23 +144,23 @@ def _ini_data(close_condition_wav_dir, open_condition_wav_dir, noise_dir, out_di
 
 def _get_padad_waveData(file):
   waveData, sr = audio_tool.read_audio(file)
-  if(sr != PARAM.FS):
+  if(sr != FLAGS.PARAM.FS):
     print("Audio samplerate error.")
     exit(-1)
 
-  while len(waveData) < PARAM.LEN_WAWE_PAD_TO:
+  while len(waveData) < FLAGS.PARAM.LEN_WAWE_PAD_TO:
     waveData = np.tile(waveData, 2)
 
   len_wave = len(waveData)
-  wave_begin = np.random.randint(len_wave-PARAM.LEN_WAWE_PAD_TO+1)
-  waveData = waveData[wave_begin:wave_begin+PARAM.LEN_WAWE_PAD_TO]
+  wave_begin = np.random.randint(len_wave-FLAGS.PARAM.LEN_WAWE_PAD_TO+1)
+  waveData = waveData[wave_begin:wave_begin+FLAGS.PARAM.LEN_WAWE_PAD_TO]
 
   return waveData
 
 
 def _mix_wav_by_SNR(waveData, noise):
   # S = (speech+alpha*noise)/(1+alpha)
-  snr = np.random.randint(PARAM.MIN_SNR, PARAM.MAX_SNR+1)
+  snr = np.random.randint(FLAGS.PARAM.MIN_SNR, FLAGS.PARAM.MAX_SNR+1)
   As = linalg.norm(waveData)
   An = linalg.norm(noise)
 
@@ -170,7 +170,7 @@ def _mix_wav_by_SNR(waveData, noise):
 
 
 def _mix_wav_LINEAR(waveData, noise):
-  coef = np.random.random()*(PARAM.MAX_COEF-PARAM.MIN_COEF)+PARAM.MIN_COEF
+  coef = np.random.random()*(FLAGS.PARAM.MAX_COEF-FLAGS.PARAM.MIN_COEF)+FLAGS.PARAM.MIN_COEF
   waveMix = (waveData+coef*noise)/(1.0+coef)
   return waveMix
 
@@ -178,14 +178,14 @@ def _mix_wav_LINEAR(waveData, noise):
 def _extract_mag_spec(data):
   # 幅度谱
   mag_spec = spectrum_tool.magnitude_spectrum_librosa_stft(
-      data, PARAM.NFFT, PARAM.OVERLAP)
+      data, FLAGS.PARAM.NFFT, FLAGS.PARAM.OVERLAP)
   return mag_spec
 
 
 def _extract_phase(data):
   theta = spectrum_tool.phase_spectrum_librosa_stft(data,
-                                                    PARAM.NFFT,
-                                                    PARAM.OVERLAP)
+                                                    FLAGS.PARAM.NFFT,
+                                                    FLAGS.PARAM.OVERLAP)
   return theta
 
 
@@ -193,9 +193,9 @@ def _extract_feature_x_y_xtheta_ytheta(utt_dir1, utt_dir2):
   waveData1 = _get_padad_waveData(utt_dir1)
   waveData2 = _get_padad_waveData(utt_dir2)
   # utt2作为噪音
-  if PARAM.MIX_METHOD == 'SNR':
+  if FLAGS.PARAM.MIX_METHOD == 'SNR':
     mixedData = _mix_wav_by_SNR(waveData1, waveData2)
-  if PARAM.MIX_METHOD == 'LINEAR':
+  if FLAGS.PARAM.MIX_METHOD == 'LINEAR':
     mixedData = _mix_wav_LINEAR(waveData1, waveData2)
 
   # write mixed wav
@@ -211,21 +211,21 @@ def _extract_feature_x_y_xtheta_ytheta(utt_dir1, utt_dir2):
   # print('-------------------------------------------')
   # print(np.max(X),'----',np.min(X),'----',np.mean(X),'----',np.sqrt(np.var(X)))
   # print(np.max(Y),'----',np.min(Y),'----',np.mean(Y),'----',np.sqrt(np.var(Y)))
-  # PARAM.CLIP_NORM = np.max([np.max(X),np.max(Y),PARAM.CLIP_NORM])
-  # print(PARAM.CLIP_NORM)
+  # FLAGS.PARAM.CLIP_NORM = np.max([np.max(X),np.max(Y),FLAGS.PARAM.CLIP_NORM])
+  # print(FLAGS.PARAM.CLIP_NORM)
 
   return [X, Y, x_theta, y_theta]
 
 
 def parse_func(example_proto):
   sequence_features = {
-      'inputs': tf.FixedLenSequenceFeature(shape=[PARAM.INPUT_SIZE],
+      'inputs': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.INPUT_SIZE],
                                            dtype=tf.float32),
-      'labels': tf.FixedLenSequenceFeature(shape=[PARAM.OUTPUT_SIZE],
+      'labels': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.OUTPUT_SIZE],
                                            dtype=tf.float32),
-      'xtheta': tf.FixedLenSequenceFeature(shape=[PARAM.INPUT_SIZE],
+      'xtheta': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.INPUT_SIZE],
                                            dtype=tf.float32),
-      'ytheta': tf.FixedLenSequenceFeature(shape=[PARAM.OUTPUT_SIZE],
+      'ytheta': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.OUTPUT_SIZE],
                                            dtype=tf.float32),
   }
   _, sequence = tf.parse_single_sequence_example(
@@ -236,13 +236,13 @@ def parse_func(example_proto):
 
 def parse_func_with_theta(example_proto):
   sequence_features = {
-      'inputs': tf.FixedLenSequenceFeature(shape=[PARAM.INPUT_SIZE],
+      'inputs': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.INPUT_SIZE],
                                            dtype=tf.float32),
-      'labels': tf.FixedLenSequenceFeature(shape=[PARAM.OUTPUT_SIZE],
+      'labels': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.OUTPUT_SIZE],
                                            dtype=tf.float32),
-      'xtheta': tf.FixedLenSequenceFeature(shape=[PARAM.INPUT_SIZE],
+      'xtheta': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.INPUT_SIZE],
                                            dtype=tf.float32),
-      'ytheta': tf.FixedLenSequenceFeature(shape=[PARAM.OUTPUT_SIZE],
+      'ytheta': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.OUTPUT_SIZE],
                                            dtype=tf.float32),
   }
   _, sequence = tf.parse_single_sequence_example(
@@ -260,13 +260,13 @@ def _gen_tfrecord_minprocess(
       X_Y_Xtheta_Ytheta = _extract_feature_x_y_xtheta_ytheta(index_[0],
                                                              index_[1])
       X = np.reshape(np.array(X_Y_Xtheta_Ytheta[0], dtype=np.float32),
-                     newshape=[-1, PARAM.INPUT_SIZE])
+                     newshape=[-1, FLAGS.PARAM.INPUT_SIZE])
       Y = np.reshape(np.array(X_Y_Xtheta_Ytheta[1], dtype=np.float32),
-                     newshape=[-1, PARAM.OUTPUT_SIZE])
+                     newshape=[-1, FLAGS.PARAM.OUTPUT_SIZE])
       Xtheta = np.reshape(np.array(X_Y_Xtheta_Ytheta[2], dtype=np.float32),
-                          newshape=[-1, PARAM.INPUT_SIZE])
+                          newshape=[-1, FLAGS.PARAM.INPUT_SIZE])
       Ytheta = np.reshape(np.array(X_Y_Xtheta_Ytheta[3], dtype=np.float32),
-                          newshape=[-1, PARAM.OUTPUT_SIZE])
+                          newshape=[-1, FLAGS.PARAM.OUTPUT_SIZE])
       # print(np.mean(X),np.sqrt(np.var(X)),np.median(X),np.max(X),np.min(X))
       # print(np.mean(X),np.sqrt(np.var(X)),np.median(X),np.max(Y),np.min(Y))
       input_features = [
@@ -299,7 +299,7 @@ def generate_tfrecord(gen=True):
   if gen == True : generate Tfrecord and return Tfrecord list
   else : return Tfrecord list
   '''
-  tfrecords_dir = PARAM.TFRECORDS_DIR
+  tfrecords_dir = FLAGS.PARAM.TFRECORDS_DIR
   train_tfrecords_dir = os.path.join(tfrecords_dir, 'train')
   val_tfrecords_dir = os.path.join(tfrecords_dir, 'validation')
   testcc_tfrecords_dir = os.path.join(tfrecords_dir, 'test_cc')
@@ -310,10 +310,10 @@ def generate_tfrecord(gen=True):
                       testoc_tfrecords_dir]
 
   if gen:
-    _ini_data(PARAM.CLOSE_CONDATION_SPEAKER_LIST_DIR,
-              PARAM.OPEN_CONDATION_SPEAKER_LIST_DIR,
-              PARAM.NOISE_DIR,
-              PARAM.DATA_DICT_DIR)
+    _ini_data(FLAGS.PARAM.CLOSE_CONDATION_SPEAKER_LIST_DIR,
+              FLAGS.PARAM.OPEN_CONDATION_SPEAKER_LIST_DIR,
+              FLAGS.PARAM.NOISE_DIR,
+              FLAGS.PARAM.DATA_DICT_DIR)
     if os.path.exists(train_tfrecords_dir):
       shutil.rmtree(train_tfrecords_dir)
     if os.path.exists(val_tfrecords_dir):
@@ -328,7 +328,7 @@ def generate_tfrecord(gen=True):
     os.makedirs(testoc_tfrecords_dir)
 
     gen_start_time = time.time()
-    pool = multiprocessing.Pool(PARAM.PROCESS_NUM_GENERATE_TFERCORD)
+    pool = multiprocessing.Pool(FLAGS.PARAM.PROCESS_NUM_GENERATE_TFERCORD)
     for dataset_dir in dataset_dir_list:
       # start_time = time.time()
       data_set_name = {
@@ -338,7 +338,7 @@ def generate_tfrecord(gen=True):
           'oc': 'test_oc',
       }[dataset_dir[-2:]]
       dataset_index_list = scipy.io.loadmat(
-          os.path.join(PARAM.DATA_DICT_DIR,
+          os.path.join(FLAGS.PARAM.DATA_DICT_DIR,
                        data_set_name,
                        'mixed_wav_dir.mat'))["mixed_wav_dir"]
 
@@ -347,11 +347,11 @@ def generate_tfrecord(gen=True):
                              index_[1].replace(' ', '')] for index_ in dataset_index_list]
       len_dataset = len(dataset_index_list)
       minprocess_utt_num = int(
-          len_dataset/PARAM.TFRECORDS_NUM)
-      for i_process in range(PARAM.TFRECORDS_NUM):
+          len_dataset/FLAGS.PARAM.TFRECORDS_NUM)
+      for i_process in range(FLAGS.PARAM.TFRECORDS_NUM):
         s_site = i_process*minprocess_utt_num
         e_site = s_site+minprocess_utt_num
-        if i_process == (PARAM.TFRECORDS_NUM-1):
+        if i_process == (FLAGS.PARAM.TFRECORDS_NUM-1):
           e_site = len_dataset
         # print(s_site,e_site)
         pool.apply_async(_gen_tfrecord_minprocess,
@@ -382,23 +382,23 @@ def generate_tfrecord(gen=True):
 
 def get_batch_use_tfdata(tfrecords_list, get_theta=True):
   files = tf.data.Dataset.list_files(tfrecords_list)
-  files = files.take(PARAM.MAX_TFRECORD_FILES_USED)
-  if PARAM.SHUFFLE:
-    files = files.shuffle(PARAM.PROCESS_NUM_GENERATE_TFERCORD)
-  if not PARAM.SHUFFLE:
+  files = files.take(FLAGS.PARAM.MAX_TFRECORD_FILES_USED)
+  if FLAGS.PARAM.SHUFFLE:
+    files = files.shuffle(FLAGS.PARAM.PROCESS_NUM_GENERATE_TFERCORD)
+  if not FLAGS.PARAM.SHUFFLE:
     dataset = files.interleave(tf.data.TFRecordDataset,
                                cycle_length=1,
-                               block_length=PARAM.batch_size,
+                               block_length=FLAGS.PARAM.batch_size,
                                #  num_parallel_calls=1,
                                )
   else:  # shuffle
     dataset = files.interleave(tf.data.TFRecordDataset,
-                               cycle_length=PARAM.batch_size*3,
+                               cycle_length=FLAGS.PARAM.batch_size*3,
                                #  block_length=1,
-                               num_parallel_calls=PARAM.num_threads_processing_data,
+                               num_parallel_calls=FLAGS.PARAM.num_threads_processing_data,
                                )
-  if PARAM.SHUFFLE:
-    dataset = dataset.shuffle(PARAM.batch_size*3)
+  if FLAGS.PARAM.SHUFFLE:
+    dataset = dataset.shuffle(FLAGS.PARAM.batch_size*3)
   # region
   # !tf.data with tf.device(cpu) OOM???
   # dataset = dataset.map(
@@ -414,8 +414,8 @@ def get_batch_use_tfdata(tfrecords_list, get_theta=True):
   # !map_and_batch efficient is better than map+paded_batch
   dataset = dataset.apply(tf.data.experimental.map_and_batch(
       map_func=parse_func_with_theta if get_theta else parse_func,
-      batch_size=PARAM.batch_size,
-      num_parallel_calls=PARAM.num_threads_processing_data,
+      batch_size=FLAGS.PARAM.batch_size,
+      num_parallel_calls=FLAGS.PARAM.num_threads_processing_data,
       # num_parallel_batches=2,
   ))
   # dataset = dataset.prefetch(buffer_size=NNET_PARAM.batch_size) # perfetch 太耗内存，并没有明显的速度提升
@@ -426,14 +426,14 @@ def get_batch_use_tfdata(tfrecords_list, get_theta=True):
 
 def _get_batch_use_tfdata(tfrecords_list, get_theta=False):
   files = os.listdir(tfrecords_list[:-11])
-  files = files[:min(PARAM.MAX_TFRECORD_FILES_USED, len(files))]
+  files = files[:min(FLAGS.PARAM.MAX_TFRECORD_FILES_USED, len(files))]
   files = [os.path.join(tfrecords_list[:-11], file) for file in files]
   dataset_list = [tf.data.TFRecordDataset(file).map(parse_func_with_theta if get_theta else parse_func,
-                                                    num_parallel_calls=PARAM.num_threads_processing_data) for file in files]
+                                                    num_parallel_calls=FLAGS.PARAM.num_threads_processing_data) for file in files]
 
-  num_classes = PARAM.MAX_TFRECORD_FILES_USED
-  num_classes_per_batch = PARAM.batch_size
-  num_utt_per_class = PARAM.batch_size//num_classes_per_batch
+  num_classes = FLAGS.PARAM.MAX_TFRECORD_FILES_USED
+  num_classes_per_batch = FLAGS.PARAM.batch_size
+  num_utt_per_class = FLAGS.PARAM.batch_size//num_classes_per_batch
 
   def generator(_):
     # Sample `num_classes_per_batch` classes for the batch
