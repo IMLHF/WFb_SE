@@ -112,10 +112,10 @@ if __name__=='__main__':
     reY = np.where(reY>abs_max,abs_max,reY)
     reY = np.where(reY<-abs_max,-abs_max,reY)
     audio_tool.write_audio(os.path.join(decode_ans_file,
-                                        ('%3d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
+                                        ('%03d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
                            reY,
                            sr)
     file_name = mixed_dir[mixed_dir.rfind('/')+1:mixed_dir.rfind('.')]
     spectrum_tool.picture_spec(mask,
                                os.path.join(decode_ans_file,
-                                            ('%3d_' % (i+1))+file_name))
+                                            ('%03d_' % (i+1))+file_name))
