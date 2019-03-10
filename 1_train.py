@@ -33,7 +33,7 @@ def train_one_epoch(sess, tr_model):
         lr = sess.run(tr_model.lr)
         costtime = time.time()-stime
         stime = time.time()
-        avg_loss = tr_loss / (i*PARAM.batch_size+current_batchsize)
+        avg_loss = tr_loss / (i+1)
         train_epoch_msg = ("MINIBATCH %05d: AVG.LOSS %04.6f, "
                            "LR %02.6f, log_bias %05.2f, "
                            "DURATION %06dS") % (
@@ -45,7 +45,7 @@ def train_one_epoch(sess, tr_model):
       i += 1
     except tf.errors.OutOfRangeError:
       break
-  tr_loss /= ((i-1)*PARAM.batch_size+current_batchsize)
+  tr_loss /= i
   return tr_loss, model_lr, log_bias
 
 
@@ -60,7 +60,7 @@ def eval_one_epoch(sess, val_model):
       # print(inputs)
       # exit(0)
       val_loss += loss
-      data_len += current_batchsize
+      data_len += 1
     except tf.errors.OutOfRangeError:
       break
   val_loss /= data_len
