@@ -119,7 +119,7 @@ def train():
     if PARAM.resume_training.lower() == 'true':
       ckpt = tf.train.get_checkpoint_state(os.path.join(PARAM.SAVE_DIR, PARAM.CHECK_POINT))
       if ckpt and ckpt.model_checkpoint_path:
-        tf.logging.info("restore from" + ckpt.model_checkpoint_path)
+        # tf.logging.info("restore from" + ckpt.model_checkpoint_path)
         tr_model.saver.restore(sess, ckpt.model_checkpoint_path)
         best_path = ckpt.model_checkpoint_path
       else:
