@@ -1,9 +1,9 @@
 from losses import loss
-import model_baseline.lstm_SE
+import models.baseline_rnn
 
 
 class base_config:
-  SE_MODEL = model_baseline.lstm_SE.Model_Baseline
+  SE_MODEL = models.baseline_rnn.Model_Baseline
   AUDIO_BITS = 16
   NFFT = 256
   OVERLAP = 128
