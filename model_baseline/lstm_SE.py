@@ -6,8 +6,8 @@ import sys
 from tensorflow.contrib.rnn.python.ops import rnn
 from utils import tf_tool
 from losses import loss
-from utils.spectrum_tool import norm_mag_spec, norm_logmag_spec, rm_norm_mag_spec, rm_norm_logmag_spec
-from utils.spectrum_tool import normedLogmag2normedMag, normedMag2normedLogmag
+from utils.tf_tool import norm_mag_spec, norm_logmag_spec, rm_norm_mag_spec, rm_norm_logmag_spec
+from utils.tf_tool import normedLogmag2normedMag, normedMag2normedLogmag
 import FLAGS
 
 
