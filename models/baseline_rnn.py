@@ -133,14 +133,21 @@ class Model_Baseline(object):
           mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
 
     self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
+
+    # region get infer spec
+    if FLAGS.PARAM.DECODING_MASK_POSITION == 'mag':
+      self._y_mag_estimation = rm_norm_mag_spec(self._mask*self._norm_x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
+    elif FLAGS.PARAM.DECODING_MASK_POSITION == 'logmag':
+      self._y_mag_estimation = rm_norm_logmag_spec(self._mask*self._norm_x_logmag_spec,
+                                                   FLAGS.PARAM.MAG_NORM_MAX,
+                                                   self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
     if behavior == Model_Baseline.infer:
-      if FLAGS.PARAM.DECODING_MASK_POSITION == 'mag':
-        self._y_estimation = rm_norm_mag_spec(self._mask*self._norm_x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
-      elif FLAGS.PARAM.DECODING_MASK_POSITION == 'logmag':
-        self._y_estimation = rm_norm_logmag_spec(self._mask*self._norm_x_logmag_spec,
-                                                 FLAGS.PARAM.MAG_NORM_MAX,
-                                                 self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
       return
+    '''
+    _y_mag_estimation is estimated mag_spec
+    _y_estimation is loss_targe, mag_sepec or logmag_spec
+    '''
+    # endregion
 
     # region prepare y_estimation and y_labels
     if FLAGS.PARAM.TRAINING_MASK_POSITION == 'mag':
@@ -168,8 +175,8 @@ class Model_Baseline(object):
     if FLAGS.PARAM.LOSS_FUNC == 'SPEC_MSE': # log_mag and mag MSE
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels)
     elif FLAGS.PARAM.LOSS_FUNC == 'MFCC_SPEC_MSE':
-      self._loss1, self._loss2 = loss.reduce_sun_frame_batchsize_MFCC_AND_SPEC_MSE(self._y_estimation, self._y_labels,
-                                                                                   self._y_mag_estimation2, self._x_mag_spec)
+      self._loss1, self._loss2 = loss.reduce_sum_frame_batchsize_MFCC_AND_SPEC_MSE(self._y_estimation, self._y_labels,
+                                                                                   self._y_mag_estimation, self._x_mag_spec)
       self._loss = 0.5*self._loss1 + 0.5*self._loss2
     # endregion
 

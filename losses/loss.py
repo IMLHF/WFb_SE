@@ -16,7 +16,7 @@ def reduce_sum_frame_batchsize_MSE_LOW_FS_IMPROVE(y1, y2):
                                          tf.slice(y2, [0, 0, 0], [-1, -1, low_frame_point]))
   return loss1+loss2
 
-def reduce_sum_frame_batchsize_MFCC_ANS_SPEC_MSE(y1,y2,spec_est,spec_label):
+def reduce_sum_frame_batchsize_MFCC_AND_SPEC_MSE(y1,y2,spec_est,spec_label):
   '''
   spec_est:
     dim: [batch,time,frequence]
