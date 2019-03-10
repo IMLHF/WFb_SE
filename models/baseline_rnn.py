@@ -175,8 +175,8 @@ class Model_Baseline(object):
     if FLAGS.PARAM.LOSS_FUNC == 'SPEC_MSE': # log_mag and mag MSE
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels)
     elif FLAGS.PARAM.LOSS_FUNC == 'MFCC_SPEC_MSE':
-      self._loss1, self._loss2 = loss.reduce_sum_frame_batchsize_MFCC_AND_SPEC_MSE(self._y_estimation, self._y_labels,
-                                                                                   self._y_mag_estimation, self._y_mag_spec)
+      self._loss1, self._loss2 = loss.balanced_MFCC_AND_SPEC_MSE(self._y_estimation, self._y_labels,
+                                                                 self._y_mag_estimation, self._y_mag_spec)
       self._loss = FLAGS.PARAM.SPEC_LOSS_COEF*self._loss1 + FLAGS.PARAM.MFCC_LOSS_COEF*self._loss2
     # endregion
 
