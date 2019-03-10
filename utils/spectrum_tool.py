@@ -3,6 +3,7 @@ import scipy
 import scipy.signal
 import librosa
 import matplotlib.pyplot as plt
+import tensorflow as tf
 # plt.switch_backend('agg')
 # ffmpeg -i 20180829_191732_mono.wav -ar 16000 -ac 1 20180829_191732_mono16k.wav
 
@@ -98,81 +99,43 @@ def griffin_lim(spec, NFFT, overlap, max_iter, mixed_wav):
                            window=scipy.signal.windows.hann)
   return y
 
+# norm mag to [0,1]
+def norm_mag_spec(mag_spec, MAG_NORM_MAX):
+  # mag_spec = tf.clip_by_value(mag_spec, 0, MAG_NORM_MAX)
+  normed_mag = mag_spec / (MAG_NORM_MAX - 0)
+  return normed_mag
 
-def stft_for_reconstruction(x, fft_size, hopsamp):
-    """Compute and return the STFT of the supplied time domain signal x.
-    Args:
-        x (1-dim Numpy array): A time domain signal.
-        fft_size (int): FFT size. Should be a power of 2, otherwise DFT will be used.
-        hopsamp (int):
-    Returns:
-        The STFT. The rows are the time slices and columns are the frequency bins.
-    """
-    window = np.hanning(fft_size)
-    fft_size = int(fft_size)
-    hopsamp = int(hopsamp)
-    return np.array([np.fft.rfft(window*x[i:i+fft_size])
-                     for i in range(0, len(x)-fft_size, hopsamp)])
+# add bias and logarithm to mag, dispersion to [0,1]
+def norm_logmag_spec(mag_spec, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS):
+  LOG_NORM_MIN = tf.log(tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS) / tf.log(10.0)
+  LOG_NORM_MAX = tf.log(tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS+MAG_NORM_MAX) / tf.log(10.0)
 
+  # mag_spec = tf.clip_by_value(mag_spec, 0, MAG_NORM_MAX)
+  logmag_spec = tf.log(mag_spec+tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS)/tf.log(10.0)
+  logmag_spec -= LOG_NORM_MIN
+  normed_logmag = logmag_spec / (LOG_NORM_MAX - LOG_NORM_MIN)
+  return normed_logmag
 
-def istft_for_reconstruction(X, fft_size, hopsamp):
-    """Invert a STFT into a time domain signal.
-    Args:
-        X (2-dim Numpy array): Input spectrogram. The rows are the time slices and columns are the frequency bins.
-        fft_size (int):
-        hopsamp (int): The hop size, in samples.
-    Returns:
-        The inverse STFT.
-    """
-    fft_size = int(fft_size)
-    hopsamp = int(hopsamp)
-    window = np.hanning(fft_size)
-    time_slices = X.shape[0]
-    len_samples = int(time_slices*hopsamp + fft_size)
-    x = np.zeros(len_samples)
-    for n,i in enumerate(range(0, len(x)-fft_size, hopsamp)):
-        x[i:i+fft_size] += window*np.real(np.fft.irfft(X[n]))
-    return x
+# Inverse process of norm_mag_spec()
+def rm_norm_mag_spec(normed_mag, MAG_NORM_MAX):
+  mag_spec = normed_mag * (MAG_NORM_MAX - 0)
+  return mag_spec
 
+# Inverse process of norm_logmag_spec()
+def rm_norm_logmag_spec(normed_logmag, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS):
+  LOG_NORM_MIN = tf.log(tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS) / tf.log(10.0)
+  LOG_NORM_MAX = tf.log(tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS+MAG_NORM_MAX) / tf.log(10.0)
 
-def griffin_lim_v2(magnitude_spectrogram, fft_size, overlap, iterations, mixed_wave=None):
-    """Reconstruct an audio signal from a magnitude spectrogram.
-    Given a magnitude spectrogram as input, reconstruct
-    the audio signal and return it using the Griffin-Lim algorithm from the paper:
-    "Signal estimation from modified short-time fourier transform" by Griffin and Lim,
-    in IEEE transactions on Acoustics, Speech, and Signal Processing. Vol ASSP-32, No. 2, April 1984.
-    Args:
-        magnitude_spectrogram (2-dim Numpy array): The magnitude spectrogram. The rows correspond to the time slices
-            and the columns correspond to frequency bins.
-        fft_size (int): The FFT size, which should be a power of 2.
-        hopsamp (int): The hope size in samples.
-        iterations (int): Number of iterations for the Griffin-Lim algorithm. Typically a few hundred
-            is sufficient.
-    Returns:
-        The reconstructed time domain signal as a 1-dim Numpy array.
-    """
-    tmp_mag = librosa.core.stft(mixed_wave,
-                                n_fft=fft_size,
-                                hop_length=fft_size-overlap,
-                                window=scipy.signal.windows.hann).T
-    mixed_wave = istft_for_reconstruction(tmp_mag, fft_size, fft_size-overlap)
+  mag_spec = normed_logmag * (LOG_NORM_MAX - LOG_NORM_MIN)
+  mag_spec += LOG_NORM_MIN
+  mag_spec *= tf.log(10.0)
+  mag_spec = tf.exp(mag_spec) - DEFAULT_LOG_BIAS - tf.nn.relu(log_bias)
+  return mag_spec
 
-    hopsamp = fft_size - overlap
-    time_slices = magnitude_spectrogram.shape[0]
-    len_samples = int(time_slices*hopsamp + fft_size)
-    # Initialize the reconstructed signal to noise.
-    x_reconstruct = mixed_wave
-    if mixed_wave is None:
-      x_reconstruct = np.random.randn(len_samples)
-    n = iterations # number of iterations of Griffin-Lim algorithm.
-    while n > 0:
-        n -= 1
-        reconstruction_spectrogram = stft_for_reconstruction(x_reconstruct, fft_size, hopsamp)
-        reconstruction_angle = np.angle(reconstruction_spectrogram)
-        # Discard magnitude part of the reconstruction and use the supplied magnitude spectrogram instead.
-        proposal_spectrogram = magnitude_spectrogram*np.exp(1.0j*reconstruction_angle)
-        prev_x = x_reconstruct
-        x_reconstruct = istft_for_reconstruction(proposal_spectrogram, fft_size, hopsamp)
-        diff = np.sqrt(sum((x_reconstruct - prev_x)**2)/x_reconstruct.size)
-        print('Reconstruction iteration: {}/{} RMSE: {} '.format(iterations - n, iterations, diff))
-    return x_reconstruct
+#
+def normedMag2normedLogmag(normed_mag, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS):
+  return norm_logmag_spec(rm_norm_mag_spec(normed_mag, MAG_NORM_MAX), MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS)
+
+#
+def normedLogmag2normedMag(normed_logmag, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS):
+  return norm_mag_spec(rm_norm_logmag_spec(normed_logmag, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS), MAG_NORM_MAX)
