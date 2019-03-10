@@ -1,7 +1,9 @@
 from losses import loss
+import model_baseline.lstm_SE
 
 
 class base_config:
+  SE_MODEL = model_baseline.lstm_SE.Model_Baseline
   AUDIO_BITS = 16
   NFFT = 256
   OVERLAP = 128
@@ -13,7 +15,7 @@ class base_config:
   MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
   LSTM_ACTIVATION = 'tanh'
   MASK_TYPE = "PSM"  # "PSM" or "IRM"
-  LOSS_FUNC = loss.reduce_sum_frame_batchsize_MSE
+  LOSS_FUNC = "SPEC_MSE" # "SPEC_MSE" or "MFCC_SPEC_MSE"
   KEEP_PROB = 0.8
   RNN_LAYER = 2
   CLIP_NORM = 5.0
@@ -65,7 +67,8 @@ class base_config:
   LABEL_TYPE = None  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = None  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = None  # should be same to TRAINING_MASK_POSITION
-  INIT_LOG_BIAS = 0
+  DEFAULT_LOG_BIAS = 1e-12
+  INIT_LOG_BIAS = 0 # real log_bias is DEFAULT_LOG_BIAS+tf.nn.relu(INIT_LOG_BIAS)
   LOG_BIAS_TRAINABEL = False
   #LOG_NORM_MAX = log(LOG_BIAS+MAG_NORM_MAX)
   #LOG_NORM_MIN = log(LOG_BIAS)
@@ -85,16 +88,30 @@ class base_config:
   GET_AUDIO_IN_TEST = False
 
 
+class C_ReluChangeToWeightedSoftmax(base_config):
+  CHECK_POINT = 'nnet_C_ReluChangeToWeightedSoftmax'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+
 class C001(base_config): #
   CHECK_POINT = 'nnet_C001'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  GENERATE_TFRECORD = False
   '''
   iter4 PESQ: 0.4
   '''
+
+class C001_2(base_config): #
+  CHECK_POINT = 'nnet_C001_2'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "MFCC_SPEC_MSE"
 
 
 class C002(base_config):  #
@@ -173,5 +190,5 @@ class CXX(base_config):  #
   LOG_BIAS_TRAINABEL = True
 
 
-PARAM = C005
+PARAM = C001
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
