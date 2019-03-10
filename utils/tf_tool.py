@@ -144,3 +144,25 @@ def normedMag2normedLogmag(normed_mag, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS)
 #
 def normedLogmag2normedMag(normed_logmag, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS):
   return norm_mag_spec(rm_norm_logmag_spec(normed_logmag, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS), MAG_NORM_MAX)
+
+def mfccs_form_realStft(mag_spectrograms, sample_rate, num_mel_bins, n_mfccs):
+  # Warp the linear scale spectrograms into the mel-scale.
+  num_spectrogram_bins = mag_spectrograms.shape[-1].value
+  lower_edge_hertz, upper_edge_hertz = 0.0, sample_rate/2
+  linear_to_mel_weight_matrix = tf.contrib.signal.linear_to_mel_weight_matrix(num_mel_bins,
+                                                                              num_spectrogram_bins,
+                                                                              sample_rate,
+                                                                              lower_edge_hertz,
+                                                                              upper_edge_hertz)
+  mel_spectrograms = tf.tensordot(
+    mag_spectrograms, linear_to_mel_weight_matrix, 1)
+  mel_spectrograms.set_shape(mag_spectrograms.shape[:-1].concatenate(
+    linear_to_mel_weight_matrix.shape[-1:]))
+
+  # Compute a stabilized log to get log-magnitude mel-scale spectrograms.
+  log_mel_spectrograms = tf.log(mel_spectrograms + 1e-6)
+
+  # Compute MFCCs from log_mel_spectrograms and take the first 13.
+  mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(
+    log_mel_spectrograms)[..., :n_mfccs]
+  return mfccs
