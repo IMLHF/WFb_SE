@@ -6,14 +6,11 @@ import utils
 import utils.audio_tool
 import os
 import shutil
-from models.lstm_SE import SE_MODEL
 import wave
 import gc
 from FLAGS import PARAM
 from tensorflow.python import debug as tf_debug
 from dataManager.mixed_aishell_8k_tfrecord_io import generate_tfrecord, get_batch_use_tfdata
-
-os.environ['CUDA_VISIBLE_DEVICES'] = sys.argv[1]
 
 
 
@@ -94,17 +91,17 @@ def train():
 
     # build model
     with tf.name_scope('model'):
-      tr_model = SE_MODEL(x_batch_tr,
-                          lengths_batch_tr,
-                          y_batch_tr,
-                          Xtheta_batch_tr,
-                          Ytheta_batch_tr)
+      tr_model = PARAM.SE_MODEL(x_batch_tr,
+                                lengths_batch_tr,
+                                y_batch_tr,
+                                Xtheta_batch_tr,
+                                Ytheta_batch_tr)
       tf.get_variable_scope().reuse_variables()
-      val_model = SE_MODEL(x_batch_val,
-                           lengths_batch_val,
-                           y_batch_val,
-                           Xtheta_batch_val,
-                           Ytheta_batch_val)
+      val_model = PARAM.SE_MODEL(x_batch_val,
+                                 lengths_batch_val,
+                                 y_batch_val,
+                                 Xtheta_batch_val,
+                                 Ytheta_batch_val)
 
     utils.tf_tool.show_all_variables()
     init = tf.group(tf.global_variables_initializer(),
@@ -224,12 +221,14 @@ def train():
     tf.logging.info("Done training")
 
 
-def main(_):
+def main(argv):
   if not os.path.exists(PARAM.SAVE_DIR):
     os.makedirs(PARAM.SAVE_DIR)
   train()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+  os.environ['CUDA_VISIBLE_DEVICES'] = sys.argv[1]
   tf.logging.set_verbosity(tf.logging.INFO)
   tf.app.run(main=main)
+  # python3 1_train.py 0 2>&1 | tee exp/rnn_speech_enhancement/nnet_C001_train_full.log
