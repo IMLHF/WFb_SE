@@ -6,14 +6,11 @@ import gc
 from utils import spectrum_tool
 from utils import audio_tool
 from pypesq import pesq
-from models.lstm_SE import SE_MODEL
 from FLAGS import PARAM
 import math
 from dataManager.mixed_aishell_8k_tfrecord_io import generate_tfrecord, get_batch_use_tfdata
 import time
 
-os.environ['CUDA_VISIBLE_DEVICES'] = sys.argv[1]
-tf.logging.set_verbosity(tf.logging.INFO)
 
 def _build_model_use_tfdata(test_set_tfrecords_dir, ckpt_dir):
   '''
@@ -29,12 +26,12 @@ def _build_model_use_tfdata(test_set_tfrecords_dir, ckpt_dir):
           get_theta=True)
 
     with tf.name_scope('model'):
-      test_model = SE_MODEL(x_batch,
-                            lengths_batch,
-                            y_batch,
-                            Xtheta_batch,
-                            Ytheta_batch,
-                            infer=True)
+      test_model = PARAM.SE_MODEL(x_batch,
+                                  lengths_batch,
+                                  y_batch,
+                                  Xtheta_batch,
+                                  Ytheta_batch,
+                                  infer=True)
 
     init = tf.group(tf.global_variables_initializer(),
                     tf.local_variables_initializer())
@@ -79,7 +76,7 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
                                                                               model.x_theta,
                                                                               model.y_mag,
                                                                               model.y_theta,
-                                                                              model.cleaned,
+                                                                              model.y_estimation,
                                                                               model.batch_size])
       x_wav = [spectrum_tool.librosa_istft(
           x_mag_t*np.exp(1j*x_theta_t),
@@ -166,7 +163,7 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
   print('avg_sdr      imp:',sdr_ans[2])
   return {'pesq':list(pesq_ans), 'stoi':list(stoi_ans), 'sdr':list(sdr_ans)}
 
-def test_CC_and_OC(test_set_name):
+def test_CC_or_OC(test_set_name):
   ckpt_dir = PARAM.CHECK_POINT
   _, _, testcc_tfrecords_dir, testoc_tfrecords_dir = generate_tfrecord(
       gen=PARAM.GENERATE_TFRECORD)
@@ -191,6 +188,8 @@ def test_CC_and_OC(test_set_name):
   #   f.write('\n')
 
 if __name__ == "__main__":
-  test_CC_and_OC(str(sys.argv[2]))
+  os.environ['CUDA_VISIBLE_DEVICES'] = sys.argv[1]
+  tf.logging.set_verbosity(tf.logging.INFO)
+  test_CC_or_OC(str(sys.argv[2]))
   # python3 2_test_CC_and_OC.py 0 test_cc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_C001_testcc.log
   # python3 2_test_CC_and_OC.py 0 test_oc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_C001_testoc.log
