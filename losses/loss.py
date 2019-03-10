@@ -7,6 +7,9 @@ def reduce_sum_frame_batchsize_MSE(y1, y2):
   cost = tf.reduce_mean(tf.reduce_sum(tf.pow(y1-y2, 2), 1), 1)
   return tf.reduce_sum(cost)
 
+def reduce_mean_MSE(y1, y2):
+  cost = tf.reduce_mean(tf.reduce_mean(tf.pow(y1-y2, 2), 1), 1)
+  return tf.reduce_mean(cost)
 
 def reduce_sum_frame_batchsize_MSE_LOW_FS_IMPROVE(y1, y2):
   loss1 = reduce_sum_frame_batchsize_MSE(y1, y2)
@@ -23,8 +26,8 @@ def reduce_sum_frame_batchsize_MFCC_AND_SPEC_MSE(y1,y2,spec_est,spec_label):
   spec_label:
     dim: [batch,time,frequence]
   '''
+  spec_loss = reduce_sum_frame_batchsize_MSE(y1, y2)
   mfccs_est = tf_tool.mfccs_form_realStft(spec_est, FLAGS.PARAM.FS, 20, 13)
   mfccs_label = tf_tool.mfccs_form_realStft(spec_label, FLAGS.PARAM.FS, 20, 13)
-  loss1 = reduce_sum_frame_batchsize_MSE(mfccs_est, mfccs_label)
-  loss2 = reduce_sum_frame_batchsize_MSE(y1, y2)
-  return loss1,loss2
+  mfcc_loss = reduce_mean_MSE(mfccs_est, mfccs_label) / 40 # loss1/loss2 ~= 40
+  return spec_loss, mfcc_loss

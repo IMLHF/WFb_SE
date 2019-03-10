@@ -124,6 +124,8 @@ class C001_3(base_config): #
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC = "MFCC_SPEC_MSE"
+  MFCC_LOSS_COEF = 0.5
+  SPEC_LOSS_COEF = 0.5
 
 
 class C002(base_config):  #
@@ -202,5 +204,5 @@ class CXX(base_config):  #
   LOG_BIAS_TRAINABEL = True
 
 
-PARAM = C001
+PARAM = C001_3
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)

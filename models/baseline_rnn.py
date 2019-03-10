@@ -177,7 +177,7 @@ class Model_Baseline(object):
     elif FLAGS.PARAM.LOSS_FUNC == 'MFCC_SPEC_MSE':
       self._loss1, self._loss2 = loss.reduce_sum_frame_batchsize_MFCC_AND_SPEC_MSE(self._y_estimation, self._y_labels,
                                                                                    self._y_mag_estimation, self._x_mag_spec)
-      self._loss = 0.5*self._loss1 + 0.5*self._loss2
+      self._loss = FLAGS.PARAM.SPEC_LOSS_COEF*self._loss1 + FLAGS.PARAM.MFCC_LOSS_COEF*self._loss2
     # endregion
 
     if behavior == Model_Baseline.validation:
