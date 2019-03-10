@@ -147,8 +147,13 @@ class Model_Baseline(object):
       self._y_estimation = self._mask*self._norm_x_mag_spec
     elif FLAGS.PARAM.TRAINING_MASK_POSITION == 'logmag':
       self._y_estimation = self._mask*self._norm_x_logmag_spec
-    if FLAGS.PARAM.MASK_TYPE == 'PSIRM':
+    if FLAGS.PARAM.MASK_TYPE == 'PSM':
       self._y_labels *= tf.cos(self._x_theta-self._y_theta)
+    elif FLAGS.PARAM.MASK_TYPE == 'IRM':
+      pass
+    else:
+      tf.logging.error('Mask type error.')
+      exit(-1)
 
     if FLAGS.PARAM.TRAINING_MASK_POSITION != FLAGS.PARAM.LABEL_TYPE:
       if FLAGS.PARAM.LABEL_TYPE == 'mag':
@@ -163,11 +168,9 @@ class Model_Baseline(object):
     if FLAGS.PARAM.LOSS_FUNC == 'SPEC_MSE': # log_mag and mag MSE
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels)
     elif FLAGS.PARAM.LOSS_FUNC == 'MFCC_SPEC_MSE':
-      if FLAGS.PARAM.LABEL_TYPE == 'mag':
-        self._loss = loss.reduce_sun_frame_batchsize_MFCC_AND_SPEC_MSE(self._y_estimation,self._y_labels)
-      else:
-        tf.logging.error('Labels type is log_magnitude_spectrum, cannot calculate MFCC.')
-        exit(-1)
+      self._loss1, self._loss2 = loss.reduce_sun_frame_batchsize_MFCC_AND_SPEC_MSE(self._y_estimation, self._y_labels,
+                                                                                   self._y_mag_estimation2, self._x_mag_spec)
+      self._loss = 0.5*self._loss1 + 0.5*self._loss2
     # endregion
 
     if behavior == Model_Baseline.validation:
