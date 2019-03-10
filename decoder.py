@@ -9,7 +9,7 @@ from FLAGS import PARAM
 from utils import audio_tool
 
 
-def build_session(ckpt_dir, MODEL_CLASS):
+def build_session(ckpt_dir):
   g = tf.Graph()
   with g.as_default():
     with tf.device('/cpu:0'):
@@ -20,12 +20,12 @@ def build_session(ckpt_dir, MODEL_CLASS):
         x_theta = tf.placeholder(tf.float32,shape=[1,None,PARAM.INPUT_SIZE],name='x_theta')
         y_theta = tf.placeholder(tf.float32,shape=[1,None,PARAM.INPUT_SIZE],name='y_theta')
     with tf.name_scope('model'):
-      model = MODEL_CLASS(x_batch,
-                          lengths_batch,
-                          y_batch,
-                          x_theta,
-                          y_theta,
-                          infer=True)
+      model = PARAM.SE_MODEL(x_batch,
+                             lengths_batch,
+                             y_batch,
+                             x_theta,
+                             y_theta,
+                             behavior=PARAM.SE_MODEL.infer)
 
     init = tf.group(tf.global_variables_initializer(),
                     tf.local_variables_initializer())
@@ -90,7 +90,7 @@ if __name__=='__main__':
   decode_ans_file = os.path.join(PARAM.SAVE_DIR,'decode_'+ckpt)
   if not os.path.exists(decode_ans_file):
     os.makedirs(decode_ans_file)
-  sess, model = build_session(ckpt, PARAM.SE_MODEL)
+  sess, model = build_session(ckpt)
 
   decode_file_list = [
       'exp/rnn_speech_enhancement/s_2_00_MIX_1_clapping_8k.wav',

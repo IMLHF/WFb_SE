@@ -31,7 +31,7 @@ def _build_model_use_tfdata(test_set_tfrecords_dir, ckpt_dir):
                                   y_batch,
                                   Xtheta_batch,
                                   Ytheta_batch,
-                                  infer=True)
+                                  behavior=PARAM.SE_MODEL.infer)
 
     init = tf.group(tf.global_variables_initializer(),
                     tf.local_variables_initializer())

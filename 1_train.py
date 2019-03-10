@@ -95,13 +95,15 @@ def train():
                                 lengths_batch_tr,
                                 y_batch_tr,
                                 Xtheta_batch_tr,
-                                Ytheta_batch_tr)
+                                Ytheta_batch_tr,
+                                PARAM.SE_MODEL.train)
       tf.get_variable_scope().reuse_variables()
       val_model = PARAM.SE_MODEL(x_batch_val,
                                  lengths_batch_val,
                                  y_batch_val,
                                  Xtheta_batch_val,
-                                 Ytheta_batch_val)
+                                 Ytheta_batch_val,
+                                 PARAM.SE_MODEL.validation)
 
     utils.tf_tool.show_all_variables()
     init = tf.group(tf.global_variables_initializer(),

@@ -12,14 +12,21 @@ import FLAGS
 
 
 class Model_Baseline(object):
+  infer = 'infer'
+  train = 'train'
+  validation = 'validation'
+
   def __init__(self,
                x_mag_spec_batch,
                lengths_batch,
                y_mag_spec_batch=None,
                theta_x_batch=None,
                theta_y_batch=None,
-               infer=False):
-    if infer is False:
+               behavior='train'):
+    '''
+    behavior = 'train/validation/infer'
+    '''
+    if behavior != Model_Baseline.infer:
       assert(y_mag_spec_batch is not None)
       assert(theta_x_batch is not None)
       assert(theta_y_batch is not None)
@@ -59,7 +66,7 @@ class Model_Baseline(object):
           initializer=tf.contrib.layers.xavier_initializer(),
           state_is_tuple=True, activation=FLAGS.PARAM.LSTM_ACTIVATION)
     lstm_attn_cell = lstm_cell
-    if not infer and FLAGS.PARAM.KEEP_PROB < 1.0:
+    if behavior != Model_Baseline.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
       def lstm_attn_cell():
         return tf.contrib.rnn.DropoutWrapper(lstm_cell(), output_keep_prob=FLAGS.PARAM.KEEP_PROB)
 
@@ -69,7 +76,7 @@ class Model_Baseline(object):
           # kernel_initializer=tf.contrib.layers.xavier_initializer(),
           activation=FLAGS.PARAM.LSTM_ACTIVATION)
     GRU_attn_cell = lstm_cell
-    if not infer and FLAGS.PARAM.KEEP_PROB < 1.0:
+    if behavior != Model_Baseline.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
       def GRU_attn_cell():
         return tf.contrib.rnn.DropoutWrapper(GRU_cell(), output_keep_prob=FLAGS.PARAM.KEEP_PROB)
 
@@ -126,7 +133,7 @@ class Model_Baseline(object):
           mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
 
     self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
-    if infer:
+    if behavior == Model_Baseline.infer:
       if FLAGS.PARAM.DECODING_MASK_POSITION == 'mag':
         self._y_estimation = rm_norm_mag_spec(self._mask*self._norm_x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
       elif FLAGS.PARAM.DECODING_MASK_POSITION == 'logmag':
@@ -163,9 +170,9 @@ class Model_Baseline(object):
         exit(-1)
     # endregion
 
-    if tf.get_variable_scope().reuse:
+    if behavior == Model_Baseline.validation:
       '''
-      reuse model cannot train.
+      val model cannot train.
       '''
       return
     self._lr = tf.Variable(0.0, trainable=False)
