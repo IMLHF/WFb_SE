@@ -101,12 +101,24 @@ class C001(base_config): #
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  MASK_TYPE = "IRM"
   '''
   iter4 PESQ: 0.4
   '''
 
 class C001_2(base_config): #
   CHECK_POINT = 'nnet_C001_2'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  # MASK_TYPE = "PSM" # default
+  '''
+  iter4 PESQ: 0.4
+  '''
+
+class C001_3(base_config): #
+  CHECK_POINT = 'nnet_C001_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
