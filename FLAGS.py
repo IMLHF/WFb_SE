@@ -9,6 +9,8 @@ class base_config:
   NFFT = 256
   OVERLAP = 128
   FS = 8000
+  MEL_BLANCE_COEF = 3.2e8
+  MFCC_BLANCE_COEF = 40
   INPUT_SIZE = 129
   OUTPUT_SIZE = 129
   LSTM_num_proj = None
@@ -96,7 +98,7 @@ class C_ReluChangeToWeightedSoftmax(base_config):
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
 
-class C001(base_config): #
+class C001(base_config): # DONE 15043
   CHECK_POINT = 'nnet_C001'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -107,7 +109,7 @@ class C001(base_config): #
   iter4 PESQ: 0.4
   '''
 
-class C001_2(base_config): #
+class C001_2(base_config): # DONE 15043
   CHECK_POINT = 'nnet_C001_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -119,7 +121,7 @@ class C001_2(base_config): #
   '''
 
 
-class C001_2_RT(base_config): #
+class C001_2_RT(base_config): # RUNNNING 15043
   CHECK_POINT = 'nnet_C001_2_RT'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -128,7 +130,7 @@ class C001_2_RT(base_config): #
   SE_MODEL = models.recurrent_train_model.Model_Recurrent_Train
 
 
-class C001_3(base_config): #
+class C001_3(base_config): # DONE 15043
   CHECK_POINT = 'nnet_C001_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -139,7 +141,7 @@ class C001_3(base_config): #
   MFCC_LOSS_COEF = 0.5
 
 
-class C001_3_2(base_config): #
+class C001_3_2(base_config): # PREPARE
   CHECK_POINT = 'nnet_C001_3_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -149,7 +151,7 @@ class C001_3_2(base_config): #
   SPEC_LOSS_COEF = 0.8
   MFCC_LOSS_COEF = 0.2
 
-class C001_4(base_config): #
+class C001_4(base_config): # RUNNING 15041
   CHECK_POINT = 'nnet_C001_4'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -235,5 +237,5 @@ class CXX(base_config):  #
   LOG_BIAS_TRAINABEL = True
 
 
-PARAM = C001_3
+PARAM = C001_3_2
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
