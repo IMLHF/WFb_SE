@@ -230,7 +230,7 @@ class Model_Recurrent_Train(object):
     return self._real_logbias
 
   @property
-  def y_estimation(self):
+  def y_mag_estimation(self):
     '''
     description: model outputs
     type: enhanced spectrum

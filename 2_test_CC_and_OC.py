@@ -76,7 +76,7 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
                                                                               model.x_theta,
                                                                               model.y_mag,
                                                                               model.y_theta,
-                                                                              model.y_estimation,
+                                                                              model.y_mag_estimation,
                                                                               model.batch_size])
       x_wav = [spectrum_tool.librosa_istft(
           x_mag_t*np.exp(1j*x_theta_t),

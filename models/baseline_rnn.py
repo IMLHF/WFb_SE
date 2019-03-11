@@ -213,13 +213,13 @@ class Model_Baseline(object):
     return self._real_logbias
 
   @property
-  def y_estimation(self):
+  def y_mag_estimation(self):
     '''
     description: model outputs
     type: enhanced spectrum
     dims: [batch,time,frequence]
     '''
-    return self._y_estimation
+    return self._y_mag_estimation
 
   @property
   def x_mag(self):

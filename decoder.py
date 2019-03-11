@@ -55,24 +55,24 @@ def decode_one_wav(sess, model, wavedata):
   length = np.shape(x_spec_t)[0]
   x_spec = np.array([x_spec_t], dtype=np.float32)
   lengths = np.array([length], dtype=np.int32)
-  y_estimation, mask, x_mag, norm_x_mag, norm_logmag = sess.run(
-      [model.y_estimation, model.mask,
+  y_mag_estimation, mask, x_mag, norm_x_mag, norm_logmag = sess.run(
+      [model.y_mag_estimation, model.mask,
        model._x_mag_spec, model._norm_x_mag_spec, model._norm_x_logmag_spec],
       feed_dict={
           model.x_mag: x_spec,
           model.lengths: lengths,
       })
 
-  y_estimation = np.array(y_estimation[0])
+  y_mag_estimation = np.array(y_mag_estimation[0])
   mask = np.array(mask[0])
-  print(np.shape(y_estimation), np.shape(mask))
+  print(np.shape(y_mag_estimation), np.shape(mask))
   if PARAM.RESTORE_PHASE == 'MIXED':
-    y_estimation = y_estimation*np.exp(1j*spectrum_tool.phase_spectrum_librosa_stft(wavedata,
-                                                                                    PARAM.NFFT,
-                                                                                    PARAM.OVERLAP))
-    reY = spectrum_tool.librosa_istft(y_estimation, PARAM.NFFT, PARAM.OVERLAP)
+    y_mag_estimation = y_mag_estimation*np.exp(1j*spectrum_tool.phase_spectrum_librosa_stft(wavedata,
+                                                                                            PARAM.NFFT,
+                                                                                            PARAM.OVERLAP))
+    reY = spectrum_tool.librosa_istft(y_mag_estimation, PARAM.NFFT, PARAM.OVERLAP)
   elif PARAM.RESTORE_PHASE == 'GRIFFIN_LIM':
-    reY = spectrum_tool.griffin_lim(y_estimation,
+    reY = spectrum_tool.griffin_lim(y_mag_estimation,
                                     PARAM.NFFT,
                                     PARAM.OVERLAP,
                                     PARAM.GRIFFIN_ITERNUM,
@@ -82,6 +82,7 @@ def decode_one_wav(sess, model, wavedata):
   print(np.shape(x_mag), np.max(x_mag), np.min(x_mag))
   print(np.shape(norm_x_mag), np.max(norm_x_mag), np.min(norm_x_mag))
   print(np.shape(norm_logmag), np.max(norm_logmag), np.min(norm_logmag))
+  print(np.shape(y_mag_estimation), np.max(y_mag_estimation), np.min(y_mag_estimation))
   # spectrum_tool.picture_spec(mask[0],"233")
   return reY, mask
 
