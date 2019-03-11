@@ -16,7 +16,7 @@ class base_config:
   MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
   LSTM_ACTIVATION = 'tanh'
   MASK_TYPE = "PSM"  # "PSM" or "IRM"
-  LOSS_FUNC = "SPEC_MSE" # "SPEC_MSE" or "MFCC_SPEC_MSE"
+  LOSS_FUNC = "SPEC_MSE" # "SPEC_MSE" or "MFCC_SPEC_MSE" or "MEL_SPEC_MSE"
   KEEP_PROB = 0.8
   RNN_LAYER = 2
   CLIP_NORM = 5.0
@@ -140,7 +140,7 @@ class C001_3(base_config): #
 
 
 class C001_3_2(base_config): #
-  CHECK_POINT = 'nnet_C001_3'
+  CHECK_POINT = 'nnet_C001_3_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
@@ -149,6 +149,15 @@ class C001_3_2(base_config): #
   SPEC_LOSS_COEF = 0.8
   MFCC_LOSS_COEF = 0.2
 
+class C001_4(base_config): #
+  CHECK_POINT = 'nnet_C001_4'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "MEL_SPEC_MSE"
+  SPEC_LOSS_COEF = 0.5
+  MEL_LOSS_COEF = 0.5
 
 class C002(base_config):  #
   CHECK_POINT = 'nnet_C002'
