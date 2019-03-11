@@ -9,6 +9,7 @@ from losses import loss
 from utils.tf_tool import norm_mag_spec, norm_logmag_spec, rm_norm_mag_spec, rm_norm_logmag_spec
 from utils.tf_tool import normedLogmag2normedMag, normedMag2normedLogmag
 from models.baseline_rnn import Model_Baseline
+import utils.tf_tool
 import FLAGS
 
 
@@ -31,137 +32,135 @@ class Model_Recurrent_Train(object):
       assert(y_mag_spec_batch is not None)
       assert(theta_x_batch is not None)
       assert(theta_y_batch is not None)
-    self._log_bias = tf.get_variable('logbias', [1], trainable=FLAGS.PARAM.LOG_BIAS_TRAINABEL,
-                                     initializer=tf.constant_initializer(FLAGS.PARAM.INIT_LOG_BIAS))
-    self._real_logbias = self._log_bias + FLAGS.PARAM.DEFAULT_LOG_BIAS
-    self._x_mag_spec = x_mag_spec_batch
-    self._norm_x_mag_spec = norm_mag_spec(self._x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
-    self._norm_x_logmag_spec = norm_logmag_spec(self._x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX, self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
+    with tf.variable_scope("recurrent_train_model"):
+      self._log_bias = tf.get_variable('logbias', [1], trainable=FLAGS.PARAM.LOG_BIAS_TRAINABEL,
+                                       initializer=tf.constant_initializer(FLAGS.PARAM.INIT_LOG_BIAS))
+      self._real_logbias = self._log_bias + FLAGS.PARAM.DEFAULT_LOG_BIAS
+      self._x_mag_spec = x_mag_spec_batch
+      self._norm_x_mag_spec = norm_mag_spec(self._x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
+      self._norm_x_logmag_spec = norm_logmag_spec(self._x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX, self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
 
-    self._y_mag_spec = y_mag_spec_batch
-    self._norm_y_mag_spec = norm_mag_spec(self._y_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
-    self._norm_y_logmag_spec = norm_logmag_spec(self._y_mag_spec, FLAGS.PARAM.MAG_NORM_MAX, self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
+      self._y_mag_spec = y_mag_spec_batch
+      self._norm_y_mag_spec = norm_mag_spec(self._y_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
+      self._norm_y_logmag_spec = norm_logmag_spec(self._y_mag_spec, FLAGS.PARAM.MAG_NORM_MAX, self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
 
-    self._lengths = lengths_batch
-    self._batch_size = tf.shape(self._lengths)[0]
+      self._lengths = lengths_batch
+      self._batch_size = tf.shape(self._lengths)[0]
 
-    self._x_theta = theta_x_batch
-    self._y_theta = theta_y_batch
-    self._model_type = FLAGS.PARAM.MODEL_TYPE
+      self._x_theta = theta_x_batch
+      self._y_theta = theta_y_batch
+      self._model_type = FLAGS.PARAM.MODEL_TYPE
 
-    if FLAGS.PARAM.INPUT_TYPE == 'mag':
-      self.net_input = self._norm_x_mag_spec
-    elif FLAGS.PARAM.INPUT_TYPE == 'logmag':
-      self.net_input = self._norm_x_logmag_spec
-    if FLAGS.PARAM.LABEL_TYPE == 'mag':
-      self._y_labels = self._norm_y_mag_spec
-    elif FLAGS.PARAM.LABEL_TYPE == 'logmag':
-      self._y_labels = self._norm_y_logmag_spec
+      if FLAGS.PARAM.INPUT_TYPE == 'mag':
+        self.net_input = self._norm_x_mag_spec
+      elif FLAGS.PARAM.INPUT_TYPE == 'logmag':
+        self.net_input = self._norm_x_logmag_spec
+      if FLAGS.PARAM.LABEL_TYPE == 'mag':
+        self._y_labels = self._norm_y_mag_spec
+      elif FLAGS.PARAM.LABEL_TYPE == 'logmag':
+        self._y_labels = self._norm_y_logmag_spec
 
-    outputs = self.net_input
+      outputs = self.net_input
 
-    def lstm_cell():
-      return tf.contrib.rnn.LSTMCell(
-          FLAGS.PARAM.RNN_SIZE, forget_bias=1.0, use_peepholes=True,
-          num_proj=FLAGS.PARAM.LSTM_num_proj,
-          initializer=tf.contrib.layers.xavier_initializer(),
-          state_is_tuple=True, activation=FLAGS.PARAM.LSTM_ACTIVATION)
-    lstm_attn_cell = lstm_cell
-    if behavior != Model_Baseline.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
-      def lstm_attn_cell():
-        return tf.contrib.rnn.DropoutWrapper(lstm_cell(), output_keep_prob=FLAGS.PARAM.KEEP_PROB)
+      def lstm_cell():
+        return tf.contrib.rnn.LSTMCell(
+            FLAGS.PARAM.RNN_SIZE, forget_bias=1.0, use_peepholes=True,
+            num_proj=FLAGS.PARAM.LSTM_num_proj,
+            initializer=tf.contrib.layers.xavier_initializer(),
+            state_is_tuple=True, activation=FLAGS.PARAM.LSTM_ACTIVATION)
+      lstm_attn_cell = lstm_cell
+      if behavior != Model_Baseline.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
+        def lstm_attn_cell():
+          return tf.contrib.rnn.DropoutWrapper(lstm_cell(), output_keep_prob=FLAGS.PARAM.KEEP_PROB)
 
-    def GRU_cell():
-      return tf.contrib.rnn.GRUCell(
-          FLAGS.PARAM.RNN_SIZE,
-          # kernel_initializer=tf.contrib.layers.xavier_initializer(),
-          activation=FLAGS.PARAM.LSTM_ACTIVATION)
-    GRU_attn_cell = lstm_cell
-    if behavior != Model_Baseline.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
-      def GRU_attn_cell():
-        return tf.contrib.rnn.DropoutWrapper(GRU_cell(), output_keep_prob=FLAGS.PARAM.KEEP_PROB)
+      def GRU_cell():
+        return tf.contrib.rnn.GRUCell(
+            FLAGS.PARAM.RNN_SIZE,
+            # kernel_initializer=tf.contrib.layers.xavier_initializer(),
+            activation=FLAGS.PARAM.LSTM_ACTIVATION)
+      GRU_attn_cell = lstm_cell
+      if behavior != Model_Baseline.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
+        def GRU_attn_cell():
+          return tf.contrib.rnn.DropoutWrapper(GRU_cell(), output_keep_prob=FLAGS.PARAM.KEEP_PROB)
 
-    if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM':
-      with tf.variable_scope('BLSTM'):
+      if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM':
+        with tf.variable_scope('BLSTM'):
 
-        lstm_fw_cell = tf.contrib.rnn.MultiRNNCell(
-            [lstm_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
-        lstm_bw_cell = tf.contrib.rnn.MultiRNNCell(
-            [lstm_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+          lstm_fw_cell = tf.contrib.rnn.MultiRNNCell(
+              [lstm_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+          lstm_bw_cell = tf.contrib.rnn.MultiRNNCell(
+              [lstm_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
 
-        lstm_fw_cell = lstm_fw_cell._cells
-        lstm_bw_cell = lstm_bw_cell._cells
+          fw_cell = lstm_fw_cell._cells
+          bw_cell = lstm_bw_cell._cells
+
+      if FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
+        with tf.variable_scope('BGRU'):
+
+          gru_fw_cell = tf.contrib.rnn.MultiRNNCell(
+              [GRU_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+          gru_bw_cell = tf.contrib.rnn.MultiRNNCell(
+              [GRU_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+
+          fw_cell = gru_fw_cell._cells
+          bw_cell = gru_bw_cell._cells
+
+      with tf.variable_scope('BiRNN'):
         result = rnn.stack_bidirectional_dynamic_rnn(
-            cells_fw=lstm_fw_cell,
-            cells_bw=lstm_bw_cell,
+            cells_fw=fw_cell,
+            cells_bw=bw_cell,
             inputs=outputs,
             dtype=tf.float32,
             sequence_length=self._lengths)
         outputs, fw_final_states, bw_final_states = result
-    if FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
-      with tf.variable_scope('BGRU'):
 
-        gru_fw_cell = tf.contrib.rnn.MultiRNNCell(
-            [GRU_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
-        gru_bw_cell = tf.contrib.rnn.MultiRNNCell(
-            [GRU_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+      with tf.variable_scope('fullconnectOut'):
+        in_size = FLAGS.PARAM.RNN_SIZE
+        if self._model_type.upper()[0] == 'B':  # bidirection
+          rnn_output_num = FLAGS.PARAM.RNN_SIZE*2
+          if FLAGS.PARAM.MODEL_TYPE == 'BLSTM' and (not (FLAGS.PARAM.LSTM_num_proj is None)):
+            rnn_output_num = 2*FLAGS.PARAM.LSTM_num_proj
+          outputs = tf.reshape(outputs, [-1, rnn_output_num])
+          in_size = rnn_output_num
+        out_size = FLAGS.PARAM.OUTPUT_SIZE
+        weights = tf.get_variable('weights1', [in_size, out_size],
+                                  initializer=tf.random_normal_initializer(stddev=0.01))
+        biases = tf.get_variable('biases1', [out_size],
+                                 initializer=tf.constant_initializer(0.0))
+        mask = tf.nn.relu(tf.matmul(outputs, weights) + biases)
+        self._mask = tf.reshape(
+            mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
 
-        gru_fw_cell = gru_fw_cell._cells
-        gru_bw_cell = gru_bw_cell._cells
-        result = rnn.stack_bidirectional_dynamic_rnn(
-            cells_fw=gru_fw_cell,
-            cells_bw=gru_bw_cell,
-            inputs=outputs,
-            dtype=tf.float32,
-            sequence_length=self._lengths)
-        outputs, fw_final_states, bw_final_states = result
+      self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
 
-    with tf.variable_scope('fullconnectOut'):
-      in_size = FLAGS.PARAM.RNN_SIZE
-      if self._model_type.upper()[0] == 'B':  # bidirection
-        rnn_output_num = FLAGS.PARAM.RNN_SIZE*2
-        if FLAGS.PARAM.MODEL_TYPE == 'BLSTM' and (not (FLAGS.PARAM.LSTM_num_proj is None)):
-          rnn_output_num = 2*FLAGS.PARAM.LSTM_num_proj
-        outputs = tf.reshape(outputs, [-1, rnn_output_num])
-        in_size = rnn_output_num
-      out_size = FLAGS.PARAM.OUTPUT_SIZE
-      weights = tf.get_variable('weights1', [in_size, out_size],
-                                initializer=tf.random_normal_initializer(stddev=0.01))
-      biases = tf.get_variable('biases1', [out_size],
-                               initializer=tf.constant_initializer(0.0))
-      mask = tf.nn.relu(tf.matmul(outputs, weights) + biases)
-      self._mask = tf.reshape(
-          mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
+      # region get infer spec
+      if FLAGS.PARAM.DECODING_MASK_POSITION == 'mag':
+        self._y_mag_estimation = rm_norm_mag_spec(self._mask*self._norm_x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
+      elif FLAGS.PARAM.DECODING_MASK_POSITION == 'logmag':
+        self._y_mag_estimation = rm_norm_logmag_spec(self._mask*self._norm_x_logmag_spec,
+                                                     FLAGS.PARAM.MAG_NORM_MAX,
+                                                     self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
+      if behavior == Model_Baseline.infer:
+        return
+      '''
+      _y_mag_estimation is estimated mag_spec
+      _y_estimation is loss_targe, mag_sepec or logmag_spec
+      _y_mag_estimation2 is 2-stage estimated mag_spec
+      '''
+      # endregion
 
-    self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
-
-    # region get infer spec
-    if FLAGS.PARAM.DECODING_MASK_POSITION == 'mag':
-      self._y_mag_estimation = rm_norm_mag_spec(self._mask*self._norm_x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
-    elif FLAGS.PARAM.DECODING_MASK_POSITION == 'logmag':
-      self._y_mag_estimation = rm_norm_logmag_spec(self._mask*self._norm_x_logmag_spec,
-                                                   FLAGS.PARAM.MAG_NORM_MAX,
-                                                   self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
-    if behavior == Model_Baseline.infer:
-      return
-    '''
-    _y_mag_estimation is estimated mag_spec
-    _y_estimation is loss_targe, mag_sepec or logmag_spec
-    _y_mag_estimation2 is 2-stage estimated mag_spec
-    '''
-    # endregion
-
-    # recurrent trainning
-    tf.get_variable_scope().reuse_variables()
-    same_model = Model_Baseline(self._y_mag_estimation,
-                                lengths_batch,
-                                None,
-                                None,
-                                None,
-                                behavior=Model_Baseline.infer)
-    self._y_estimation2 = same_model._y_estimation
-    self._y_mag_estimation2 = same_model._y_mag_estimation
-    # endregion
+      # recurrent trainning
+      tf.get_variable_scope().reuse_variables()
+      same_model = Model_Baseline(self._y_mag_estimation,
+                                  lengths_batch,
+                                  y_mag_spec_batch,
+                                  theta_x_batch,
+                                  theta_y_batch,
+                                  behavior=Model_Baseline.infer)
+      self._y_estimation2 = same_model._y_estimation
+      self._y_mag_estimation2 = same_model._y_mag_estimation
+      # utils.tf_tool.show_all_variables()
+      # endregion
 
     # region prepare y_estimation and y_labels
     if FLAGS.PARAM.TRAINING_MASK_POSITION == 'mag':

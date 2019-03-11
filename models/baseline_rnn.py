@@ -88,15 +88,9 @@ class Model_Baseline(object):
         lstm_bw_cell = tf.contrib.rnn.MultiRNNCell(
             [lstm_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
 
-        lstm_fw_cell = lstm_fw_cell._cells
-        lstm_bw_cell = lstm_bw_cell._cells
-        result = rnn.stack_bidirectional_dynamic_rnn(
-            cells_fw=lstm_fw_cell,
-            cells_bw=lstm_bw_cell,
-            inputs=outputs,
-            dtype=tf.float32,
-            sequence_length=self._lengths)
-        outputs, fw_final_states, bw_final_states = result
+        fw_cell = lstm_fw_cell._cells
+        bw_cell = lstm_bw_cell._cells
+
     if FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
       with tf.variable_scope('BGRU'):
 
@@ -105,15 +99,17 @@ class Model_Baseline(object):
         gru_bw_cell = tf.contrib.rnn.MultiRNNCell(
             [GRU_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
 
-        gru_fw_cell = gru_fw_cell._cells
-        gru_bw_cell = gru_bw_cell._cells
-        result = rnn.stack_bidirectional_dynamic_rnn(
-            cells_fw=gru_fw_cell,
-            cells_bw=gru_bw_cell,
-            inputs=outputs,
-            dtype=tf.float32,
-            sequence_length=self._lengths)
-        outputs, fw_final_states, bw_final_states = result
+        fw_cell = gru_fw_cell._cells
+        bw_cell = gru_bw_cell._cells
+
+    with tf.variable_scope('BiRNN'):
+      result = rnn.stack_bidirectional_dynamic_rnn(
+          cells_fw=fw_cell,
+          cells_bw=bw_cell,
+          inputs=outputs,
+          dtype=tf.float32,
+          sequence_length=self._lengths)
+      outputs, fw_final_states, bw_final_states = result
 
     with tf.variable_scope('fullconnectOut'):
       in_size = FLAGS.PARAM.RNN_SIZE
@@ -141,8 +137,6 @@ class Model_Baseline(object):
       self._y_mag_estimation = rm_norm_logmag_spec(self._mask*self._norm_x_logmag_spec,
                                                    FLAGS.PARAM.MAG_NORM_MAX,
                                                    self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
-    if behavior == Model_Baseline.infer:
-      return
     '''
     _y_mag_estimation is estimated mag_spec
     _y_estimation is loss_targe, mag_sepec or logmag_spec
@@ -170,6 +164,9 @@ class Model_Baseline(object):
         self._y_estimation = normedMag2normedLogmag(self._y_estimation, FLAGS.PARAM.MAG_NORM_MAX,
                                                     self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
     # endregion
+
+    if behavior == Model_Baseline.infer:
+      return
 
     # region get LOSS
     if FLAGS.PARAM.LOSS_FUNC == 'SPEC_MSE': # log_mag and mag MSE
