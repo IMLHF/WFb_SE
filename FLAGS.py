@@ -1,5 +1,6 @@
 from losses import loss
 import models.baseline_rnn
+import models.recurrent_train_model
 
 
 class base_config:
@@ -117,6 +118,16 @@ class C001_2(base_config): #
   iter4 PESQ: 0.4
   '''
 
+
+class C001_2_RT(base_config): #
+  CHECK_POINT = 'nnet_C001_2_RT'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  SE_MODEL = models.recurrent_train_model.Model_Recurrent_Train
+
+
 class C001_3(base_config): #
   CHECK_POINT = 'nnet_C001_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -124,8 +135,19 @@ class C001_3(base_config): #
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC = "MFCC_SPEC_MSE"
-  MFCC_LOSS_COEF = 0.5
   SPEC_LOSS_COEF = 0.5
+  MFCC_LOSS_COEF = 0.5
+
+
+class C001_3_2(base_config): #
+  CHECK_POINT = 'nnet_C001_3'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "MFCC_SPEC_MSE"
+  SPEC_LOSS_COEF = 0.8
+  MFCC_LOSS_COEF = 0.2
 
 
 class C002(base_config):  #
