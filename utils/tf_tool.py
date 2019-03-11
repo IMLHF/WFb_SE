@@ -148,7 +148,7 @@ def normedLogmag2normedMag(normed_logmag, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BI
 def melspec_form_realStft(mag_spectrograms, sample_rate, num_mel_bins):
   # Warp the linear scale spectrograms into the mel-scale.
   num_spectrogram_bins = mag_spectrograms.shape[-1].value
-  lower_edge_hertz, upper_edge_hertz = 0.0, sample_rate/2
+  lower_edge_hertz, upper_edge_hertz = sample_rate*0.015625, sample_rate*0.475
   linear_to_mel_weight_matrix = tf.contrib.signal.linear_to_mel_weight_matrix(num_mel_bins,
                                                                               num_spectrogram_bins,
                                                                               sample_rate,
