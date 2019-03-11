@@ -55,10 +55,14 @@ def eval_one_epoch(sess, val_model):
   data_len = 0
   while True:
     try:
-      loss, current_batchsize = sess.run(
-          [val_model.loss, val_model.batch_size])
+      loss, current_batchsize = sess.run([
+          val_model.loss, val_model.batch_size,
+          # val_model._loss1, val_model._loss2,
+      ])
       # print(inputs)
       # exit(0)
+      # print(loss2,'/',loss1)
+      sys.stdout.flush()
       val_loss += loss
       data_len += 1
     except tf.errors.OutOfRangeError:
