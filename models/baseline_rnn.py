@@ -90,6 +90,13 @@ class Model_Baseline(object):
 
         fw_cell = lstm_fw_cell._cells
         bw_cell = lstm_bw_cell._cells
+        result = rnn.stack_bidirectional_dynamic_rnn(
+            cells_fw=fw_cell,
+            cells_bw=bw_cell,
+            inputs=outputs,
+            dtype=tf.float32,
+            sequence_length=self._lengths)
+        outputs, fw_final_states, bw_final_states = result
 
     if FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
       with tf.variable_scope('BGRU'):
@@ -101,15 +108,14 @@ class Model_Baseline(object):
 
         fw_cell = gru_fw_cell._cells
         bw_cell = gru_bw_cell._cells
+        result = rnn.stack_bidirectional_dynamic_rnn(
+            cells_fw=fw_cell,
+            cells_bw=bw_cell,
+            inputs=outputs,
+            dtype=tf.float32,
+            sequence_length=self._lengths)
+        outputs, fw_final_states, bw_final_states = result
 
-    with tf.variable_scope('BiRNN'):
-      result = rnn.stack_bidirectional_dynamic_rnn(
-          cells_fw=fw_cell,
-          cells_bw=bw_cell,
-          inputs=outputs,
-          dtype=tf.float32,
-          sequence_length=self._lengths)
-      outputs, fw_final_states, bw_final_states = result
 
     with tf.variable_scope('fullconnectOut'):
       in_size = FLAGS.PARAM.RNN_SIZE
