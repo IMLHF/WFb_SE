@@ -43,13 +43,11 @@ class base_config:
   RESTORE_PHASE = 'GRIFFIN_LIM'  # 'MIXED','GRIFFIN_LIM'.
   GRIFFIN_ITERNUM = 50
   minibatch_size = 400  # batch num to show
-  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/room/work/lhf/alldata/aishell2_100speaker_list_1_8k'
-  OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/room/work/lhf/alldata/aishell2_100speaker_list_2_8k'
-  # NOISE_DIR = '/all_data/many_noise' # for docker
-  NOISE_DIR = '/home/room/work/lhf/alldata/many_noise_8k'
+  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_1_8k'
+  OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_2_8k'
+  NOISE_DIR = '/home/student/work/lhf/alldata/many_noise_8k'
+  TFRECORDS_DIR = '/home/student/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_8k_snrmix_wavespan32767'
   DATA_DICT_DIR = '_data/mixed_aishell'
-  # TFRECORDS_DIR = '/all_data/feature_tfrecords' # for docker
-  TFRECORDS_DIR = '/home/room/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_8k_snrmix_wavespan32767'
   GENERATE_TFRECORD = False
   PROCESS_NUM_GENERATE_TFERCORD = 16
   TFRECORDS_NUM = 160  # 提多少，后面设置MAX_TFRECORD_FILES_USED表示用多少
@@ -99,6 +97,10 @@ class C_ReluChangeToWeightedSoftmax(base_config):
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
 
 class C001(base_config): # DONE 15043
+  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/room/work/lhf/alldata/aishell2_100speaker_list_1_8k'
+  OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/room/work/lhf/alldata/aishell2_100speaker_list_2_8k'
+  NOISE_DIR = '/home/room/work/lhf/alldata/many_noise_8k'
+  TFRECORDS_DIR = '/home/room/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_8k_snrmix_wavespan32767'
   CHECK_POINT = 'nnet_C001'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -109,7 +111,7 @@ class C001(base_config): # DONE 15043
   iter4 PESQ: 0.4
   '''
 
-class C001_2(base_config): # DONE 15043
+class C001_2(base_config): # RUNNING 15041
   CHECK_POINT = 'nnet_C001_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -121,7 +123,7 @@ class C001_2(base_config): # DONE 15043
   '''
 
 
-class C001_2_RT(base_config): # RUNNNING 15043
+class C001_2_RT(base_config): # RUNNNING 15041
   CHECK_POINT = 'nnet_C001_2_RT'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -130,7 +132,7 @@ class C001_2_RT(base_config): # RUNNNING 15043
   SE_MODEL = models.recurrent_train_model.Model_Recurrent_Train
 
 
-class C001_3(base_config): # DONE 15043
+class C001_3(base_config): # DONE 15041
   CHECK_POINT = 'nnet_C001_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -141,7 +143,7 @@ class C001_3(base_config): # DONE 15043
   MFCC_LOSS_COEF = 0.5
 
 
-class C001_3_2(base_config): # PREPARE
+class C001_3_2(base_config): # prepare 15041
   CHECK_POINT = 'nnet_C001_3_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -151,7 +153,7 @@ class C001_3_2(base_config): # PREPARE
   SPEC_LOSS_COEF = 0.8
   MFCC_LOSS_COEF = 0.2
 
-class C001_4(base_config): # RUNNING 15041
+class C001_4(base_config): # DONE 15041
   CHECK_POINT = 'nnet_C001_4'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -237,5 +239,5 @@ class CXX(base_config):  #
   LOG_BIAS_TRAINABEL = True
 
 
-PARAM = C001_3_2
+PARAM = C001_4
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
