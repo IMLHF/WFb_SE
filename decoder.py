@@ -9,16 +9,16 @@ from FLAGS import PARAM
 from utils import audio_tool
 
 
-def build_session(ckpt_dir):
+def build_session(ckpt_dir,batch_size,finalizeG=True):
   g = tf.Graph()
   with g.as_default():
     with tf.device('/cpu:0'):
       with tf.name_scope('input'):
-        x_batch = tf.placeholder(tf.float32,shape=[1,None,PARAM.INPUT_SIZE],name='x_batch')
-        lengths_batch = tf.placeholder(tf.int32,shape=[1],name='lengths_batch')
-        y_batch = tf.placeholder(tf.float32,shape=[1,None,PARAM.INPUT_SIZE],name='y_batch')
-        x_theta = tf.placeholder(tf.float32,shape=[1,None,PARAM.INPUT_SIZE],name='x_theta')
-        y_theta = tf.placeholder(tf.float32,shape=[1,None,PARAM.INPUT_SIZE],name='y_theta')
+        x_batch = tf.placeholder(tf.float32,shape=[batch_size,None,PARAM.INPUT_SIZE],name='x_batch')
+        lengths_batch = tf.placeholder(tf.int32,shape=[batch_size],name='lengths_batch')
+        y_batch = tf.placeholder(tf.float32,shape=[batch_size,None,PARAM.INPUT_SIZE],name='y_batch')
+        x_theta = tf.placeholder(tf.float32,shape=[batch_size,None,PARAM.INPUT_SIZE],name='x_theta')
+        y_theta = tf.placeholder(tf.float32,shape=[batch_size,None,PARAM.INPUT_SIZE],name='y_theta')
     with tf.name_scope('model'):
       model = PARAM.SE_MODEL(x_batch,
                              lengths_batch,
@@ -44,8 +44,10 @@ def build_session(ckpt_dir):
     else:
       tf.logging.fatal("checkpoint not found.")
       sys.exit(-1)
-  g.finalize()
-  return sess,model
+  if finalizeG:
+    g.finalize()
+    return sess,model
+  return sess,model,g
 
 
 def decode_one_wav(sess, model, wavedata):
@@ -91,7 +93,7 @@ if __name__=='__main__':
   decode_ans_file = os.path.join(PARAM.SAVE_DIR,'decode_'+ckpt)
   if not os.path.exists(decode_ans_file):
     os.makedirs(decode_ans_file)
-  sess, model = build_session(ckpt)
+  sess, model = build_session(ckpt, 1)
 
   decode_file_list = [
       'exp/rnn_speech_enhancement/s_2_00_MIX_1_clapping_8k.wav',
@@ -101,6 +103,7 @@ if __name__=='__main__':
       'exp/rnn_speech_enhancement/speech5_8k.wav',
       'exp/rnn_speech_enhancement/speech6_8k.wav',
       'exp/rnn_speech_enhancement/speech7_8k.wav',
+      # 'exp/rnn_speech_enhancement/decode_nnet_C001_3/nnet_C001_3_007_speech7_8k.wav'
   ]
 
   for i, mixed_dir in enumerate(decode_file_list):
@@ -112,10 +115,10 @@ if __name__=='__main__':
     reY = np.where(reY>abs_max,abs_max,reY)
     reY = np.where(reY<-abs_max,-abs_max,reY)
     audio_tool.write_audio(os.path.join(decode_ans_file,
-                                        ('%03d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
+                                        (ckpt+'_%03d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
                            reY,
                            sr)
     file_name = mixed_dir[mixed_dir.rfind('/')+1:mixed_dir.rfind('.')]
     spectrum_tool.picture_spec(mask,
                                os.path.join(decode_ans_file,
-                                            ('%03d_' % (i+1))+file_name))
+                                            (ckpt+'_%03d_' % (i+1))+file_name))
