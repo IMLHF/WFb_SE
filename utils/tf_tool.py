@@ -21,6 +21,21 @@ def new_variable(name, shape,
   return var
 
 
+def lstm_cell(n_units, n_proj, activation_fun):
+  return tf.contrib.rnn.LSTMCell(
+      n_units, forget_bias=1.0, use_peepholes=True,
+      num_proj=n_proj,
+      initializer=tf.contrib.layers.xavier_initializer(),
+      state_is_tuple=True, activation=activation_fun)
+
+
+def GRU_cell(n_units, activation_fun):
+  return tf.contrib.rnn.GRUCell(
+      n_units,
+      kernel_initializer=tf.contrib.layers.xavier_initializer(),
+      activation=activation_fun)
+
+
 def tdnn_layer_not_active(x, time_width, time_stride, units_num, padding, name):
   shape = (time_width, np.shape(x)[-1], units_num)
   weights = new_variable(shape=shape, name=name+'_weight')
