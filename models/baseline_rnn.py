@@ -261,6 +261,8 @@ class Model_Baseline(object):
       self._loss1, self._loss2 = loss.balanced_MEL_AND_SPEC_MSE(self._y_estimation, self._y_labels,
                                                                 self._y_mag_estimation, self._y_mag_spec)
       self._loss = FLAGS.PARAM.SPEC_LOSS_COEF*self._loss1 + FLAGS.PARAM.MEL_LOSS_COEF*self._loss2
+    elif FLAGS.PARAM.LOSS_FUNC == "SPEC_MSE_LOWF_EN":
+      self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
     else:
       print('Loss type error.')
       exit(-1)
