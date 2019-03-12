@@ -8,7 +8,49 @@ from utils import tf_tool
 from losses import loss
 from utils.tf_tool import norm_mag_spec, norm_logmag_spec, rm_norm_mag_spec, rm_norm_logmag_spec
 from utils.tf_tool import normedLogmag2normedMag, normedMag2normedLogmag
+from utils.tf_tool import lstm_cell, GRU_cell
 import FLAGS
+
+
+def threshold_feature(features, inputs, input_finnal_dim):
+  '''
+  inputs: func inputs of calculate noise_threshold
+  '''
+  in_size = input_finnal_dim
+  with tf.variable_scope('fullconnectGetThreshold'):
+    # attention layer
+    with tf.variable_scope('attention_scorer'):
+      weights_scorer = tf.get_variable('weights_scorer', [in_size, 1],
+                                       initializer=tf.random_normal_initializer(stddev=0.01))
+      biases_scorer = tf.get_variable('biases_scorer', [1],
+                                      initializer=tf.constant_initializer(0.0))
+      attention_alpha_vec = tf.matmul(inputs, weights_scorer) + biases_scorer # [batch,time,1]
+      attention_alpha_vec = tf.expand_dims(tf.squeeze(attention_alpha_vec, axis=[-1]),-2) # [batch,1,time]
+      attention_alpha_vec = tf.nn.softmax(attention_alpha_vec, axis=-1)
+      attened_vec = tf.squeeze(tf.matmul(attention_alpha_vec, inputs), axis=[-2]) # [batch, in_size]
+
+    weights_threshold = tf.get_variable('weights_threshold', [in_size, 1],
+                                        initializer=tf.random_normal_initializer(stddev=0.01))
+    biases_threshold = tf.get_variable('biases_threshold', [1],
+                                       initializer=tf.constant_initializer(0.0))
+    noise_mag_threshold = tf.relu(tf.matmul(attened_vec, weights_threshold) + biases_threshold)
+
+
+    if FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.SQUARE_FADE:
+      tf.logging.info('Use Square Noise Threshold.')
+      features = tf.multiply(features, tf.nn.relu6(features*6/noise_mag_threshold) / 6)
+      return features
+    elif FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EXPONENTIAL_FADE:
+      tf.logging.info('Use Exponential Noise Threshold.')
+      features = tf.pow(features/noise_mag_threshold, 2 - tf.nn.relu6(features*6/noise_mag_threshold)/6)
+      return features
+    elif FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EN_EXPONENTIAL_FADE:
+      tf.logging.info('Use Enhanced Exponential Noise Threshold.')
+      features = tf.pow(features/noise_mag_threshold, (2 - tf.nn.relu6(features*6/noise_mag_threshold)/6)**2)
+      return features
+    else:
+      print('Threshold error.')
+      exit(-1)
 
 
 class Model_Baseline(object):
@@ -59,34 +101,29 @@ class Model_Baseline(object):
 
     outputs = self.net_input
 
-    def lstm_cell():
-      return tf.contrib.rnn.LSTMCell(
-          FLAGS.PARAM.RNN_SIZE, forget_bias=1.0, use_peepholes=True,
-          num_proj=FLAGS.PARAM.LSTM_num_proj,
-          initializer=tf.contrib.layers.xavier_initializer(),
-          state_is_tuple=True, activation=FLAGS.PARAM.LSTM_ACTIVATION)
     lstm_attn_cell = lstm_cell
     if behavior != Model_Baseline.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
-      def lstm_attn_cell():
-        return tf.contrib.rnn.DropoutWrapper(lstm_cell(), output_keep_prob=FLAGS.PARAM.KEEP_PROB)
+      def lstm_attn_cell(n_units, n_proj, act):
+        return tf.contrib.rnn.DropoutWrapper(lstm_cell(n_units, n_proj, act),
+                                             output_keep_prob=FLAGS.PARAM.KEEP_PROB)
 
-    def GRU_cell():
-      return tf.contrib.rnn.GRUCell(
-          FLAGS.PARAM.RNN_SIZE,
-          # kernel_initializer=tf.contrib.layers.xavier_initializer(),
-          activation=FLAGS.PARAM.LSTM_ACTIVATION)
-    GRU_attn_cell = lstm_cell
+    GRU_attn_cell = GRU_cell
     if behavior != Model_Baseline.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
-      def GRU_attn_cell():
-        return tf.contrib.rnn.DropoutWrapper(GRU_cell(), output_keep_prob=FLAGS.PARAM.KEEP_PROB)
+      def GRU_attn_cell(n_units, act):
+        return tf.contrib.rnn.DropoutWrapper(GRU_cell(n_units, act),
+                                             output_keep_prob=FLAGS.PARAM.KEEP_PROB)
 
     if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM':
       with tf.variable_scope('BLSTM'):
 
         lstm_fw_cell = tf.contrib.rnn.MultiRNNCell(
-            [lstm_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+            [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                            FLAGS.PARAM.LSTM_num_proj,
+                            FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
         lstm_bw_cell = tf.contrib.rnn.MultiRNNCell(
-            [lstm_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+            [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                            FLAGS.PARAM.LSTM_num_proj,
+                            FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
 
         fw_cell = lstm_fw_cell._cells
         bw_cell = lstm_bw_cell._cells
@@ -102,9 +139,11 @@ class Model_Baseline(object):
       with tf.variable_scope('BGRU'):
 
         gru_fw_cell = tf.contrib.rnn.MultiRNNCell(
-            [GRU_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+            [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                           FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
         gru_bw_cell = tf.contrib.rnn.MultiRNNCell(
-            [GRU_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+            [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                           FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
 
         fw_cell = gru_fw_cell._cells
         bw_cell = gru_bw_cell._cells
@@ -116,23 +155,48 @@ class Model_Baseline(object):
             sequence_length=self._lengths)
         outputs, fw_final_states, bw_final_states = result
 
-
+    # region full connection get mask
+    # calcu rnn output size
+    in_size = FLAGS.PARAM.RNN_SIZE
+    mask = None
+    if self._model_type.upper()[0] == 'B':  # bidirection
+      rnn_output_num = FLAGS.PARAM.RNN_SIZE*2
+      if FLAGS.PARAM.MODEL_TYPE == 'BLSTM' and (not (FLAGS.PARAM.LSTM_num_proj is None)):
+        rnn_output_num = 2*FLAGS.PARAM.LSTM_num_proj
+      outputs = tf.reshape(outputs, [-1, rnn_output_num])
+      in_size = rnn_output_num
+    out_size = FLAGS.PARAM.OUTPUT_SIZE
     with tf.variable_scope('fullconnectOut'):
-      in_size = FLAGS.PARAM.RNN_SIZE
-      if self._model_type.upper()[0] == 'B':  # bidirection
-        rnn_output_num = FLAGS.PARAM.RNN_SIZE*2
-        if FLAGS.PARAM.MODEL_TYPE == 'BLSTM' and (not (FLAGS.PARAM.LSTM_num_proj is None)):
-          rnn_output_num = 2*FLAGS.PARAM.LSTM_num_proj
-        outputs = tf.reshape(outputs, [-1, rnn_output_num])
-        in_size = rnn_output_num
-      out_size = FLAGS.PARAM.OUTPUT_SIZE
       weights = tf.get_variable('weights1', [in_size, out_size],
                                 initializer=tf.random_normal_initializer(stddev=0.01))
       biases = tf.get_variable('biases1', [out_size],
                                initializer=tf.constant_initializer(0.0))
+    if FLAGS.PARAM.COEF_SOFTMAX_AS_OUTPUT:
+      with tf.variable_scope('fullconnectCoef'):
+        weights_coef = tf.get_variable('weights_coef', [in_size, 1],
+                                       initializer=tf.random_normal_initializer(mean=1.0, stddev=0.01))
+        biases_coef = tf.get_variable('biases_coef', [1],
+                                      initializer=tf.constant_initializer(0.0))
+      mask = tf.multiply(tf.nn.softmax(tf.reshape(tf.matmul(outputs, weights) + biases, [self._batch_size,-1])),
+                         tf.nn.relu(tf.reduce_sum(tf.matmul(outputs, weights_coef) + biases_coef, axis=[-1,-2])))
+    else:
       mask = tf.nn.relu(tf.matmul(outputs, weights) + biases)
-      self._mask = tf.reshape(
-          mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
+    # endregion
+
+    # region Apply Noise Threshold Function on Mask
+    if FLAGS.PARAM.THRESHOLD_FUNC is not None:
+      # use noise threshold
+      if FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_MASK:
+        mask = threshold_feature(mask, outputs, in_size)
+      elif FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_SPEC:
+        pass
+      else:
+        print('Threshold position error!')
+        exit(-1)
+    # endregion
+
+    self._mask = tf.reshape(
+        mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
 
     self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
 
@@ -161,6 +225,18 @@ class Model_Baseline(object):
     else:
       tf.logging.error('Mask type error.')
       exit(-1)
+
+    # region Apply Noise Threshold Function on Spec(log or mag)
+    if FLAGS.PARAM.THRESHOLD_FUNC is not None:
+      # use noise threshold
+      if FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_MASK:
+        pass
+      elif FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_SPEC:
+        self._y_estimation = threshold_feature(self._y_estimation, outputs, in_size)
+      else:
+        print('Threshold position error!')
+        exit(-1)
+    # endregion
 
     if FLAGS.PARAM.TRAINING_MASK_POSITION != FLAGS.PARAM.LABEL_TYPE:
       if FLAGS.PARAM.LABEL_TYPE == 'mag':
