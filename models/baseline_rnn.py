@@ -137,11 +137,10 @@ class Model_Baseline(object):
                                        initializer=tf.random_normal_initializer(mean=1.0, stddev=0.01))
         biases_coef = tf.get_variable('biases_coef', [1],
                                       initializer=tf.constant_initializer(0.0))
-      raw_mask = tf.reshape(tf.matmul(outputs, weights) + biases, [self._batch_size,-1]) # [batch, time*fre]
-      batch_coef_vec = tf.reshape(tf.matmul(outputs, weights_coef) + biases_coef, [self._batch_size,-1]) # [batch, time]
-      batch_coef = tf.reshape(tf.reduce_sum(batch_coef_vec, axis=[-1]),[self._batch_size,1]) # [batch,1]
-      mask = tf.multiply(tf.nn.softmax(raw_mask,axis=-1),
-                         tf.nn.relu(batch_coef))
+      raw_mask = tf.reshape(tf.matmul(outputs, weights) + biases, [self._batch_size,-1,FLAGS.PARAM.OUTPUT_SIZE]) # [batch,time,fre]
+      batch_coef_vec = tf.nn.relu(tf.reshape(tf.matmul(outputs, weights_coef) + biases_coef, [self._batch_size,-1])) # [batch, time]
+      mask = tf.multiply(raw_mask,
+                         tf.reshape(batch_coef_vec,[self._batch_size,-1,1]))
     else:
       mask = tf.nn.relu(tf.matmul(outputs, weights) + biases)
     # endregion
@@ -202,6 +201,8 @@ class Model_Baseline(object):
       self._loss = FLAGS.PARAM.SPEC_LOSS_COEF*self._loss1 + FLAGS.PARAM.MEL_LOSS_COEF*self._loss2
     elif FLAGS.PARAM.LOSS_FUNC == "SPEC_MSE_LOWF_EN":
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
+    elif FLAGS.PARAM.LOSS_FUNC == "FAIR_SPEC_MSE":
+      self._loss = loss.fair_reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
     else:
       print('Loss type error.')
       exit(-1)
