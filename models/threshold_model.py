@@ -180,7 +180,7 @@ class Threshold_Model(object):
                                 initializer=tf.random_normal_initializer(stddev=0.01))
       biases = tf.get_variable('biases1', [out_size],
                                initializer=tf.constant_initializer(0.0))
-    if FLAGS.PARAM.COEF_SOFTMAX_AS_OUTPUT:
+    if FLAGS.PARAM.TIME_NOSOFTMAX_ATTENTION:
       with tf.variable_scope('fullconnectCoef'):
         weights_coef = tf.get_variable('weights_coef', [in_size, 1],
                                        initializer=tf.random_normal_initializer(mean=1.0, stddev=0.01))

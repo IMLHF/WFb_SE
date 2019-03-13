@@ -184,10 +184,10 @@ class Model_Baseline(object):
                                                     self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
     # endregion
 
+    self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
     if behavior == Model_Baseline.infer:
       return
 
-    self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
     # region get LOSS
     if FLAGS.PARAM.LOSS_FUNC == 'SPEC_MSE': # log_mag and mag MSE
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels)
