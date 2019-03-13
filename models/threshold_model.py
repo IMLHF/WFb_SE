@@ -44,17 +44,19 @@ def threshold_feature(features, inputs, batch, input_finnal_dim):
       tf.logging.info('Use Square Noise Threshold.')
       # features = tf.multiply(features, tf.nn.relu6(features*6/noise_mag_threshold) / 6)
       features = tf.multiply(features, tf.nn.relu6(features*6*noise_mag_threshold) / 6)
-      return features
+      return features, noise_mag_threshold
     elif FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EXPONENTIAL_FADE:
       tf.logging.info('Use Exponential Noise Threshold.')
       # features = tf.pow(features/noise_mag_threshold, 2 - tf.nn.relu6(features*6/noise_mag_threshold)/6)
-      features = tf.pow(features*noise_mag_threshold, 2 - tf.nn.relu6(features*6*noise_mag_threshold)/6)
-      return features
+      features = tf.pow(features*noise_mag_threshold,
+                        2 - tf.nn.relu6(features*6*noise_mag_threshold)/6)/tf.maximum(1e-12, noise_mag_threshold)
+      return features, noise_mag_threshold
     elif FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EN_EXPONENTIAL_FADE:
       tf.logging.info('Use Enhanced Exponential Noise Threshold.')
       # features = tf.pow(features/noise_mag_threshold, (2 - tf.nn.relu6(features*6/noise_mag_threshold)/6)**2)
-      features = tf.pow(features*noise_mag_threshold, (2 - tf.nn.relu6(features*6*noise_mag_threshold)/6)**2)
-      return features
+      features = tf.pow(features*noise_mag_threshold,
+                        (2 - tf.nn.relu6(features*6*noise_mag_threshold)/6)**2)/tf.maximum(1e-12, noise_mag_threshold)
+      return features, noise_mag_threshold
     else:
       print('Threshold error.')
       exit(-1)
@@ -197,7 +199,7 @@ class Threshold_Model(object):
     if FLAGS.PARAM.THRESHOLD_FUNC is not None:
       # use noise threshold
       if FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_MASK:
-        self._mask = threshold_feature(self._mask, outputs, self._batch_size, in_size)
+        self._mask, self._threshold = threshold_feature(self._mask, outputs, self._batch_size, in_size)
       elif FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_SPEC:
         pass
       else:
@@ -224,7 +226,7 @@ class Threshold_Model(object):
       if FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_MASK:
         pass
       elif FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_SPEC:
-        self._y_estimation = threshold_feature(self._y_estimation, outputs,self._batch_size, in_size)
+        self._y_estimation, self._threshold = threshold_feature(self._y_estimation, outputs,self._batch_size, in_size)
     # endregion
 
     # region get infer spec
@@ -302,6 +304,15 @@ class Threshold_Model(object):
     dims: [0]
     '''
     return self._real_logbias
+
+  @property
+  def threshold(self):
+    '''
+    description:
+    type: >0
+    dims: [0]
+    '''
+    return self._threshold
 
   @property
   def y_mag_estimation(self):
