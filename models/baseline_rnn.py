@@ -139,8 +139,7 @@ class Model_Baseline(object):
                                       initializer=tf.constant_initializer(0.0))
       raw_mask = tf.reshape(tf.matmul(outputs, weights) + biases, [self._batch_size,-1]) # [batch, time*fre]
       batch_coef_vec = tf.reshape(tf.matmul(outputs, weights_coef) + biases_coef, [self._batch_size,-1]) # [batch, time]
-      batch_coef = tf.reduce_sum(batch_coef_vec, axis=[-1])
-      print(np.shape(batch_coef_vec),np.shape(batch_coef))
+      batch_coef = tf.reshape(tf.reduce_sum(batch_coef_vec, axis=[-1]),[self._batch_size,1]) # [batch,1]
       mask = tf.multiply(tf.nn.softmax(raw_mask,axis=-1),
                          tf.nn.relu(batch_coef))
     else:
