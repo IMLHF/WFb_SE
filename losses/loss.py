@@ -7,6 +7,10 @@ def reduce_sum_frame_batchsize_MSE(y1, y2):
   cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(y1-y2, 2), 1), 1))
   return cost
 
+def fair_reduce_sum_frame_batchsize_MSE(y1, y2):
+  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(tf.abs(y1-y2)+1, 2)-1, 1), 1))
+  return cost
+
 def reduce_mean_MSE(y1, y2):
   cost = tf.reduce_mean(tf.pow(y1-y2, 2))
   return cost
