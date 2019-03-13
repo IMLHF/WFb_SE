@@ -19,7 +19,7 @@ class base_config:
   MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
   LSTM_ACTIVATION = 'tanh'
   MASK_TYPE = "PSM"  # "PSM" or "IRM"
-  LOSS_FUNC = "SPEC_MSE" # "SPEC_MSE" or "MFCC_SPEC_MSE" or "MEL_SPEC_MSE" or "SPEC_MSE_LOWF_EN"
+  LOSS_FUNC = "SPEC_MSE" # "SPEC_MSE" or "MFCC_SPEC_MSE" or "MEL_SPEC_MSE" or "SPEC_MSE_LOWF_EN" or "FAIR_SPEC_MSE"
   KEEP_PROB = 0.8
   RNN_LAYER = 2
   CLIP_NORM = 5.0
@@ -89,7 +89,7 @@ class base_config:
 
   GET_AUDIO_IN_TEST = False
 
-  COEF_SOFTMAX_AS_OUTPUT = False
+  TIME_NOSOFTMAX_ATTENTION = False
 
   # fixed param
   SQUARE_FADE = 'square_fade'
@@ -102,21 +102,7 @@ class base_config:
   THRESHOLD_POS = None
 
 
-
-class C_WeightedSoftmax(base_config): # prepare 15041
-  CHECK_POINT = 'nnet_C_WeightedSoftmax'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  COEF_SOFTMAX_AS_OUTPUT = True
-
-
-class C001(base_config): # prepare 15043
-  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/room/work/lhf/alldata/aishell2_100speaker_list_1_8k'
-  OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/room/work/lhf/alldata/aishell2_100speaker_list_2_8k'
-  NOISE_DIR = '/home/room/work/lhf/alldata/many_noise_8k'
-  TFRECORDS_DIR = '/home/room/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_8k_snrmix_wavespan32767'
+class C001_1(base_config): # RUNNING 15041
   CHECK_POINT = 'nnet_C001'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -204,13 +190,26 @@ class C001_4_3(base_config): # DONE 15041
   MEL_LOSS_COEF = 0.8
 
 
-class C001_5(base_config): # RUNNING 15041
+class C001_5(base_config): # DONE 15041
   CHECK_POINT = 'nnet_C001_5'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC = "SPEC_MSE_LOWF_EN"
+  # MASK_TYPE = "PSM" # default
+
+
+class C001_6(base_config): # RUNNING 15041
+  '''
+  fair spectrum(mag or log) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_6'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "FAIR_SPEC_MSE"
   # MASK_TYPE = "PSM" # default
 
 
@@ -262,6 +261,18 @@ class C002_3(base_config): # prepare 15043
   max_epochs = 50
 
 
+class C003_1(base_config): # RUNNING 15041
+  '''
+  time-nosoftmax-attention
+  '''
+  CHECK_POINT = 'nnet_C003_1'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  TIME_NOSOFTMAX_ATTENTION = True
+
+
 class C002_(base_config):  #
   CHECK_POINT = 'nnet_C002'
   INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
@@ -281,14 +292,7 @@ class C003_(base_config):
 
 # 002和003对比看mask最佳位置，001和003对比看对数谱和幅度谱哪个做loss较好
 
-class CXX(base_config):  #
-  INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  INIT_LOG_BIAS = 0
-  LOG_BIAS_TRAINABEL = True
 
 
-PARAM = C002_3
+PARAM = C001_6
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
