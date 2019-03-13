@@ -29,6 +29,7 @@ def train_one_epoch(sess, tr_model):
            tr_model.log_bias,
            tr_model.lr])
       tr_loss += loss
+      # print("\r    Batch loss: %f" % loss, end="")
       if (i+1) % PARAM.minibatch_size == 0:
         lr = sess.run(tr_model.lr)
         costtime = time.time()-stime
@@ -64,6 +65,7 @@ def eval_one_epoch(sess, val_model):
       # print(loss2,'/',loss1)
       sys.stdout.flush()
       val_loss += loss
+      # print("\r    Batch loss: %f" % loss, end="")
       data_len += 1
     except tf.errors.OutOfRangeError:
       break
