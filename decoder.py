@@ -4,9 +4,11 @@ import sys
 import utils
 import os
 import gc
+from pypesq import pesq
 from utils import spectrum_tool
+import utils.audio_tool
 from FLAGS import PARAM
-from utils import audio_tool
+import shutil
 
 
 def build_session(ckpt_dir,batch_size,finalizeG=True):
@@ -67,7 +69,7 @@ def decode_one_wav(sess, model, wavedata):
 
   y_mag_estimation = np.array(y_mag_estimation[0])
   mask = np.array(mask[0])
-  print(np.shape(y_mag_estimation), np.shape(mask))
+  # print(np.shape(y_mag_estimation), np.shape(mask))
   if PARAM.RESTORE_PHASE == 'MIXED':
     y_mag_estimation = y_mag_estimation*np.exp(1j*spectrum_tool.phase_spectrum_librosa_stft(wavedata,
                                                                                             PARAM.NFFT,
@@ -80,13 +82,52 @@ def decode_one_wav(sess, model, wavedata):
                                     PARAM.GRIFFIN_ITERNUM,
                                     wavedata)
 
-  print(np.shape(mask), np.max(mask), np.min(mask))
-  print(np.shape(x_mag), np.max(x_mag), np.min(x_mag))
-  print(np.shape(norm_x_mag), np.max(norm_x_mag), np.min(norm_x_mag))
-  print(np.shape(norm_logmag), np.max(norm_logmag), np.min(norm_logmag))
-  print(np.shape(y_mag_estimation), np.max(y_mag_estimation), np.min(y_mag_estimation))
+  # print(np.shape(mask), np.max(mask), np.min(mask))
+  # print(np.shape(x_mag), np.max(x_mag), np.min(x_mag))
+  # print(np.shape(norm_x_mag), np.max(norm_x_mag), np.min(norm_x_mag))
+  # print(np.shape(norm_logmag), np.max(norm_logmag), np.min(norm_logmag))
+  # print(np.shape(y_mag_estimation), np.max(y_mag_estimation), np.min(y_mag_estimation))
   # spectrum_tool.picture_spec(mask[0],"233")
   return reY, mask
+
+def decode_and_getpesq(decode_file_list, ref_list, sess, model, decode_ans_file, save_audio, ans_file):
+  if os.path.exists(os.path.join(decode_ans_file,ans_file)):
+    os.remove(os.path.join(decode_ans_file,ans_file))
+  pesq_sum = 0
+  for i, mixed_dir in enumerate(decode_file_list):
+    print(i+1,mixed_dir)
+    waveData, sr = utils.audio_tool.read_audio(mixed_dir)
+    reY, mask = decode_one_wav(sess,model,waveData)
+    abs_max = (2 ** (PARAM.AUDIO_BITS - 1) - 1)
+    reY = np.where(reY > abs_max, abs_max, reY)
+    reY = np.where(reY < -abs_max, -abs_max, reY)
+    if save_audio:
+      utils.audio_tool.write_audio(os.path.join(decode_ans_file,
+                                                (ckpt+'_%03d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
+                                   reY,
+                                   sr)
+      file_name = mixed_dir[mixed_dir.rfind('/')+1:mixed_dir.rfind('.')]
+      spectrum_tool.picture_spec(mask,
+                                 os.path.join(decode_ans_file,
+                                              (ckpt+'_%03d_' % (i+1))+file_name))
+
+    if i<len(ref_list):
+      ref, sr = utils.audio_tool.read_audio(ref_list[i])
+      ref = np.array(ref)
+      waveData = np.array(waveData)
+      print(np.shape(ref),np.shape(waveData),np.shape(reY),sr)
+      reY = np.array(reY)
+      pesq_raw = pesq(ref/32767,waveData/32767,sr)
+      pesq_en = pesq(ref/32767,reY/32767,sr)
+      pesq_imp = pesq_en - pesq_raw
+      pesq_sum+=pesq_imp
+      with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
+        f.write('pesq_raw:%.3f, \tpesq_en:%.3f, \tpesq_imp:%.3f. \t%s\r\n\r\n' % (pesq_raw,pesq_en,pesq_imp,file_name))
+
+  with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
+      f.write('pesq_avg:%.3f. \r\n' % (pesq_sum/len(ref_list)))
+  print("avg pesq:%.3f" % (pesq_sum/len(ref_list)))
+
 
 if __name__=='__main__':
   ckpt= PARAM.CHECK_POINT # don't forget to change FLAGS.PARAM
@@ -99,6 +140,9 @@ if __name__=='__main__':
       'exp/rnn_speech_enhancement/s_2_00_MIX_1_clapping_8k.wav',
       'exp/rnn_speech_enhancement/s_8_01_MIX_4_rainning_8k.wav',
       'exp/rnn_speech_enhancement/s_8_21_MIX_3_factory_8k.wav',
+      'exp/rnn_speech_enhancement/s_2_00_8k_raw.wav',
+      'exp/rnn_speech_enhancement/s_8_01_8k_raw.wav',
+      'exp/rnn_speech_enhancement/s_8_21_8k_raw.wav',
       'exp/rnn_speech_enhancement/speech1_8k.wav',
       'exp/rnn_speech_enhancement/speech5_8k.wav',
       'exp/rnn_speech_enhancement/speech6_8k.wav',
@@ -106,19 +150,35 @@ if __name__=='__main__':
       # 'exp/rnn_speech_enhancement/decode_nnet_C001_3/nnet_C001_3_007_speech7_8k.wav'
   ]
 
-  for i, mixed_dir in enumerate(decode_file_list):
-    print(i+1,mixed_dir)
-    waveData, sr = audio_tool.read_audio(mixed_dir)
-    reY, mask = decode_one_wav(sess,model,waveData)
-    print(np.max(reY))
-    abs_max = (2 ** (PARAM.AUDIO_BITS - 1) - 1)
-    reY = np.where(reY>abs_max,abs_max,reY)
-    reY = np.where(reY<-abs_max,-abs_max,reY)
-    audio_tool.write_audio(os.path.join(decode_ans_file,
-                                        (ckpt+'_%03d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
-                           reY,
-                           sr)
-    file_name = mixed_dir[mixed_dir.rfind('/')+1:mixed_dir.rfind('.')]
-    spectrum_tool.picture_spec(mask,
-                               os.path.join(decode_ans_file,
-                                            (ckpt+'_%03d_' % (i+1))+file_name))
+
+  if len(sys.argv)<=1:
+    for i, mixed_dir in enumerate(decode_file_list):
+      print(i+1,mixed_dir)
+      waveData, sr = utils.audio_tool.read_audio(mixed_dir)
+      reY, mask = decode_one_wav(sess,model,waveData)
+      print(np.max(reY))
+      abs_max = (2 ** (PARAM.AUDIO_BITS - 1) - 1)
+      reY = np.where(reY>abs_max,abs_max,reY)
+      reY = np.where(reY<-abs_max,-abs_max,reY)
+      utils.audio_tool.write_audio(os.path.join(decode_ans_file,
+                                                (ckpt+'_%03d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
+                                   reY,
+                                   sr)
+      file_name = mixed_dir[mixed_dir.rfind('/')+1:mixed_dir.rfind('.')]
+      spectrum_tool.picture_spec(mask,
+                                 os.path.join(decode_ans_file,
+                                              (ckpt+'_%03d_' % (i+1))+file_name))
+  elif int(sys.argv[1])==0:
+    ref_list = [
+      'exp/rnn_speech_enhancement/2_00_8k.wav',
+      'exp/rnn_speech_enhancement/8_01_8k.wav',
+      'exp/rnn_speech_enhancement/8_21_8k.wav',
+      'exp/rnn_speech_enhancement/2_00_8k.wav',
+      'exp/rnn_speech_enhancement/8_01_8k.wav',
+      'exp/rnn_speech_enhancement/8_21_8k.wav',
+    ]
+    decode_and_getpesq(decode_file_list, ref_list, sess, model, decode_ans_file, True, 'pesq.txt')
+  elif int(sys.argv[1])==1:
+    mixed_list = []
+    refer_list = []
+    decode_and_getpesq(mixed_list, refer_list, sess, model, decode_ans_file, True, 'pesq_fair.txt')
