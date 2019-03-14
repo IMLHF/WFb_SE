@@ -36,27 +36,31 @@ def threshold_feature(features, inputs, batch, input_finnal_dim):
                                         initializer=tf.random_normal_initializer(stddev=0.01))
     biases_threshold = tf.get_variable('biases_threshold', [1],
                                        initializer=tf.constant_initializer(0.0))
-    noise_mag_threshold = tf.expand_dims(
-        tf.nn.relu(tf.matmul(attened_vec, weights_threshold) + biases_threshold), axis=-1)  # [batch,1,1]
-
+    threshold_net_out = tf.expand_dims(
+      tf.matmul(attened_vec, weights_threshold) + biases_threshold, axis=-1)  # [batch,1,1]
+    n_threshold_reciprocal = tf.nn.relu(threshold_net_out+FLAGS.PARAM.INIT_THRESHOLD_RECIPROCAL)
 
     if FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.SQUARE_FADE:
       tf.logging.info('Use Square Noise Threshold.')
-      # features = tf.multiply(features, tf.nn.relu6(features*6/noise_mag_threshold) / 6)
-      features = tf.multiply(features, tf.nn.relu6(features*6*noise_mag_threshold) / 6)
-      return features, noise_mag_threshold
+      # features = tf.multiply(features, tf.nn.relu6(features*6/n_threshold) / 6)
+      features = tf.multiply(features, tf.nn.relu6(features*6*n_threshold_reciprocal) / 6)
+      return features, n_threshold_reciprocal
     elif FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EXPONENTIAL_FADE:
       tf.logging.info('Use Exponential Noise Threshold.')
-      # features = tf.pow(features/noise_mag_threshold, 2 - tf.nn.relu6(features*6/noise_mag_threshold)/6)
-      features = tf.pow(features*noise_mag_threshold,
-                        2 - tf.nn.relu6(features*6*noise_mag_threshold)/6)/tf.maximum(1e-12, noise_mag_threshold)
-      return features, noise_mag_threshold
+      # features = tf.pow(features/n_threshold, 2 - tf.nn.relu6(features*6/n_threshold)/6)
+      features = tf.pow(features*n_threshold_reciprocal,
+                        2 - tf.nn.relu6(features*6*n_threshold_reciprocal)/6)/tf.maximum(1e-12, n_threshold_reciprocal)
+      return features, n_threshold_reciprocal
     elif FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EN_EXPONENTIAL_FADE:
       tf.logging.info('Use Enhanced Exponential Noise Threshold.')
-      # features = tf.pow(features/noise_mag_threshold, (2 - tf.nn.relu6(features*6/noise_mag_threshold)/6)**2)
-      features = tf.pow(features*noise_mag_threshold,
-                        (2 - tf.nn.relu6(features*6*noise_mag_threshold)/6)**2)/tf.maximum(1e-12, noise_mag_threshold)
-      return features, noise_mag_threshold
+      # features = tf.pow(features/n_threshold, (2 - tf.nn.relu6(features*6/n_threshold)/6)**2)
+      if FLAGS.PARAM.EXP_COEF is None:
+        print('Please set EXP_COEF.')
+        exit(-1)
+      features = tf.pow(
+          features*n_threshold_reciprocal, (2 - tf.nn.relu6(
+              features*6*n_threshold_reciprocal)/6)**FLAGS.PARAM.EXP_COEF)/tf.maximum(1e-12, n_threshold_reciprocal)
+      return features, n_threshold_reciprocal
     else:
       print('Threshold error.')
       exit(-1)
