@@ -28,7 +28,7 @@ class Model_Baseline(object):
     '''
     behavior = 'train/validation/infer'
     '''
-    if behavior != Model_Baseline.infer:
+    if behavior != self.infer:
       assert(y_mag_spec_batch is not None)
       assert(theta_x_batch is not None)
       assert(theta_y_batch is not None)
@@ -62,13 +62,13 @@ class Model_Baseline(object):
     outputs = self.net_input
 
     lstm_attn_cell = lstm_cell
-    if behavior != Model_Baseline.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
+    if behavior != self.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
       def lstm_attn_cell(n_units, n_proj, act):
         return tf.contrib.rnn.DropoutWrapper(lstm_cell(n_units, n_proj, act),
                                              output_keep_prob=FLAGS.PARAM.KEEP_PROB)
 
     GRU_attn_cell = GRU_cell
-    if behavior != Model_Baseline.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
+    if behavior != self.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
       def GRU_attn_cell(n_units, act):
         return tf.contrib.rnn.DropoutWrapper(GRU_cell(n_units, act),
                                              output_keep_prob=FLAGS.PARAM.KEEP_PROB)
@@ -185,7 +185,7 @@ class Model_Baseline(object):
     # endregion
 
     self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
-    if behavior == Model_Baseline.infer:
+    if behavior == self.infer:
       return
 
     # region get LOSS
@@ -208,7 +208,7 @@ class Model_Baseline(object):
       exit(-1)
     # endregion
 
-    if behavior == Model_Baseline.validation:
+    if behavior == self.validation:
       '''
       val model cannot train.
       '''

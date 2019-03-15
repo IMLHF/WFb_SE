@@ -10,6 +10,7 @@ from utils.tf_tool import norm_mag_spec, norm_logmag_spec, rm_norm_mag_spec, rm_
 from utils.tf_tool import normedLogmag2normedMag, normedMag2normedLogmag
 from models.baseline_rnn import Model_Baseline
 import utils.tf_tool
+from utils.tf_tool import lstm_cell, GRU_cell
 import FLAGS
 
 
@@ -28,7 +29,7 @@ class Model_Recurrent_Train(object):
     '''
     behavior = 'train/validation/infer'
     '''
-    if behavior != Model_Baseline.infer:
+    if behavior != self.infer:
       assert(y_mag_spec_batch is not None)
       assert(theta_x_batch is not None)
       assert(theta_y_batch is not None)
@@ -62,62 +63,59 @@ class Model_Recurrent_Train(object):
 
       outputs = self.net_input
 
-      def lstm_cell():
-        return tf.contrib.rnn.LSTMCell(
-            FLAGS.PARAM.RNN_SIZE, forget_bias=1.0, use_peepholes=True,
-            num_proj=FLAGS.PARAM.LSTM_num_proj,
-            initializer=tf.contrib.layers.xavier_initializer(),
-            state_is_tuple=True, activation=FLAGS.PARAM.LSTM_ACTIVATION)
-      lstm_attn_cell = lstm_cell
-      if behavior != Model_Baseline.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
-        def lstm_attn_cell():
-          return tf.contrib.rnn.DropoutWrapper(lstm_cell(), output_keep_prob=FLAGS.PARAM.KEEP_PROB)
+    lstm_attn_cell = lstm_cell
+    if behavior != self.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
+      def lstm_attn_cell(n_units, n_proj, act):
+        return tf.contrib.rnn.DropoutWrapper(lstm_cell(n_units, n_proj, act),
+                                             output_keep_prob=FLAGS.PARAM.KEEP_PROB)
 
-      def GRU_cell():
-        return tf.contrib.rnn.GRUCell(
-            FLAGS.PARAM.RNN_SIZE,
-            # kernel_initializer=tf.contrib.layers.xavier_initializer(),
-            activation=FLAGS.PARAM.LSTM_ACTIVATION)
-      GRU_attn_cell = lstm_cell
-      if behavior != Model_Baseline.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
-        def GRU_attn_cell():
-          return tf.contrib.rnn.DropoutWrapper(GRU_cell(), output_keep_prob=FLAGS.PARAM.KEEP_PROB)
+    GRU_attn_cell = GRU_cell
+    if behavior != self.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
+      def GRU_attn_cell(n_units, act):
+        return tf.contrib.rnn.DropoutWrapper(GRU_cell(n_units, act),
+                                             output_keep_prob=FLAGS.PARAM.KEEP_PROB)
 
-      if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM':
-        with tf.variable_scope('BLSTM'):
+    if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM':
+      with tf.variable_scope('BLSTM'):
 
-          lstm_fw_cell = tf.contrib.rnn.MultiRNNCell(
-              [lstm_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
-          lstm_bw_cell = tf.contrib.rnn.MultiRNNCell(
-              [lstm_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+        lstm_fw_cell = tf.contrib.rnn.MultiRNNCell(
+            [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                            FLAGS.PARAM.LSTM_num_proj,
+                            FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+        lstm_bw_cell = tf.contrib.rnn.MultiRNNCell(
+            [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                            FLAGS.PARAM.LSTM_num_proj,
+                            FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
 
-          fw_cell = lstm_fw_cell._cells
-          bw_cell = lstm_bw_cell._cells
-          result = rnn.stack_bidirectional_dynamic_rnn(
-              cells_fw=fw_cell,
-              cells_bw=bw_cell,
-              inputs=outputs,
-              dtype=tf.float32,
-              sequence_length=self._lengths)
-          outputs, fw_final_states, bw_final_states = result
+        fw_cell = lstm_fw_cell._cells
+        bw_cell = lstm_bw_cell._cells
+        result = rnn.stack_bidirectional_dynamic_rnn(
+            cells_fw=fw_cell,
+            cells_bw=bw_cell,
+            inputs=outputs,
+            dtype=tf.float32,
+            sequence_length=self._lengths)
+        outputs, fw_final_states, bw_final_states = result
 
-      if FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
-        with tf.variable_scope('BGRU'):
+    if FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
+      with tf.variable_scope('BGRU'):
 
-          gru_fw_cell = tf.contrib.rnn.MultiRNNCell(
-              [GRU_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
-          gru_bw_cell = tf.contrib.rnn.MultiRNNCell(
-              [GRU_attn_cell() for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+        gru_fw_cell = tf.contrib.rnn.MultiRNNCell(
+            [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                           FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+        gru_bw_cell = tf.contrib.rnn.MultiRNNCell(
+            [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                           FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
 
-          fw_cell = gru_fw_cell._cells
-          bw_cell = gru_bw_cell._cells
-          result = rnn.stack_bidirectional_dynamic_rnn(
-              cells_fw=fw_cell,
-              cells_bw=bw_cell,
-              inputs=outputs,
-              dtype=tf.float32,
-              sequence_length=self._lengths)
-          outputs, fw_final_states, bw_final_states = result
+        fw_cell = gru_fw_cell._cells
+        bw_cell = gru_bw_cell._cells
+        result = rnn.stack_bidirectional_dynamic_rnn(
+            cells_fw=fw_cell,
+            cells_bw=bw_cell,
+            inputs=outputs,
+            dtype=tf.float32,
+            sequence_length=self._lengths)
+        outputs, fw_final_states, bw_final_states = result
 
       with tf.variable_scope('fullconnectOut'):
         in_size = FLAGS.PARAM.RNN_SIZE
@@ -145,7 +143,7 @@ class Model_Recurrent_Train(object):
         self._y_mag_estimation = rm_norm_logmag_spec(self._mask*self._norm_x_logmag_spec,
                                                      FLAGS.PARAM.MAG_NORM_MAX,
                                                      self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
-      if behavior == Model_Baseline.infer:
+      if behavior == self.infer:
         return
       '''
       _y_mag_estimation is estimated mag_spec
@@ -161,7 +159,7 @@ class Model_Recurrent_Train(object):
                                   y_mag_spec_batch,
                                   theta_x_batch,
                                   theta_y_batch,
-                                  behavior=Model_Baseline.infer)
+                                  behavior=self.infer)
       self._y_estimation2 = same_model._y_estimation
       self._y_mag_estimation2 = same_model._y_mag_estimation
       # utils.tf_tool.show_all_variables()
@@ -208,7 +206,7 @@ class Model_Recurrent_Train(object):
       exit(-1)
     # endregion
 
-    if behavior == Model_Baseline.validation:
+    if behavior == self.validation:
       '''
       val model cannot train.
       '''
