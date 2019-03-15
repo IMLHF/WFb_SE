@@ -9,6 +9,7 @@ from utils import spectrum_tool
 import utils.audio_tool
 from FLAGS import PARAM
 import shutil
+import time
 
 
 def build_session(ckpt_dir,batch_size,finalizeG=True):
@@ -95,32 +96,33 @@ def decode_and_getpesq(decode_file_list, ref_list, sess, model, decode_ans_file,
     os.remove(os.path.join(decode_ans_file,ans_file))
   pesq_sum = 0
   for i, mixed_dir in enumerate(decode_file_list):
-    print(i+1,mixed_dir)
+    print('\n',i+1,mixed_dir)
     waveData, sr = utils.audio_tool.read_audio(mixed_dir)
     reY, mask = decode_one_wav(sess,model,waveData)
     abs_max = (2 ** (PARAM.AUDIO_BITS - 1) - 1)
     reY = np.where(reY > abs_max, abs_max, reY)
     reY = np.where(reY < -abs_max, -abs_max, reY)
+    file_name = mixed_dir[mixed_dir.rfind('/')+1:mixed_dir.rfind('.')]
     if save_audio:
       utils.audio_tool.write_audio(os.path.join(decode_ans_file,
                                                 (ckpt+'_%03d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
                                    reY,
                                    sr)
-      file_name = mixed_dir[mixed_dir.rfind('/')+1:mixed_dir.rfind('.')]
       spectrum_tool.picture_spec(mask,
                                  os.path.join(decode_ans_file,
                                               (ckpt+'_%03d_' % (i+1))+file_name))
 
     if i<len(ref_list):
       ref, sr = utils.audio_tool.read_audio(ref_list[i])
+      print('refer: ',ref_list[i])
       ref = np.array(ref)
       waveData = np.array(waveData)
-      print(np.shape(ref),np.shape(waveData),np.shape(reY),sr)
       reY = np.array(reY)
       pesq_raw = pesq(ref/32767,waveData/32767,sr)
       pesq_en = pesq(ref/32767,reY/32767,sr)
       pesq_imp = pesq_en - pesq_raw
       pesq_sum+=pesq_imp
+      print("SR = %d, PESQ Imp: %.3f. " % (sr,pesq_imp))
       with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
         f.write('pesq_raw:%.3f, \tpesq_en:%.3f, \tpesq_imp:%.3f. \t%s\r\n\r\n' % (pesq_raw,pesq_en,pesq_imp,file_name))
 
@@ -179,6 +181,20 @@ if __name__=='__main__':
     ]
     decode_and_getpesq(decode_file_list, ref_list, sess, model, decode_ans_file, True, 'pesq.txt')
   elif int(sys.argv[1])==1:
-    mixed_list = []
+    start_time = time.time()
+    mixed_dirs = os.path.join('exp','real_test_fair','mixed_wav_2')
+    mixed_list = os.listdir(mixed_dirs)
+    mixed_list = [os.path.join(mixed_dirs,mixed_file) for mixed_file in mixed_list]
+    mixed_list.sort()
+
+    refer_dirs = os.path.join('exp','real_test_fair','speech_for_ac_en_2')
+    refer_list_single = os.listdir(refer_dirs)
+    refer_list_single = [os.path.join(refer_dirs,refer_file) for refer_file in refer_list_single]
+    refer_list_single.sort()
     refer_list = []
-    decode_and_getpesq(mixed_list, refer_list, sess, model, decode_ans_file, True, 'pesq_fair.txt')
+    for wav_dir in refer_list_single:
+      for i in range(7):
+        refer_list.append(wav_dir)
+    decode_and_getpesq(mixed_list, refer_list, sess, model, decode_ans_file, False, 'pesq_fair_2.txt')
+    print(ckpt)
+    print("Cost time : %dS" % (time.time()-start_time))
