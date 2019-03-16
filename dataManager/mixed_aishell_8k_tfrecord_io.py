@@ -13,6 +13,7 @@ import utils
 from utils import audio_tool
 from utils import spectrum_tool
 from numpy import linalg
+from utils.audio_tool import _mix_wav_by_randomSNR, _mix_wav_randomLINEAR
 import FLAGS
 
 FILE_NAME = __file__[max(__file__.rfind('/')+1, 0):__file__.rfind('.')]
@@ -158,23 +159,6 @@ def _get_padad_waveData(file):
   return waveData
 
 
-def _mix_wav_by_SNR(waveData, noise):
-  # S = (speech+alpha*noise)/(1+alpha)
-  snr = np.random.randint(FLAGS.PARAM.MIN_SNR, FLAGS.PARAM.MAX_SNR+1)
-  As = linalg.norm(waveData)
-  An = linalg.norm(noise)
-
-  alpha = As/(An*(10**(snr/20))) if An != 0 else 0
-  waveMix = (waveData+alpha*noise)/(1.0+alpha)
-  return waveMix
-
-
-def _mix_wav_LINEAR(waveData, noise):
-  coef = np.random.random()*(FLAGS.PARAM.MAX_COEF-FLAGS.PARAM.MIN_COEF)+FLAGS.PARAM.MIN_COEF
-  waveMix = (waveData+coef*noise)/(1.0+coef)
-  return waveMix
-
-
 def _extract_mag_spec(data):
   # 幅度谱
   mag_spec = spectrum_tool.magnitude_spectrum_librosa_stft(
@@ -194,9 +178,9 @@ def _extract_feature_x_y_xtheta_ytheta(utt_dir1, utt_dir2):
   waveData2 = _get_padad_waveData(utt_dir2)
   # utt2作为噪音
   if FLAGS.PARAM.MIX_METHOD == 'SNR':
-    mixedData = _mix_wav_by_SNR(waveData1, waveData2)
+    mixedData = _mix_wav_by_randomSNR(waveData1, waveData2)
   if FLAGS.PARAM.MIX_METHOD == 'LINEAR':
-    mixedData = _mix_wav_LINEAR(waveData1, waveData2)
+    mixedData = _mix_wav_randomLINEAR(waveData1, waveData2)
 
   # write mixed wav
   # name1 = utt_dir1[utt_dir1.rfind('/')+1:utt_dir1.rfind('.')]
