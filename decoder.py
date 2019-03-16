@@ -6,10 +6,12 @@ import os
 import gc
 from pypesq import pesq
 from utils import spectrum_tool
+from utils import audio_tool
 import utils.audio_tool
 from FLAGS import PARAM
 import shutil
 import time
+import utils.assess.core as pesqexe
 
 
 def build_session(ckpt_dir,batch_size,finalizeG=True):
@@ -91,10 +93,12 @@ def decode_one_wav(sess, model, wavedata):
   # spectrum_tool.picture_spec(mask[0],"233")
   return reY, mask
 
-def decode_and_getpesq(decode_file_list, ref_list, sess, model, decode_ans_file, save_audio, ans_file):
+def decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, save_audio, ans_file):
   if os.path.exists(os.path.join(decode_ans_file,ans_file)):
     os.remove(os.path.join(decode_ans_file,ans_file))
-  pesq_sum = 0
+  # pesq_sum = 0
+  # stoi_sum = 0
+  sdr_sum = 0
   for i, mixed_dir in enumerate(decode_file_list):
     print('\n',i+1,mixed_dir)
     waveData, sr = utils.audio_tool.read_audio(mixed_dir)
@@ -115,20 +119,34 @@ def decode_and_getpesq(decode_file_list, ref_list, sess, model, decode_ans_file,
     if i<len(ref_list):
       ref, sr = utils.audio_tool.read_audio(ref_list[i])
       print('refer: ',ref_list[i])
-      ref = np.array(ref)
-      waveData = np.array(waveData)
-      reY = np.array(reY)
-      pesq_raw = pesq(ref/32767,waveData/32767,sr)
-      pesq_en = pesq(ref/32767,reY/32767,sr)
-      pesq_imp = pesq_en - pesq_raw
-      pesq_sum+=pesq_imp
-      print("SR = %d, PESQ Imp: %.3f. " % (sr,pesq_imp))
+      len_small = min(len(ref),len(waveData),len(reY))
+      ref = np.array(ref[:len_small])
+      waveData = np.array(waveData[:len_small])
+      reY = np.array(reY[:len_small])
+      # print(sr)
+      # sdr
+      sdr_imp = audio_tool.cal_SDRi(np.array([ref]),
+                                    np.array([reY]),
+                                    np.array([waveData]))
+      sdr_sum += sdr_imp
+      print("SR = %d, SDR Imp: %.3f. " % (sr,sdr_imp))
       with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
-        f.write('pesq_raw:%.3f, \tpesq_en:%.3f, \tpesq_imp:%.3f. \t%s\r\n\r\n' % (pesq_raw,pesq_en,pesq_imp,file_name))
+        f.write('\tsdr_imp:%.3f. \t%s\r\n\r\n' % (sdr_imp,file_name))
+      # pesq
+      # pesq_raw = pesq(waveData,ref,sr)
+      # pesq_en = pesq(reY,ref,sr)
+      # pesq_imp = pesq_en - pesq_raw
+      # pesq_sum+=pesq_imp
+      # print("SR = %d, PESQ Imp: %.3f. " % (sr,pesq_imp))
+      # with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
+      #   f.write('pesq_raw:%.3f, \tpesq_en:%.3f, \tpesq_imp:%.3f. \t%s\r\n\r\n' % (pesq_raw,pesq_en,pesq_imp,file_name))
 
   with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
-      f.write('pesq_avg:%.3f. \r\n' % (pesq_sum/len(ref_list)))
-  print("avg pesq:%.3f" % (pesq_sum/len(ref_list)))
+    f.write('sdr_avg:%.3f. \r\n' % (sdr_sum/len(ref_list)))
+  print("avg sdr:%.3f" % (sdr_sum/len(ref_list)))
+  # with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
+  #     f.write('pesq_avg:%.3f. \r\n' % (pesq_sum/len(ref_list)))
+  # print("avg pesq:%.3f" % (pesq_sum/len(ref_list)))
 
 
 if __name__=='__main__':
@@ -179,15 +197,15 @@ if __name__=='__main__':
       'exp/rnn_speech_enhancement/8_01_8k.wav',
       'exp/rnn_speech_enhancement/8_21_8k.wav',
     ]
-    decode_and_getpesq(decode_file_list, ref_list, sess, model, decode_ans_file, True, 'pesq.txt')
+    decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, True, 'pesq.txt')
   elif int(sys.argv[1])==1:
     start_time = time.time()
-    mixed_dirs = os.path.join('exp','real_test_fair','mixed_wav_2')
+    mixed_dirs = os.path.join('exp','real_test_fair','ITU_T_Test', 'mixed_wav')
     mixed_list = os.listdir(mixed_dirs)
     mixed_list = [os.path.join(mixed_dirs,mixed_file) for mixed_file in mixed_list]
     mixed_list.sort()
 
-    refer_dirs = os.path.join('exp','real_test_fair','speech_for_ac_en_2')
+    refer_dirs = os.path.join('exp','real_test_fair','ITU_T_Test', 'refer_wav')
     refer_list_single = os.listdir(refer_dirs)
     refer_list_single = [os.path.join(refer_dirs,refer_file) for refer_file in refer_list_single]
     refer_list_single.sort()
@@ -195,6 +213,6 @@ if __name__=='__main__':
     for wav_dir in refer_list_single:
       for i in range(7):
         refer_list.append(wav_dir)
-    decode_and_getpesq(mixed_list, refer_list, sess, model, decode_ans_file, False, 'pesq_fair_2.txt')
+    decode_and_getMeature(mixed_list, refer_list, sess, model, decode_ans_file, False, 'SDRi.txt')
     print(ckpt)
     print("Cost time : %dS" % (time.time()-start_time))
