@@ -53,13 +53,33 @@ def threshold_feature(features, inputs, batch, input_finnal_dim):
       return features, n_threshold_reciprocal
     elif FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EN_EXPONENTIAL_FADE:
       tf.logging.info('Use Enhanced Exponential Noise Threshold.')
+      if FLAGS.PARAM.THRESHOLD_EXP_TRAINABLE:
+        with tf.variable_scope('fullconnectGetThreshold_exp_coef'):
+          # attention layer
+          with tf.variable_scope('attention_scorer2'):
+            weights_scorer2 = tf.get_variable('weights_scorer2', [in_size, 1],
+                                              initializer=tf.random_normal_initializer(stddev=0.05))
+            biases_scorer2 = tf.get_variable('biases_scorer2', [1],
+                                             initializer=tf.constant_initializer(0.0))
+            attention_alpha_vec2 = tf.matmul(tf.reshape(inputs, [-1, input_finnal_dim]),
+                                             weights_scorer2) + biases_scorer2  # [batch*time,1]
+            attention_alpha_vec2 = tf.reshape(attention_alpha_vec2,[batch,1,-1]) # [batch,1,time]
+            attention_alpha_vec2 = tf.nn.softmax(attention_alpha_vec2, axis=-1)
+            attened_vec2 = tf.reshape(tf.matmul(attention_alpha_vec2, inputs), [batch,-1])# [batch,in_size]
+
+          weights_th_exp = tf.get_variable('weights_th_exp', [in_size, 1],
+                                           initializer=tf.random_normal_initializer(stddev=0.05))
+          biases_th_exp = tf.get_variable('biases_th_exp', [1],
+                                          initializer=tf.constant_initializer(0.0))
+          th_exp_net_out = tf.expand_dims(
+            tf.matmul(attened_vec2, weights_th_exp) + biases_th_exp, axis=-1)  # [batch,1,1]
+          th_exp_coef = tf.nn.relu(th_exp_net_out+FLAGS.PARAM.INIT_THRESHOLD_EXP_COEF)
+      else:
+        th_exp_coef = FLAGS.PARAM.INIT_THRESHOLD_EXP_COEF
       # features = tf.pow(features/n_threshold, (2 - tf.nn.relu6(features*6/n_threshold)/6)**2)
-      if FLAGS.PARAM.EXP_COEF is None:
-        print('Please set EXP_COEF.')
-        exit(-1)
       features = tf.pow(
           features*n_threshold_reciprocal, (2 - tf.nn.relu6(
-              features*6*n_threshold_reciprocal)/6)**FLAGS.PARAM.EXP_COEF)/tf.maximum(1e-12, n_threshold_reciprocal)
+              features*6*n_threshold_reciprocal)/6)**th_exp_coef)/tf.maximum(1e-12, n_threshold_reciprocal)
       return features, n_threshold_reciprocal
     else:
       print('Threshold error.')
@@ -85,8 +105,14 @@ class Threshold_Model(object):
       assert(y_mag_spec_batch is not None)
       assert(theta_x_batch is not None)
       assert(theta_y_batch is not None)
-    self._log_bias = tf.get_variable('logbias', [1], trainable=FLAGS.PARAM.LOG_BIAS_TRAINABEL,
+    self._log_bias = tf.get_variable('logbias', [1], trainable=FLAGS.PARAM.LOG_BIAS_TRAINABLE,
                                      initializer=tf.constant_initializer(FLAGS.PARAM.INIT_LOG_BIAS))
+    if FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EN_EXPONENTIAL_FADE:
+      if FLAGS.PARAM.INIT_THRESHOLD_EXP_COEF is None:
+        print('Please set EXP_COEF.')
+        exit(-1)
+      self._threshold_exp_coef = tf.get_variable('th_exp', [1], trainable=FLAGS.PARAM.THRESHOLD_EXP_TRAINABLE,
+                                                 initializer=tf.constant_initializer(FLAGS.PARAM.INIT_THRESHOLD_EXP_COEF))
     self._real_logbias = self._log_bias + FLAGS.PARAM.DEFAULT_LOG_BIAS
     self._x_mag_spec = x_mag_spec_batch
     self._norm_x_mag_spec = norm_mag_spec(self._x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
@@ -203,7 +229,9 @@ class Threshold_Model(object):
     if FLAGS.PARAM.THRESHOLD_FUNC is not None:
       # use noise threshold
       if FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_MASK:
-        self._mask, self._threshold = threshold_feature(self._mask, outputs, self._batch_size, in_size)
+        self._mask, self._threshold = threshold_feature(self._mask, outputs,
+                                                        self._batch_size, in_size,
+                                                        self._threshold_exp_coef)
       elif FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_SPEC:
         pass
       else:
@@ -230,7 +258,9 @@ class Threshold_Model(object):
       if FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_MASK:
         pass
       elif FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_SPEC:
-        self._y_estimation, self._threshold = threshold_feature(self._y_estimation, outputs,self._batch_size, in_size)
+        self._y_estimation, self._threshold = threshold_feature(self._y_estimation,
+                                                                outputs, self._batch_size,
+                                                                in_size, self._threshold_exp_coef)
     # endregion
 
     # region get infer spec
