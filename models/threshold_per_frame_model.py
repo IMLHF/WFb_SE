@@ -24,59 +24,59 @@ def threshold_feature(features, inputs, batch, input_finnal_dim):
   with tf.variable_scope('fullconnectGetThreshold_frame'):
     # attention layer
     with tf.variable_scope('attention_scorer'):
-      weights_scorer = tf.get_variable('weights_scorer', [in_size,FLAGS.PARAM.OUTPUT_SIZE],
+      weights_scorer = tf.get_variable('weights_scorer', [in_size,input_finnal_dim],
                                        initializer=tf.random_normal_initializer(stddev=0.01))
-      biases_scorer = tf.get_variable('biases_scorer', [FLAGS.PARAM.OUTPUT_SIZE],
+      biases_scorer = tf.get_variable('biases_scorer', [input_finnal_dim],
                                       initializer=tf.constant_initializer(0.0))
       attention_alpha_vec = tf.matmul(tf.reshape(inputs, [-1, input_finnal_dim]),
-                                      weights_scorer) + biases_scorer  # [batch*time,fea_dim]
-      attention_alpha_vec = tf.reshape(attention_alpha_vec,[batch,-1,1,FLAGS.PARAM.OUTPUT_SIZE]) # [batch,time,1,fea_dim]
+                                      weights_scorer) + biases_scorer  # [batch*time,rnn_size]
+      attention_alpha_vec = tf.reshape(attention_alpha_vec,[batch,-1,1,input_finnal_dim]) # [batch,time,1,rnn_size]
       attention_alpha_vec = tf.nn.softmax(attention_alpha_vec, axis=-1)
       attened_ = tf.reshape(tf.matmul(attention_alpha_vec,
-                                      tf.reshape(inputs, [batch, -1, FLAGS.PARAM.OUTPUT_SIZE, 1])),
-                            [batch, -1, 1])  # [batch,time,1]=[batch,time,1,fea_dim]*[batch,time,fea_dim,1]
+                                      tf.reshape(inputs, [batch, -1, input_finnal_dim, 1])),
+                            [batch, -1, 1])  # [batch,time,1]=[batch,time,1,rnn_size]*[batch,time,rnn_size,1]
 
     n_threshold_reciprocal = tf.nn.relu(attened_+FLAGS.PARAM.INIT_THRESHOLD_RECIPROCAL) # [batch,time,1]
 
-    if FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.SQUARE_FADE:
-      tf.logging.info('Use Square Noise Threshold.')
-      # features = tf.multiply(features, tf.nn.relu6(features*6/n_threshold) / 6)
-      features = tf.multiply(features, tf.nn.relu6(features*6*n_threshold_reciprocal) / 6)
-      return features, n_threshold_reciprocal
-    elif FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EXPONENTIAL_FADE:
-      tf.logging.info('Use Exponential Noise Threshold.')
-      # features = tf.pow(features/n_threshold, 2 - tf.nn.relu6(features*6/n_threshold)/6)
-      features = tf.pow(features*n_threshold_reciprocal,
-                        2 - tf.nn.relu6(features*6*n_threshold_reciprocal)/6)/tf.maximum(1e-12, n_threshold_reciprocal)
-      return features, n_threshold_reciprocal
-    elif FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EN_EXPONENTIAL_FADE:
-      tf.logging.info('Use Enhanced Exponential Noise Threshold.')
-      th_exp_coef = FLAGS.PARAM.INIT_THRESHOLD_EXP_COEF
-      if FLAGS.PARAM.THRESHOLD_EXP_TRAINABLE:
-        with tf.variable_scope('fullconnectGetThreshold_exp_coef_frame'):
-          # attention layer2
-          with tf.variable_scope('attention_scorer2'):
-            weights_scorer2 = tf.get_variable('weights_scorer2', [in_size, FLAGS.PARAM.OUTPUT_SIZE],
-                                              initializer=tf.random_normal_initializer(stddev=0.05))
-            biases_scorer2 = tf.get_variable('biases_scorer2', [FLAGS.PARAM.OUTPUT_SIZE],
-                                             initializer=tf.constant_initializer(0.0))
-            attention_alpha_vec2 = tf.matmul(tf.reshape(inputs, [-1, input_finnal_dim]),
-                                             weights_scorer2) + biases_scorer2  # [batch*time,fea_dim]
-            attention_alpha_vec2 = tf.reshape(attention_alpha_vec2,[batch,-1,1,FLAGS.PARAM.OUTPUT_SIZE]) # [batch,time,1,fea_dim]
-            attention_alpha_vec2 = tf.nn.softmax(attention_alpha_vec2, axis=-1)
-            attened_ = tf.reshape(tf.matmul(attention_alpha_vec2,
-                                            tf.reshape(inputs, [batch, -1, FLAGS.PARAM.OUTPUT_SIZE, 1])),
-                                  [batch, -1, 1])  # [batch,time,1]=[batch,time,1,fea_dim]*[batch,time,fea_dim,1]
+  if FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.SQUARE_FADE:
+    tf.logging.info('Use Square Noise Threshold.')
+    # features = tf.multiply(features, tf.nn.relu6(features*6/n_threshold) / 6)
+    features = tf.multiply(features, tf.nn.relu6(features*6*n_threshold_reciprocal) / 6)
+    return features, n_threshold_reciprocal
+  elif FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EXPONENTIAL_FADE:
+    tf.logging.info('Use Exponential Noise Threshold.')
+    # features = tf.pow(features/n_threshold, 2 - tf.nn.relu6(features*6/n_threshold)/6)
+    features = tf.pow(features*n_threshold_reciprocal,
+                      2 - tf.nn.relu6(features*6*n_threshold_reciprocal)/6)/tf.maximum(1e-12, n_threshold_reciprocal)
+    return features, n_threshold_reciprocal
+  elif FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EN_EXPONENTIAL_FADE:
+    tf.logging.info('Use Enhanced Exponential Noise Threshold.')
+    th_exp_coef = FLAGS.PARAM.INIT_THRESHOLD_EXP_COEF
+    if FLAGS.PARAM.THRESHOLD_EXP_TRAINABLE:
+      with tf.variable_scope('fullconnectGetThreshold_exp_coef_frame'):
+        # attention layer2
+        with tf.variable_scope('attention_scorer2'):
+          weights_scorer2 = tf.get_variable('weights_scorer2', [in_size, FLAGS.PARAM.OUTPUT_SIZE],
+                                            initializer=tf.random_normal_initializer(stddev=0.05))
+          biases_scorer2 = tf.get_variable('biases_scorer2', [FLAGS.PARAM.OUTPUT_SIZE],
+                                           initializer=tf.constant_initializer(0.0))
+          attention_alpha_vec2 = tf.matmul(tf.reshape(inputs, [-1, input_finnal_dim]),
+                                           weights_scorer2) + biases_scorer2  # [batch*time,fea_dim]
+          attention_alpha_vec2 = tf.reshape(attention_alpha_vec2,[batch,-1,1,FLAGS.PARAM.OUTPUT_SIZE]) # [batch,time,1,fea_dim]
+          attention_alpha_vec2 = tf.nn.softmax(attention_alpha_vec2, axis=-1)
+          attened_ = tf.reshape(tf.matmul(attention_alpha_vec2,
+                                          tf.reshape(inputs, [batch, -1, FLAGS.PARAM.OUTPUT_SIZE, 1])),
+                                [batch, -1, 1])  # [batch,time,1]=[batch,time,1,fea_dim]*[batch,time,fea_dim,1]
 
-          th_exp_coef = tf.nn.relu(attened_+FLAGS.PARAM.INIT_THRESHOLD_EXP_COEF) # [batch,time,1]
-      # features = tf.pow(features/n_threshold, (2 - tf.nn.relu6(features*6/n_threshold)/6)**2)
-      features = tf.pow(
-          features*n_threshold_reciprocal, (2 - tf.nn.relu6(
-              features*6*n_threshold_reciprocal)/6)**th_exp_coef)/tf.maximum(1e-12, n_threshold_reciprocal)
-      return features, n_threshold_reciprocal
-    else:
-      print('Threshold error.')
-      exit(-1)
+        th_exp_coef = tf.nn.relu(attened_+FLAGS.PARAM.INIT_THRESHOLD_EXP_COEF) # [batch,time,1]
+    # features = tf.pow(features/n_threshold, (2 - tf.nn.relu6(features*6/n_threshold)/6)**2)
+    features = tf.pow(
+        features*n_threshold_reciprocal, (2 - tf.nn.relu6(
+            features*6*n_threshold_reciprocal)/6)**th_exp_coef)/tf.maximum(1e-12, n_threshold_reciprocal)
+    return features, n_threshold_reciprocal
+  else:
+    print('Threshold error.')
+    exit(-1)
 
 
 class Frame_Threshold_Model(object):
@@ -100,12 +100,6 @@ class Frame_Threshold_Model(object):
       assert(theta_y_batch is not None)
     self._log_bias = tf.get_variable('logbias', [1], trainable=FLAGS.PARAM.LOG_BIAS_TRAINABLE,
                                      initializer=tf.constant_initializer(FLAGS.PARAM.INIT_LOG_BIAS))
-    if FLAGS.PARAM.THRESHOLD_FUNC == FLAGS.PARAM.EN_EXPONENTIAL_FADE:
-      if FLAGS.PARAM.INIT_THRESHOLD_EXP_COEF is None:
-        print('Please set EXP_COEF.')
-        exit(-1)
-      self._threshold_exp_coef = tf.get_variable('th_exp', [1], trainable=FLAGS.PARAM.THRESHOLD_EXP_TRAINABLE,
-                                                 initializer=tf.constant_initializer(FLAGS.PARAM.INIT_THRESHOLD_EXP_COEF))
     self._real_logbias = self._log_bias + FLAGS.PARAM.DEFAULT_LOG_BIAS
     self._x_mag_spec = x_mag_spec_batch
     self._norm_x_mag_spec = norm_mag_spec(self._x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
@@ -223,8 +217,7 @@ class Frame_Threshold_Model(object):
       # use noise threshold
       if FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_MASK:
         self._mask, self._threshold = threshold_feature(self._mask, outputs,
-                                                        self._batch_size, in_size,
-                                                        self._threshold_exp_coef)
+                                                        self._batch_size, in_size)
       elif FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_SPEC:
         pass
       else:
@@ -251,9 +244,8 @@ class Frame_Threshold_Model(object):
       if FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_MASK:
         pass
       elif FLAGS.PARAM.THRESHOLD_POS == FLAGS.PARAM.THRESHOLD_ON_SPEC:
-        self._y_estimation, self._threshold = threshold_feature(self._y_estimation,
-                                                                outputs, self._batch_size,
-                                                                in_size, self._threshold_exp_coef)
+        self._y_estimation, self._threshold = threshold_feature(self._y_estimation, outputs,
+                                                                self._batch_size, in_size)
     # endregion
 
     # region get infer spec
