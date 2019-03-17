@@ -142,11 +142,11 @@ def decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_fi
       #   f.write('pesq_raw:%.3f, \tpesq_en:%.3f, \tpesq_imp:%.3f. \t%s\r\n\r\n' % (pesq_raw,pesq_en,pesq_imp,file_name))
 
   with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
-    f.write('sdr_avg:%.3f. \r\n' % (sdr_sum/len(ref_list)))
-  print("avg sdr:%.3f" % (sdr_sum/len(ref_list)))
+    f.write('SDRi_avg:%.3f. \r\n' % (sdr_sum/len(ref_list)))
+  print("avg SDRi:%.3f" % (sdr_sum/len(ref_list)))
   # with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
-  #     f.write('pesq_avg:%.3f. \r\n' % (pesq_sum/len(ref_list)))
-  # print("avg pesq:%.3f" % (pesq_sum/len(ref_list)))
+  #     f.write('pesqi_avg:%.3f. \r\n' % (pesq_sum/len(ref_list)))
+  # print("avg pesqi:%.3f" % (pesq_sum/len(ref_list)))
 
 
 if __name__=='__main__':
@@ -197,7 +197,7 @@ if __name__=='__main__':
       'exp/rnn_speech_enhancement/8_01_8k.wav',
       'exp/rnn_speech_enhancement/8_21_8k.wav',
     ]
-    decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, True, 'pesq.txt')
+    decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, True, 'sdr.txt')
   elif int(sys.argv[1])==1:
     start_time = time.time()
     mixed_dirs = os.path.join('exp','real_test_fair','ITU_T_Test', 'mixed_wav')
