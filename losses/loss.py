@@ -3,6 +3,11 @@ import numpy as np
 import FLAGS
 from utils import tf_tool
 
+
+def reduce_sum_frame_batchsize_MSE_EmphasizeLowerValue(y1, y2, pow_coef):
+  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(tf.abs(y1-y2), pow_coef), 1), 1))
+  return cost
+
 def reduce_sum_frame_batchsize_MSE(y1, y2):
   cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(y1-y2, 2), 1), 1))
   return cost
