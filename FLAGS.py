@@ -117,7 +117,7 @@ class base_config:
   POW_COEF = None
 
 
-class C001_1(base_config): # DONE 15041
+class C001_1(base_config): # *DONE 15041
   CHECK_POINT = 'nnet_C001_1'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -144,7 +144,7 @@ class C001_2_RT(base_config): # DONE 15041
   SE_MODEL = models.recurrent_train_model.Model_Recurrent_Train
 
 
-class C001_3(base_config): # *DONE 15041
+class C001_3(base_config): # DONE 15041
   CHECK_POINT = 'nnet_C001_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -318,7 +318,7 @@ class C002_1(base_config): # DONE 15043
   max_epochs = 50
 
 
-class C002_2(base_config): # *DONE 15041
+class C002_2(base_config): # **DONE 15041
   SE_MODEL = models.threshold_model.Threshold_Model
   CHECK_POINT = 'nnet_C002_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -331,7 +331,7 @@ class C002_2(base_config): # *DONE 15041
   max_epochs = 50
 
 
-class C002_2_2(base_config): # prepare 15041
+class C002_2_2(base_config): # DONE 15041
   SE_MODEL = models.threshold_model.Threshold_Model
   CHECK_POINT = 'nnet_C002_2_1'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -451,7 +451,7 @@ class C002_6_2(base_config): # DONE 15041
   max_epochs = 50
 
 
-class C002_7_1(base_config): # prepare 15041
+class C002_7_1(base_config): # DONE 15041
   SE_MODEL = models.threshold_model.Threshold_Model
   CHECK_POINT = 'nnet_C002_7_1'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -466,7 +466,7 @@ class C002_7_1(base_config): # prepare 15041
   max_epochs = 15
 
 
-class C002_7_2(base_config): # prepare 15041
+class C002_7_2(base_config): # DONE 15041
   SE_MODEL = models.threshold_model.Threshold_Model
   CHECK_POINT = 'nnet_C002_7_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -481,7 +481,7 @@ class C002_7_2(base_config): # prepare 15041
   max_epochs = 15
 
 
-class C002_8_1(base_config): # prepare 15041
+class C002_8_1(base_config): # DONE 15041
   SE_MODEL = models.threshold_per_frame_model.Frame_Threshold_Model
   CHECK_POINT = 'nnet_C002_8_1'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -494,7 +494,7 @@ class C002_8_1(base_config): # prepare 15041
   max_epochs = 15
 
 
-class C002_8_2(base_config): # prepare 15041
+class C002_8_2(base_config): # DONE 15041
   SE_MODEL = models.threshold_per_frame_model.Frame_Threshold_Model
   CHECK_POINT = 'nnet_C002_8_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -567,7 +567,7 @@ class C004_1_2(base_config):  # DONE 15041
   INIT_LOG_BIAS = 1e-2
 
 
-class C004_1_3(base_config):  # RUNNING 15041
+class C004_1_3(base_config):  # *DONE 15041
   CHECK_POINT = 'nnet_C004_1_3'
   INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
@@ -576,9 +576,36 @@ class C004_1_3(base_config):  # RUNNING 15041
   INIT_LOG_BIAS = 1e2
 
 
-class C004_1_4(base_config):  # RUNNING 15041
+class C004_1_4(base_config):  # **DONE 15041
   CHECK_POINT = 'nnet_C004_1_4'
   INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 1e4
+
+
+class C004_1_5(base_config):  # RUNNING 15041
+  CHECK_POINT = 'nnet_C004_1_5'
+  INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 1e5
+
+
+class C004_1_6(base_config):  # RUNNING 15041
+  CHECK_POINT = 'nnet_C004_1_6'
+  INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 1e6
+
+
+class C004_1_4_2(base_config):  # *RUNNING 15041
+  CHECK_POINT = 'nnet_C004_1_4_2'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
@@ -594,7 +621,7 @@ class C004_2(base_config): # DONE 15041
   INIT_LOG_BIAS = 1e-2
 
 
-class C004_2_2(base_config): # RUNNING 15041
+class C004_2_2(base_config): # DONE 15041
   CHECK_POINT = 'nnet_C004_2_2'
   INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
@@ -603,22 +630,40 @@ class C004_2_2(base_config): # RUNNING 15041
   INIT_LOG_BIAS = 1
 
 
-class C004_2_3(base_config):
+class C004_2_3(base_config): # RUNNING 15041
   CHECK_POINT = 'nnet_C004_2_3'
-  INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   INIT_LOG_BIAS = 1e2
 
 
-class C004_2_4(base_config):
+class C004_2_4(base_config): # RUNNING 15041
   CHECK_POINT = 'nnet_C004_2_4'
-  INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   INIT_LOG_BIAS = 1e4
 
-PARAM = C004_2
+
+class C004_2_5(base_config): # prepare 15041
+  CHECK_POINT = 'nnet_C004_2_5'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 1e5
+
+
+class C004_2_6(base_config): # prepare 15041
+  CHECK_POINT = 'nnet_C004_2_6'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 1e6
+
+PARAM = C004_2_4
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
