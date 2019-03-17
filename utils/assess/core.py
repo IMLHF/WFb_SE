@@ -12,6 +12,7 @@ import tempfile
 import numpy as np
 import librosa
 import platform
+from utils import audio_tool
 
 # 导入pesq.exe，用于语音质量的评估
 PESQ_PATH = os.path.split(os.path.realpath(__file__))[0]
@@ -50,8 +51,10 @@ def calc_pesq(ref_sig, deg_sig, samplerate, is_file=False):
     else:
         tmp_ref = tempfile.NamedTemporaryFile(suffix='.wav', delete=True)
         tmp_deg = tempfile.NamedTemporaryFile(suffix='.wav', delete=True)
-        librosa.output.write_wav(tmp_ref.name, ref_sig, samplerate)
-        librosa.output.write_wav(tmp_deg.name, deg_sig, samplerate)
+        # librosa.output.write_wav(tmp_ref.name, ref_sig, samplerate)
+        # librosa.output.write_wav(tmp_deg.name, deg_sig, samplerate)
+        audio_tool.write_audio(tmp_ref.name,ref_sig,samplerate)
+        audio_tool.write_audio(tmp_deg.name,deg_sig,samplerate)
         output = os.popen('%s +%d %s %s' % (PESQ_PATH, samplerate, tmp_ref.name, tmp_deg.name))
         msg = output.read()
         # print(msg)
@@ -61,6 +64,8 @@ def calc_pesq(ref_sig, deg_sig, samplerate, is_file=False):
         # os.unlink(tmp_deg.name)
     # print(msg)
     score = msg.split('Prediction : PESQ_MOS = ')
+    # print(msg)
+    # exit(0)
     # print(score)
     if len(score)<=1:
       print('error')
