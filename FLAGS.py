@@ -2,6 +2,7 @@ from losses import loss
 import models.baseline_rnn
 import models.recurrent_train_model
 import models.threshold_model
+import models.threshold_per_frame_model
 
 
 class base_config:
@@ -19,7 +20,16 @@ class base_config:
   MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
   LSTM_ACTIVATION = 'tanh'
   MASK_TYPE = "PSM"  # "PSM" or "IRM"
-  LOSS_FUNC = "SPEC_MSE" # "SPEC_MSE" or "MFCC_SPEC_MSE" or "MEL_SPEC_MSE" or "SPEC_MSE_LOWF_EN" or "FAIR_SPEC_MSE"
+  '''
+  LOSS_FUNC:
+    "SPEC_MSE" :
+    "MFCC_SPEC_MSE" :
+    "MEL_SPEC_MSE" :
+    "SPEC_MSE_LOWF_EN" :
+    "FAIR_SPEC_MSE" :
+    "SPEC_MSE_EMPHASIZE_LOWER_V" :
+  '''
+  LOSS_FUNC = "SPEC_MSE"
   KEEP_PROB = 0.8
   RNN_LAYER = 2
   CLIP_NORM = 5.0
@@ -71,7 +81,7 @@ class base_config:
   DECODING_MASK_POSITION = None  # should be same to TRAINING_MASK_POSITION
   DEFAULT_LOG_BIAS = 1e-12
   INIT_LOG_BIAS = 0 # real log_bias is DEFAULT_LOG_BIAS+tf.nn.relu(INIT_LOG_BIAS)
-  LOG_BIAS_TRAINABEL = False
+  LOG_BIAS_TRAINABLE = False
   #LOG_NORM_MAX = log(LOG_BIAS+MAG_NORM_MAX)
   #LOG_NORM_MIN = log(LOG_BIAS)
   # MAG_NORM_MAX = 70
@@ -100,8 +110,11 @@ class base_config:
   ####
   THRESHOLD_FUNC = None # None or 'square_fade' or 'exponential_fade' or 'en_exponential_fade'
   THRESHOLD_POS = None
-  INIT_THRESHOLD_RECIPROCAL = 1e-6
-  EXP_COEF = None
+  INIT_THRESHOLD_RECIPROCAL = 1e-6 # threshold = 1 / INIT_THRESHOLD_RECIPROCAL
+  INIT_THRESHOLD_EXP_COEF = None
+  THRESHOLD_EXP_TRAINABLE = False
+
+  POW_COEF = None
 
 
 class C001_1(base_config): # DONE 15041
@@ -209,6 +222,85 @@ class C001_6(base_config): # *DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
+class C001_6_2(base_config): # prepare 15041
+  '''
+  MSE emphasize lower value
+  '''
+  CHECK_POINT = 'nnet_C001_6_2'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "SPEC_MSE_EMPHASIZE_LOWER_V"
+  POW_COEF = 1
+  # MASK_TYPE = "PSM" # default
+
+
+class C001_6_3(base_config): # prepare 15041
+  '''
+  MSE emphasize lower value
+  '''
+  CHECK_POINT = 'nnet_C001_6_3'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "SPEC_MSE_EMPHASIZE_LOWER_V"
+  POW_COEF = 1/1.5
+
+
+class C001_6_4(base_config): # prepare 15041
+  '''
+  MSE emphasize lower value
+  '''
+  CHECK_POINT = 'nnet_C001_6_4'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "SPEC_MSE_EMPHASIZE_LOWER_V"
+  POW_COEF = 1/2
+
+
+class C001_6_5(base_config): # prepare 15041
+  '''
+  MSE emphasize lower value
+  '''
+  CHECK_POINT = 'nnet_C001_6_5'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "SPEC_MSE_EMPHASIZE_LOWER_V"
+  POW_COEF = 1/3
+
+
+class C001_6_6(base_config): # prepare 15041
+  '''
+  MSE emphasize lower value
+  '''
+  CHECK_POINT = 'nnet_C001_6_6'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "SPEC_MSE_EMPHASIZE_LOWER_V"
+  POW_COEF = 1/5
+
+
+class C001_6_7(base_config): # prepare 15041
+  '''
+  MSE emphasize lower value
+  '''
+  CHECK_POINT = 'nnet_C001_6_7'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "SPEC_MSE_EMPHASIZE_LOWER_V"
+  POW_COEF = 1/9
+
+
 class C002_1(base_config): # DONE 15043
   CLOSE_CONDATION_SPEAKER_LIST_DIR = base_config.CLOSE_CONDATION_SPEAKER_LIST_DIR.replace('room','student')
   OPEN_CONDATION_SPEAKER_LIST_DIR = base_config.OPEN_CONDATION_SPEAKER_LIST_DIR.replace('room','student')
@@ -227,10 +319,6 @@ class C002_1(base_config): # DONE 15043
 
 
 class C002_2(base_config): # *DONE 15041
-  CLOSE_CONDATION_SPEAKER_LIST_DIR = base_config.CLOSE_CONDATION_SPEAKER_LIST_DIR.replace('room','student')
-  OPEN_CONDATION_SPEAKER_LIST_DIR = base_config.OPEN_CONDATION_SPEAKER_LIST_DIR.replace('room','student')
-  NOISE_DIR = base_config.NOISE_DIR.replace('room','student')
-  TFRECORDS_DIR = base_config.TFRECORDS_DIR.replace('room','student')
   SE_MODEL = models.threshold_model.Threshold_Model
   CHECK_POINT = 'nnet_C002_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -241,6 +329,19 @@ class C002_2(base_config): # *DONE 15041
   THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
   INIT_THRESHOLD_RECIPROCAL = 0
   max_epochs = 50
+
+
+class C002_2_2(base_config): # prepare 15041
+  SE_MODEL = models.threshold_model.Threshold_Model
+  CHECK_POINT = 'nnet_C002_2_1'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  THRESHOLD_FUNC = base_config.EXPONENTIAL_FADE
+  THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
+  INIT_THRESHOLD_RECIPROCAL = 1e6
+  max_epochs = 15
 
 
 class C002_3_1(base_config): # DONE 15043
@@ -255,7 +356,8 @@ class C002_3_1(base_config): # DONE 15043
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   THRESHOLD_FUNC = base_config.EN_EXPONENTIAL_FADE
-  EXP_COEF = 2
+  THRESHOLD_EXP_TRAINABLE = False
+  INIT_THRESHOLD_EXP_COEF = 2
   THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
   INIT_THRESHOLD_RECIPROCAL = 10
   max_epochs = 50
@@ -273,7 +375,8 @@ class C002_3_2(base_config): # DONE 15043
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   THRESHOLD_FUNC = base_config.EN_EXPONENTIAL_FADE
-  EXP_COEF = 4
+  THRESHOLD_EXP_TRAINABLE = False
+  INIT_THRESHOLD_EXP_COEF = 4
   THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
   INIT_THRESHOLD_RECIPROCAL = 10
   max_epochs = 50
@@ -313,6 +416,8 @@ class C002_6(base_config): # diverge DONE 15041
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   THRESHOLD_FUNC = base_config.EN_EXPONENTIAL_FADE
+  THRESHOLD_EXP_TRAINABLE = False
+  INIT_THRESHOLD_EXP_COEF = 2
   THRESHOLD_POS = base_config.THRESHOLD_ON_MASK
   INIT_THRESHOLD_RECIPROCAL = 0
   max_epochs = 50
@@ -339,10 +444,97 @@ class C002_6_2(base_config): # DONE 15041
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   THRESHOLD_FUNC = base_config.EN_EXPONENTIAL_FADE
+  THRESHOLD_EXP_TRAINABLE = False
+  INIT_THRESHOLD_EXP_COEF = 2
   THRESHOLD_POS = base_config.THRESHOLD_ON_MASK
   INIT_THRESHOLD_RECIPROCAL = 10
-  EXP_COEF = 2
   max_epochs = 50
+
+
+class C002_7_1(base_config): # prepare 15041
+  SE_MODEL = models.threshold_model.Threshold_Model
+  CHECK_POINT = 'nnet_C002_7_1'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  THRESHOLD_FUNC = base_config.EN_EXPONENTIAL_FADE
+  THRESHOLD_EXP_TRAINABLE = True
+  INIT_THRESHOLD_EXP_COEF = 1
+  THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
+  INIT_THRESHOLD_RECIPROCAL = 0
+  max_epochs = 15
+
+
+class C002_7_2(base_config): # prepare 15041
+  SE_MODEL = models.threshold_model.Threshold_Model
+  CHECK_POINT = 'nnet_C002_7_2'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  THRESHOLD_FUNC = base_config.EN_EXPONENTIAL_FADE
+  THRESHOLD_EXP_TRAINABLE = True
+  INIT_THRESHOLD_EXP_COEF = 1
+  THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
+  INIT_THRESHOLD_RECIPROCAL = 1e6
+  max_epochs = 15
+
+
+class C002_8_1(base_config): # prepare 15041
+  SE_MODEL = models.threshold_per_frame_model.Frame_Threshold_Model
+  CHECK_POINT = 'nnet_C002_8_1'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  THRESHOLD_FUNC = base_config.EXPONENTIAL_FADE
+  THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
+  INIT_THRESHOLD_RECIPROCAL = 0
+  max_epochs = 15
+
+
+class C002_8_2(base_config): # prepare 15041
+  SE_MODEL = models.threshold_per_frame_model.Frame_Threshold_Model
+  CHECK_POINT = 'nnet_C002_8_2'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  THRESHOLD_FUNC = base_config.EXPONENTIAL_FADE
+  THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
+  INIT_THRESHOLD_RECIPROCAL = 1e6
+  max_epochs = 15
+
+
+class C002_9_1(base_config): # prepare 15041
+  SE_MODEL = models.threshold_per_frame_model.Frame_Threshold_Model
+  CHECK_POINT = 'nnet_C002_9_1'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  THRESHOLD_FUNC = base_config.EN_EXPONENTIAL_FADE
+  THRESHOLD_EXP_TRAINABLE = True
+  INIT_THRESHOLD_EXP_COEF = 1
+  THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
+  INIT_THRESHOLD_RECIPROCAL = 0
+  max_epochs = 15
+
+
+class C002_9_2(base_config): # prepare 15041
+  SE_MODEL = models.threshold_per_frame_model.Frame_Threshold_Model
+  CHECK_POINT = 'nnet_C002_9_2'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  THRESHOLD_FUNC = base_config.EN_EXPONENTIAL_FADE
+  THRESHOLD_EXP_TRAINABLE = True
+  INIT_THRESHOLD_EXP_COEF = 1
+  THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
+  INIT_THRESHOLD_RECIPROCAL = 1e6
+  max_epochs = 15
 
 
 class C003_1(base_config): # DONE 15041
@@ -428,5 +620,5 @@ class C004_2_4(base_config):
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   INIT_LOG_BIAS = 1e4
 
-PARAM = C004_2_2
+PARAM = C004_2
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
