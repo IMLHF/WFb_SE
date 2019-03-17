@@ -31,6 +31,7 @@ def train_one_epoch(sess, tr_model):
            #tr_model.threshold
            ])
       tr_loss += loss
+      # print(loss,flush=True)
       # print(np.min(threshold),np.max(threshold),np.mean(threshold),np.sqrt(np.var(threshold)),flush=True)
       # print("\r    Batch loss: %f" % loss, end="")
       if (i+1) % PARAM.minibatch_size == 0:

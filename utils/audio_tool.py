@@ -164,7 +164,7 @@ def get_batch_sdr_improvement(x_wav,y_wav,y_wav_est):
   sdr_ref_mixed_list = [cal_SDR(ref/AMP_MAX,
                                 mixed/AMP_MAX)[0]
                         for ref, mixed in zip(y_wav, x_wav)]
-  print(np.shape(sdr_ref_cleaned_list))
+  # print(np.shape(sdr_ref_cleaned_list))
   sdr_ref_cleaned_vec = np.array(sdr_ref_cleaned_list)
   sdr_ref_mixed_vec = np.array(sdr_ref_mixed_list)
   sdr_imp_vec = sdr_ref_cleaned_vec - sdr_ref_mixed_vec

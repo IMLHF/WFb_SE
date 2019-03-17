@@ -81,7 +81,7 @@ class base_config:
   AUDIO_VOLUME_AMP = False
 
   MIX_METHOD = 'SNR'  # "LINEAR" "SNR"
-  MAX_SNR = 5  # 以不同信噪比混合, (是否添加纯净语音到训练集)
+  MAX_SNR = 5  # 以不同信噪比混合, #并添加10%的纯净语音（尚未添加
   MIN_SNR = -5
   #MIX_METHOD = "LINEAR"
   MAX_COEF = 1.0  # 以不同系数混合
@@ -111,9 +111,6 @@ class C001_1(base_config): # DONE 15041
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   MASK_TYPE = "IRM"
-  '''
-  iter4 PESQ: 0.4
-  '''
 
 
 class C001_2(base_config): # *DONE 15041
@@ -123,9 +120,6 @@ class C001_2(base_config): # *DONE 15041
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   # MASK_TYPE = "PSM" # default
-  '''
-  iter4 PESQ: 0.4
-  '''
 
 
 class C001_2_RT(base_config): # DONE 15041
@@ -137,7 +131,7 @@ class C001_2_RT(base_config): # DONE 15041
   SE_MODEL = models.recurrent_train_model.Model_Recurrent_Train
 
 
-class C001_3(base_config): # DONE 15041
+class C001_3(base_config): # *DONE 15041
   CHECK_POINT = 'nnet_C001_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -215,7 +209,7 @@ class C001_6(base_config): # *DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C002_1(base_config): # RUNNING 15043
+class C002_1(base_config): # DONE 15043
   CLOSE_CONDATION_SPEAKER_LIST_DIR = base_config.CLOSE_CONDATION_SPEAKER_LIST_DIR.replace('room','student')
   OPEN_CONDATION_SPEAKER_LIST_DIR = base_config.OPEN_CONDATION_SPEAKER_LIST_DIR.replace('room','student')
   NOISE_DIR = base_config.NOISE_DIR.replace('room','student')
@@ -232,7 +226,7 @@ class C002_1(base_config): # RUNNING 15043
   max_epochs = 50
 
 
-class C002_2(base_config): # *RUNNING 15043
+class C002_2(base_config): # *DONE 15041
   CLOSE_CONDATION_SPEAKER_LIST_DIR = base_config.CLOSE_CONDATION_SPEAKER_LIST_DIR.replace('room','student')
   OPEN_CONDATION_SPEAKER_LIST_DIR = base_config.OPEN_CONDATION_SPEAKER_LIST_DIR.replace('room','student')
   NOISE_DIR = base_config.NOISE_DIR.replace('room','student')
@@ -249,7 +243,7 @@ class C002_2(base_config): # *RUNNING 15043
   max_epochs = 50
 
 
-class C002_3_1(base_config): # prepare 15043
+class C002_3_1(base_config): # DONE 15043
   CLOSE_CONDATION_SPEAKER_LIST_DIR = base_config.CLOSE_CONDATION_SPEAKER_LIST_DIR.replace('room','student')
   OPEN_CONDATION_SPEAKER_LIST_DIR = base_config.OPEN_CONDATION_SPEAKER_LIST_DIR.replace('room','student')
   NOISE_DIR = base_config.NOISE_DIR.replace('room','student')
@@ -263,11 +257,11 @@ class C002_3_1(base_config): # prepare 15043
   THRESHOLD_FUNC = base_config.EN_EXPONENTIAL_FADE
   EXP_COEF = 2
   THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
-  INIT_THRESHOLD_RECIPROCAL = 0
+  INIT_THRESHOLD_RECIPROCAL = 10
   max_epochs = 50
 
 
-class C002_3_2(base_config): # prepare 15043
+class C002_3_2(base_config): # DONE 15043
   CLOSE_CONDATION_SPEAKER_LIST_DIR = base_config.CLOSE_CONDATION_SPEAKER_LIST_DIR.replace('room','student')
   OPEN_CONDATION_SPEAKER_LIST_DIR = base_config.OPEN_CONDATION_SPEAKER_LIST_DIR.replace('room','student')
   NOISE_DIR = base_config.NOISE_DIR.replace('room','student')
@@ -281,11 +275,11 @@ class C002_3_2(base_config): # prepare 15043
   THRESHOLD_FUNC = base_config.EN_EXPONENTIAL_FADE
   EXP_COEF = 4
   THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
-  INIT_THRESHOLD_RECIPROCAL = 0
+  INIT_THRESHOLD_RECIPROCAL = 10
   max_epochs = 50
 
 
-class C002_4(base_config): # RUNNING 15041
+class C002_4(base_config): # DONE 15041
   SE_MODEL = models.threshold_model.Threshold_Model
   CHECK_POINT = 'nnet_C002_4'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -324,7 +318,7 @@ class C002_6(base_config): # diverge DONE 15041
   max_epochs = 50
 
 
-class C002_5_2(base_config): # RUNNING 15041
+class C002_5_2(base_config): # DONE 15041
   SE_MODEL = models.threshold_model.Threshold_Model
   CHECK_POINT = 'nnet_C002_5_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -337,7 +331,7 @@ class C002_5_2(base_config): # RUNNING 15041
   max_epochs = 50
 
 
-class C002_6_2(base_config): # RUNNING 15041
+class C002_6_2(base_config): # DONE 15041
   SE_MODEL = models.threshold_model.Threshold_Model
   CHECK_POINT = 'nnet_C002_6_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -363,8 +357,8 @@ class C003_1(base_config): # DONE 15041
   TIME_NOSOFTMAX_ATTENTION = True
 
 
-class C002_(base_config):  #
-  CHECK_POINT = 'nnet_C002'
+class C004_1(base_config): # DONE 15041
+  CHECK_POINT = 'nnet_C004_1'
   INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
@@ -372,17 +366,67 @@ class C002_(base_config):  #
   INIT_LOG_BIAS = 0
 
 
-class C003_(base_config):
-  CHECK_POINT = 'nnet_C003'
+class C004_1_2(base_config):  # DONE 15041
+  CHECK_POINT = 'nnet_C004_1_2'
+  INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 1e-2
+
+
+class C004_1_3(base_config):  # RUNNING 15041
+  CHECK_POINT = 'nnet_C004_1_3'
+  INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 1e2
+
+
+class C004_1_4(base_config):  # RUNNING 15041
+  CHECK_POINT = 'nnet_C004_1_4'
+  INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 1e4
+
+
+class C004_2(base_config): # DONE 15041
+  CHECK_POINT = 'nnet_C004_2'
   INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  INIT_LOG_BIAS = 0
-
-# 002和003对比看mask最佳位置，001和003对比看对数谱和幅度谱哪个做loss较好
+  INIT_LOG_BIAS = 1e-2
 
 
+class C004_2_2(base_config): # RUNNING 15041
+  CHECK_POINT = 'nnet_C004_2_2'
+  INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 1
 
-PARAM = C002_3_2
+
+class C004_2_3(base_config):
+  CHECK_POINT = 'nnet_C004_2_3'
+  INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 1e2
+
+
+class C004_2_4(base_config):
+  CHECK_POINT = 'nnet_C004_2_4'
+  INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 1e4
+
+PARAM = C004_2_2
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
