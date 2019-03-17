@@ -34,7 +34,7 @@ class Model_Recurrent_Train(object):
       assert(theta_x_batch is not None)
       assert(theta_y_batch is not None)
     with tf.variable_scope("recurrent_train_model"):
-      self._log_bias = tf.get_variable('logbias', [1], trainable=FLAGS.PARAM.LOG_BIAS_TRAINABEL,
+      self._log_bias = tf.get_variable('logbias', [1], trainable=FLAGS.PARAM.LOG_BIAS_TRAINABLE,
                                        initializer=tf.constant_initializer(FLAGS.PARAM.INIT_LOG_BIAS))
       self._real_logbias = self._log_bias + FLAGS.PARAM.DEFAULT_LOG_BIAS
       self._x_mag_spec = x_mag_spec_batch
