@@ -12,6 +12,7 @@ from FLAGS import PARAM
 import shutil
 import time
 import utils.assess.core as pesqexe
+from pystoi import stoi
 
 
 def build_session(ckpt_dir,batch_size,finalizeG=True):
@@ -96,9 +97,12 @@ def decode_one_wav(sess, model, wavedata):
 def decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, save_audio, ans_file):
   if os.path.exists(os.path.join(decode_ans_file,ans_file)):
     os.remove(os.path.join(decode_ans_file,ans_file))
-  # pesq_sum = 0
-  # stoi_sum = 0
-  sdr_sum = 0
+  pesq_raw_sum = 0
+  pesq_en_sum = 0
+  stoi_raw_sum = 0
+  stoi_en_sum = 0
+  sdr_raw_sum = 0
+  sdr_en_sum = 0
   for i, mixed_dir in enumerate(decode_file_list):
     print('\n',i+1,mixed_dir)
     waveData, sr = utils.audio_tool.read_audio(mixed_dir)
@@ -118,35 +122,48 @@ def decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_fi
 
     if i<len(ref_list):
       ref, sr = utils.audio_tool.read_audio(ref_list[i])
-      print('refer: ',ref_list[i])
+      print(' refer: ',ref_list[i])
       len_small = min(len(ref),len(waveData),len(reY))
       ref = np.array(ref[:len_small])
       waveData = np.array(waveData[:len_small])
       reY = np.array(reY[:len_small])
-      # print(sr)
       # sdr
-      sdr_imp = audio_tool.cal_SDRi(np.array([ref]),
-                                    np.array([reY]),
-                                    np.array([waveData]))
-      sdr_sum += sdr_imp
-      print("SR = %d, SDR Imp: %.3f. " % (sr,sdr_imp))
-      with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
-        f.write('\tsdr_imp:%.3f. \t%s\r\n\r\n' % (sdr_imp,file_name))
+      sdr_raw = audio_tool.cal_SDR(np.array([ref]),
+                                   np.array([waveData]))
+      sdr_en = audio_tool.cal_SDR(np.array([ref]),
+                                  np.array(reY))
+      sdr_raw_sum += sdr_raw
+      sdr_en_sum += sdr_en
       # pesq
-      # pesq_raw = pesq(waveData,ref,sr)
-      # pesq_en = pesq(reY,ref,sr)
-      # pesq_imp = pesq_en - pesq_raw
-      # pesq_sum+=pesq_imp
-      # print("SR = %d, PESQ Imp: %.3f. " % (sr,pesq_imp))
-      # with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
-      #   f.write('pesq_raw:%.3f, \tpesq_en:%.3f, \tpesq_imp:%.3f. \t%s\r\n\r\n' % (pesq_raw,pesq_en,pesq_imp,file_name))
+      # pesq_raw = pesq(ref,waveData,sr)
+      # pesq_en = pesq(ref,reY,sr)
+      pesq_raw = pesqexe.calc_pesq(ref,waveData,sr)
+      pesq_en = pesqexe.calc_pesq(ref,reY,sr)
+      pesq_raw_sum += pesq_raw
+      pesq_en_sum += pesq_en
+      # stoi
+      stoi_raw = stoi.stoi(ref,waveData,sr)
+      stoi_en = stoi.stoi(ref,reY,sr)
+      stoi_raw_sum += stoi_raw
+      stoi_en_sum += stoi_en
+      print("SR = %d" % sr)
+      print("PESQ_raw: %.3f, PESQ_en: %.3f, PESQimp: %.3f. " % (pesq_raw,pesq_en,pesq_en-pesq_raw))
+      print("SDR_raw: %.3f, SDR_en: %.3f, SDRimp: %.3f. " % (sdr_raw,sdr_en,sdr_en-sdr_raw))
+      print("STOI_raw: %.3f, STOI_en: %.3f, STOIimp: %.3f. " % (stoi_raw,stoi_en,stoi_en-stoi_raw))
+      with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
+        f.write(file_name+'\r\n')
+        f.write("    |-PESQ_raw: %.3f, PESQ_en: %.3f, PESQimp: %.3f. \r\n" % (pesq_raw,pesq_en,pesq_en-pesq_raw))
+        f.write("    |-SDR_raw: %.3f, SDR_en: %.3f, SDRimp: %.3f. \r\n" % (sdr_raw,sdr_en,sdr_en-sdr_raw))
+        f.write("    |-STOI_raw: %.3f, STOI_en: %.3f, STOIimp: %.3f. \r\n" % (stoi_raw,stoi_en,stoi_en-stoi_raw))
 
   with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
-    f.write('SDRi_avg:%.3f. \r\n' % (sdr_sum/len(ref_list)))
-  print("avg SDRi:%.3f" % (sdr_sum/len(ref_list)))
-  # with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
-  #     f.write('pesqi_avg:%.3f. \r\n' % (pesq_sum/len(ref_list)))
-  # print("avg pesqi:%.3f" % (pesq_sum/len(ref_list)))
+    f.write('PESQi_avg:%.3f. \r\n' % ((pesq_raw_sum-pesq_en_sum)/len(ref_list)))
+    f.write('SDRi_avg:%.3f. \r\n' % ((sdr_en_sum-sdr_raw_sum)/len(ref_list)))
+    f.write('STOIi_avg:%.3f. \r\n' % ((stoi_en_sum-stoi_raw_sum)/len(ref_list)))
+  print('\n\n\n-----------------------------------------')
+  print('PESQi_avg:%.3f. \r\n' % ((pesq_raw_sum-pesq_en_sum)/len(ref_list)))
+  print('SDRi_avg:%.3f. \r\n' % ((sdr_en_sum-sdr_raw_sum)/len(ref_list)))
+  print('STOIi_avg:%.3f. \r\n' % ((stoi_en_sum-stoi_raw_sum)/len(ref_list)))
 
 
 if __name__=='__main__':
@@ -213,6 +230,6 @@ if __name__=='__main__':
     for wav_dir in refer_list_single:
       for i in range(7):
         refer_list.append(wav_dir)
-    decode_and_getMeature(mixed_list, refer_list, sess, model, decode_ans_file, False, 'SDRi.txt')
+    decode_and_getMeature(mixed_list, refer_list, sess, model, decode_ans_file, False, 'real_testITU_T.txt')
     print(ckpt)
     print("Cost time : %dS" % (time.time()-start_time))
