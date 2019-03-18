@@ -11,6 +11,7 @@ import os
 import shutil
 from mir_eval.separation import bss_eval_sources
 from numpy import linalg
+from utils.assess.core import calc_pesq
 AMP_MAX = (2 ** (FLAGS.PARAM.AUDIO_BITS - 1) - 1)
 
 '''
@@ -119,13 +120,9 @@ def get_batch_pesq_improvement(x_wav,y_wav,y_wav_est,batch_num,set_name):
       write_audio(os.path.join(decode_ans_file, "%04d_%03d_mixed.wav" % (batch_num, i)),
                   mixed, FLAGS.PARAM.FS)
   # calculate PESQ improvement
-  pesq_ref_cleaned_list = [pesq(cleaned/AMP_MAX,
-                                ref/AMP_MAX,
-                                FLAGS.PARAM.FS)
+  pesq_ref_cleaned_list = [calc_pesq(ref, cleaned, FLAGS.PARAM.FS)
                            for ref, cleaned in zip(y_wav, y_wav_est)]
-  pesq_ref_mixed_list = [pesq(mixed/AMP_MAX,
-                              ref/AMP_MAX,
-                              FLAGS.PARAM.FS)
+  pesq_ref_mixed_list = [calc_pesq(ref, mixed, FLAGS.PARAM.FS)
                          for ref, mixed in zip(y_wav, x_wav)]
   pesq_ref_cleaned_vec = np.array(pesq_ref_cleaned_list)
   pesq_ref_mixed_vec = np.array(pesq_ref_mixed_list)

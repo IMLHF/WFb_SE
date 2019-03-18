@@ -203,7 +203,7 @@ class Model_Baseline(object):
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
     elif FLAGS.PARAM.LOSS_FUNC == "FAIR_SPEC_MSE":
       self._loss = loss.fair_reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
-    elif FLAGS.PARAM.LOSS_FUNC == "SPEC_MSE_EMPHASIZE_LOWER_V":
+    elif FLAGS.PARAM.LOSS_FUNC == "SPEC_MSE_FLEXIBLE_POW_C":
       self._loss = loss.reduce_sum_frame_batchsize_MSE_EmphasizeLowerValue(self._y_estimation,
                                                                            self._y_labels,
                                                                            FLAGS.PARAM.POW_COEF)
