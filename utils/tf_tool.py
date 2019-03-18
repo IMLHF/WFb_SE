@@ -113,10 +113,14 @@ def get_gpu_batch_size_list(n_x,n_gpu):
   gpu_batch_size_list=tf.concat([gpu_batch_size_list,[n_x]],0)
   return gpu_batch_size_list
 
+def show_variables(vars_):
+    slim.model_analyzer.analyze_vars(vars_, print_info=True)
+    sys.stdout.flush()
+
+
 def show_all_variables():
     model_vars = tf.trainable_variables()
-    slim.model_analyzer.analyze_vars(model_vars, print_info=True)
-    sys.stdout.flush()
+    show_variables(model_vars)
 
 
 # norm mag to [0,1]
