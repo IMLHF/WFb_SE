@@ -130,12 +130,12 @@ def norm_mag_spec(mag_spec, MAG_NORM_MAX):
   return normed_mag
 
 # add bias and logarithm to mag, dispersion to [0,1]
-def norm_logmag_spec(mag_spec, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS):
-  LOG_NORM_MIN = tf.log(tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS) / tf.log(10.0)
-  LOG_NORM_MAX = tf.log(tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS+MAG_NORM_MAX) / tf.log(10.0)
+def norm_logmag_spec(mag_spec, MAG_NORM_MAX, log_bias, MIN_LOG_BIAS):
+  LOG_NORM_MIN = tf.log(tf.nn.relu(log_bias)+MIN_LOG_BIAS) / tf.log(10.0)
+  LOG_NORM_MAX = tf.log(tf.nn.relu(log_bias)+MIN_LOG_BIAS+MAG_NORM_MAX) / tf.log(10.0)
 
   # mag_spec = tf.clip_by_value(mag_spec, 0, MAG_NORM_MAX)
-  logmag_spec = tf.log(mag_spec+tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS)/tf.log(10.0)
+  logmag_spec = tf.log(mag_spec+tf.nn.relu(log_bias)+MIN_LOG_BIAS)/tf.log(10.0)
   logmag_spec -= LOG_NORM_MIN
   normed_logmag = logmag_spec / (LOG_NORM_MAX - LOG_NORM_MIN)
   return normed_logmag
@@ -146,23 +146,23 @@ def rm_norm_mag_spec(normed_mag, MAG_NORM_MAX):
   return mag_spec
 
 # Inverse process of norm_logmag_spec()
-def rm_norm_logmag_spec(normed_logmag, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS):
-  LOG_NORM_MIN = tf.log(tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS) / tf.log(10.0)
-  LOG_NORM_MAX = tf.log(tf.nn.relu(log_bias)+DEFAULT_LOG_BIAS+MAG_NORM_MAX) / tf.log(10.0)
+def rm_norm_logmag_spec(normed_logmag, MAG_NORM_MAX, log_bias, MIN_LOG_BIAS):
+  LOG_NORM_MIN = tf.log(tf.nn.relu(log_bias)+MIN_LOG_BIAS) / tf.log(10.0)
+  LOG_NORM_MAX = tf.log(tf.nn.relu(log_bias)+MIN_LOG_BIAS+MAG_NORM_MAX) / tf.log(10.0)
 
   mag_spec = normed_logmag * (LOG_NORM_MAX - LOG_NORM_MIN)
   mag_spec += LOG_NORM_MIN
   mag_spec *= tf.log(10.0)
-  mag_spec = tf.exp(mag_spec) - DEFAULT_LOG_BIAS - tf.nn.relu(log_bias)
+  mag_spec = tf.exp(mag_spec) - MIN_LOG_BIAS - tf.nn.relu(log_bias)
   return mag_spec
 
 #
-def normedMag2normedLogmag(normed_mag, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS):
-  return norm_logmag_spec(rm_norm_mag_spec(normed_mag, MAG_NORM_MAX), MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS)
+def normedMag2normedLogmag(normed_mag, MAG_NORM_MAX, log_bias, MIN_LOG_BIAS):
+  return norm_logmag_spec(rm_norm_mag_spec(normed_mag, MAG_NORM_MAX), MAG_NORM_MAX, log_bias, MIN_LOG_BIAS)
 
 #
-def normedLogmag2normedMag(normed_logmag, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS):
-  return norm_mag_spec(rm_norm_logmag_spec(normed_logmag, MAG_NORM_MAX, log_bias, DEFAULT_LOG_BIAS), MAG_NORM_MAX)
+def normedLogmag2normedMag(normed_logmag, MAG_NORM_MAX, log_bias, MIN_LOG_BIAS):
+  return norm_mag_spec(rm_norm_logmag_spec(normed_logmag, MAG_NORM_MAX, log_bias, MIN_LOG_BIAS), MAG_NORM_MAX)
 
 def melspec_form_realStft(mag_spectrograms, sample_rate, num_mel_bins):
   # Warp the linear scale spectrograms into the mel-scale.

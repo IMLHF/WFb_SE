@@ -36,14 +36,14 @@ class Model_Recurrent_Train(object):
     with tf.variable_scope("recurrent_train_model"):
       self._log_bias = tf.get_variable('logbias', [1], trainable=FLAGS.PARAM.LOG_BIAS_TRAINABLE,
                                        initializer=tf.constant_initializer(FLAGS.PARAM.INIT_LOG_BIAS))
-      self._real_logbias = self._log_bias + FLAGS.PARAM.DEFAULT_LOG_BIAS
+      self._real_logbias = self._log_bias + FLAGS.PARAM.MIN_LOG_BIAS
       self._x_mag_spec = x_mag_spec_batch
       self._norm_x_mag_spec = norm_mag_spec(self._x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
-      self._norm_x_logmag_spec = norm_logmag_spec(self._x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX, self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
+      self._norm_x_logmag_spec = norm_logmag_spec(self._x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX, self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
 
       self._y_mag_spec = y_mag_spec_batch
       self._norm_y_mag_spec = norm_mag_spec(self._y_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
-      self._norm_y_logmag_spec = norm_logmag_spec(self._y_mag_spec, FLAGS.PARAM.MAG_NORM_MAX, self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
+      self._norm_y_logmag_spec = norm_logmag_spec(self._y_mag_spec, FLAGS.PARAM.MAG_NORM_MAX, self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
 
       self._lengths = lengths_batch
       self._batch_size = tf.shape(self._lengths)[0]
@@ -142,7 +142,7 @@ class Model_Recurrent_Train(object):
       elif FLAGS.PARAM.DECODING_MASK_POSITION == 'logmag':
         self._y_mag_estimation = rm_norm_logmag_spec(self._mask*self._norm_x_logmag_spec,
                                                      FLAGS.PARAM.MAG_NORM_MAX,
-                                                     self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
+                                                     self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
       if behavior == self.infer:
         return
       '''
@@ -181,10 +181,10 @@ class Model_Recurrent_Train(object):
     if FLAGS.PARAM.TRAINING_MASK_POSITION != FLAGS.PARAM.LABEL_TYPE:
       if FLAGS.PARAM.LABEL_TYPE == 'mag':
         self._y_estimation = normedLogmag2normedMag(self._y_estimation, FLAGS.PARAM.MAG_NORM_MAX,
-                                                    self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
+                                                    self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
       elif FLAGS.PARAM.LABEL_TYPE == 'logmag':
         self._y_estimation = normedMag2normedLogmag(self._y_estimation, FLAGS.PARAM.MAG_NORM_MAX,
-                                                    self._log_bias, FLAGS.PARAM.DEFAULT_LOG_BIAS)
+                                                    self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
     # endregion
 
     # region get LOSS
