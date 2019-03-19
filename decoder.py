@@ -150,6 +150,7 @@ def decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_fi
       print("PESQ_raw: %.3f, PESQ_en: %.3f, PESQimp: %.3f. " % (pesq_raw,pesq_en,pesq_en-pesq_raw))
       print("SDR_raw: %.3f, SDR_en: %.3f, SDRimp: %.3f. " % (sdr_raw,sdr_en,sdr_en-sdr_raw))
       print("STOI_raw: %.3f, STOI_en: %.3f, STOIimp: %.3f. " % (stoi_raw,stoi_en,stoi_en-stoi_raw))
+      sys.stdout.flush()
       with open(os.path.join(decode_ans_file,ans_file),'a+') as f:
         f.write(file_name+'\r\n')
         f.write("    |-PESQ_raw: %.3f, PESQ_en: %.3f, PESQimp: %.3f. \r\n" % (pesq_raw,pesq_en,pesq_en-pesq_raw))
@@ -165,6 +166,7 @@ def decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_fi
   print('PESQ_raw:%.3f, PESQ_en:%.3f, PESQi_avg:%.3f. \r\n' % (pesq_raw_sum/len_list, pesq_en_sum/len_list, (pesq_en_sum-pesq_raw_sum)/len_list))
   print('SDR_raw:%.3f, SDR_en:%.3f, SDRi_avg:%.3f. \r\n' % (sdr_raw_sum/len_list, sdr_en_sum/len_list, (sdr_en_sum-sdr_raw_sum)/len_list))
   print('STOI_raw:%.3f, STOI_en:%.3f, STOIi_avg:%.3f. \r\n' % (stoi_raw_sum/len_list, stoi_en_sum/len_list, (stoi_en_sum-stoi_raw_sum)/len_list))
+  sys.stdout.flush()
 
 
 if __name__=='__main__':
