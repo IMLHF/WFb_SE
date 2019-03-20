@@ -32,6 +32,7 @@ def train_one_epoch(sess, tr_model):
            ])
       tr_loss += loss
       # print(loss,flush=True)
+      print(np.min(log_bias),np.max(log_bias),np.mean(log_bias),np.sqrt(np.var(log_bias)),flush=True)
       # print(np.min(threshold),np.max(threshold),np.mean(threshold),np.sqrt(np.var(threshold)),flush=True)
       # print("\r    Batch loss: %f" % loss, end="")
       if (i+1) % PARAM.minibatch_size == 0:
@@ -40,9 +41,9 @@ def train_one_epoch(sess, tr_model):
         stime = time.time()
         avg_loss = tr_loss / (i+1)
         train_epoch_msg = ("MINIBATCH %05d: AVG.LOSS %04.6f, "
-                           "LR %02.6f, log_bias %05.2f, "
+                           "LR %02.6f, AVG.log_bias %05.2f, "
                            "DURATION %06dS") % (
-                               i + 1, avg_loss, lr, log_bias, costtime)
+                               i + 1, avg_loss, lr, np.mean(log_bias), costtime)
         tf.logging.info(train_epoch_msg)
         with open(os.path.join(PARAM.SAVE_DIR, PARAM.CHECK_POINT+'_train.log'), 'a+') as f:
           f.writelines(train_epoch_msg+'\n')
@@ -61,7 +62,7 @@ def eval_one_epoch(sess, val_model):
   while True:
     try:
       loss, current_batchsize = sess.run([
-          val_model.loss, val_model.batch_size,
+          val_model.loss, val_model.batch_size
           # val_model.threshold,
           # val_model._loss1, val_model._loss2,
       ])
@@ -70,6 +71,7 @@ def eval_one_epoch(sess, val_model):
       # print(loss2,'/',loss1)
       sys.stdout.flush()
       val_loss += loss
+      # print(np.min(log_bias),np.max(log_bias),np.mean(log_bias),np.sqrt(np.var(log_bias)),flush=True)
       # print(np.min(threshold),np.max(threshold),np.mean(threshold),np.sqrt(np.var(threshold)),flush=True)
       # print("\r    Batch loss: %f" % loss, end="")
       data_len += 1
@@ -174,8 +176,8 @@ def train():
       end_time = time.time()
 
       # Determine checkpoint path
-      ckpt_name = "nnet_iter%d_lrate%e_trloss%.4f_cvloss%.4f_logbias%f_duration%ds" % (
-          epoch + 1, model_lr, tr_loss, val_loss, log_bias, end_time - start_time)
+      ckpt_name = "nnet_iter%d_lrate%e_trloss%.4f_cvloss%.4f_avglogbias%f_duration%ds" % (
+          epoch + 1, model_lr, tr_loss, val_loss, np.mean(log_bias), end_time - start_time)
       ckpt_dir = os.path.join(PARAM.SAVE_DIR, PARAM.CHECK_POINT)
       if not os.path.exists(ckpt_dir):
         os.makedirs(ckpt_dir)
@@ -192,22 +194,22 @@ def train():
         loss_prev = val_loss
         best_path = ckpt_path
         msg = ("Train Iteration %03d: \n"
-               "    Train.LOSS %.4f, lrate %e, Val.LOSS %.4f, log_bias %f,\n"
+               "    Train.LOSS %.4f, lrate %e, Val.LOSS %.4f, avglog_bias %f,\n"
                "    %s, ckpt(%s) saved,\n"
                "    EPOCH DURATION: %.2fs\n") % (
             epoch + 1,
-            tr_loss, model_lr, val_loss, log_bias,
+            tr_loss, model_lr, val_loss, np.mean(log_bias),
             "NNET Accepted", ckpt_name, end_time - start_time)
         tf.logging.info(msg)
       else:
         reject_num += 1
         tr_model.saver.restore(sess, best_path)
         msg = ("Train Iteration %03d: \n"
-               "    Train.LOSS %.4f, lrate%e, Val.LOSS %.4f, log_bias %f,\n"
+               "    Train.LOSS %.4f, lrate%e, Val.LOSS %.4f, avglog_bias %f,\n"
                "    %s, ckpt(%s) abandoned,\n"
                "    EPOCH DURATION: %.2fs\n") % (
             epoch + 1,
-            tr_loss, model_lr, val_loss, log_bias,
+            tr_loss, model_lr, val_loss, np.mean(log_bias),
             "NNET Rejected", ckpt_name, end_time - start_time)
         tf.logging.info(msg)
       with open(os.path.join(PARAM.SAVE_DIR, PARAM.CHECK_POINT+'_train.log'), 'a+') as f:
