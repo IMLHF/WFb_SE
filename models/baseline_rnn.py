@@ -207,6 +207,8 @@ class Model_Baseline(object):
       self._loss = loss.reduce_sum_frame_batchsize_MSE_EmphasizeLowerValue(self._y_estimation,
                                                                            self._y_labels,
                                                                            FLAGS.PARAM.POW_COEF)
+    elif FLAGS.PARAM.LOSS_FUNC == "RELATED_MSE":
+      self._loss = loss.related_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels)
     else:
       print('Loss type error.')
       exit(-1)
