@@ -4,7 +4,7 @@ import FLAGS
 from utils import tf_tool
 
 def related_reduce_sum_frame_batchsize_MSE(y1,y2):
-  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow((y1-y2)/tf.max(y1+y2,1e-12), 2), 1), 1))
+  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow((y1-y2)/tf.maximum(y1+y2,1e-12), 2), 1), 1))
   return cost
 
 

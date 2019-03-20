@@ -2,7 +2,7 @@
 import librosa
 import librosa.output
 import numpy as np
-from pypesq import pesq
+# from pypesq import pesq
 from pystoi.stoi import stoi
 import soundfile as sf
 import FLAGS
