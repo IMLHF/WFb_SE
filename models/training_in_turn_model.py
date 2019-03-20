@@ -34,7 +34,7 @@ def sum_attention(inputs, batch, input_finnal_dim):
       return attened_vec
 
 
-class Training_Logbias_Model(object):
+class ALTER_Training_Model(object):
   infer = 'infer'
   train = 'train'
   validation = 'validation'
@@ -287,7 +287,12 @@ class Training_Logbias_Model(object):
     #   all_vars.append(var)
     train_logbiasnet = optimizer_logbiasnet.apply_gradients(zip(logbiasnet_grads, logbias_vars))
     train_masknet = optimizer_masknet.apply_gradients(zip(masknet_grads, mask_vars))
-    self._train_op = [train_logbiasnet, train_masknet]
+    if FLAGS.PARAM.TRAIN_TYPE == 'BOTH':
+      self._train_op = [train_logbiasnet, train_masknet]
+    elif FLAGS.PARAM.TRAIN_TYPE == 'LOGBIASNET':
+      self._train_op = train_logbiasnet
+    elif FLAGS.PARAM.TRAIN_TYPE == 'MASKNET':
+      self._train_op = train_masknet
 
     self._new_lr_logbiasnet = tf.placeholder(
         tf.float32, shape=[], name='new_learning_rate1')
