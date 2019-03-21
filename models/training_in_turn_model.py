@@ -232,8 +232,8 @@ class ALTER_Training_Model(object):
 
     # region get LOSS
     if FLAGS.PARAM.LOSS_FUNC == 'SPEC_MSE':  # log_mag and mag MSE
-      self._logbiasnet_loss = loss.reduce_sum_frame_batchsize_MSE(
-          self._y_normed_mag_estimation, self._y_mag_labels)
+      self._logbiasnet_loss = loss.related_reduce_sum_frame_batchsize_MSE(
+          self._y_normed_mag_estimation, self._y_mag_labels, 1e-6)
       self._masknet_loss = loss.reduce_sum_frame_batchsize_MSE(
         self._y_normed_logmag_estimation,self._y_logmag_labels)
     elif FLAGS.PARAM.LOSS_FUNC == "SPEC_MSE_FLEXIBLE_POW_C":
