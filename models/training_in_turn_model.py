@@ -8,30 +8,9 @@ from utils import tf_tool
 from losses import loss
 from utils.tf_tool import norm_mag_spec, norm_logmag_spec, rm_norm_mag_spec, rm_norm_logmag_spec
 from utils.tf_tool import normedLogmag2normedMag, normedMag2normedLogmag
-from utils.tf_tool import lstm_cell, GRU_cell
+from utils.tf_tool import lstm_cell, GRU_cell, sum_attention_with_final_state
 import FLAGS
 import numpy as np
-
-
-def sum_attention(inputs, batch, input_finnal_dim):
-  '''
-  inputs: func inputs of calculate audio-suitable log_bias
-    dims" [batch,time,fea_dim]
-  '''
-  fea_dim = input_finnal_dim
-  with tf.variable_scope('sum_attention_fc'):
-    # attention layer
-    with tf.variable_scope('attention_scorer'):
-      weights_scorer = tf.get_variable('weights_scorer', [fea_dim, 1],
-                                       initializer=tf.random_normal_initializer(stddev=0.01))
-      biases_scorer = tf.get_variable('biases_scorer', [1],
-                                      initializer=tf.constant_initializer(0.0))
-      attention_alpha_vec = tf.matmul(tf.reshape(inputs, [-1, input_finnal_dim]),
-                                      weights_scorer) + biases_scorer  # [batch*time,1]
-      attention_alpha_vec = tf.reshape(attention_alpha_vec,[batch,1,-1]) # [batch,1,time]
-      attention_alpha_vec = tf.nn.softmax(attention_alpha_vec, axis=-1)
-      attened_vec = tf.reshape(tf.matmul(attention_alpha_vec, inputs), [batch,-1])# [batch,fea_dim]
-      return attened_vec
 
 
 class ALTER_Training_Model(object):
@@ -131,7 +110,11 @@ class ALTER_Training_Model(object):
       logbias_net_outputs, fw_final_states, bw_final_states = result
 
       logbias_biRnn_out_size = FLAGS.PARAM.RNN_SIZE_LOGBIAS*2
-      attend_fea = sum_attention(logbias_net_outputs,self._batch_size,logbias_biRnn_out_size)
+      # attend_fea = sum_attention(logbias_net_outputs,self._batch_size,logbias_biRnn_out_size)
+      attend_fea = sum_attention_with_final_state(logbias_net_outputs,
+                                                  tf.concat(-1, [fw_final_states,
+                                                                 bw_final_states]),
+                                                  logbias_biRnn_out_size, 2048)
 
       with tf.variable_scope('fullconnectSuitableLogbias'):
         weights_logbias_fc = tf.get_variable('weights_logbias_fc', [logbias_biRnn_out_size, 1],
