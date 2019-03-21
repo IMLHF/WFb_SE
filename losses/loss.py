@@ -8,6 +8,14 @@ def related_reduce_sum_frame_batchsize_MSE(y1,y2,ignore_threshold):
   return cost
 
 
+def auto_ingore_related_reduce_sum_frame_batchsize_MSE(y1,y2,axis_fit_degree):
+  refer_sum = tf.maximum(tf.abs(y1)+tf.abs(y2),1e-12)
+  small_val_debuff = tf.pow(refer_sum*axis_fit_degree,-1)+1-tf.pow(axis_fit_degree,-1)
+  related_loss = (y1-y2)/refer_sum/small_val_debuff
+  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(related_loss, 2), 1), 1))
+  return cost
+
+
 def logbias_de_reduce_sum_frame_batchsize_MSE(y1,y2,logbias):
   cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(y1-y2, 2), -1), -1)+tf.pow(logbias/5000,2))
   return cost

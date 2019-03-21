@@ -209,6 +209,8 @@ class Model_Baseline(object):
                                                                            FLAGS.PARAM.POW_COEF)
     elif FLAGS.PARAM.LOSS_FUNC == "RELATED_MSE":
       self._loss = loss.related_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,FLAGS.PARAM.RELATED_MSE_IGNORE_TH)
+    elif FLAGS.PARAM.LOSS_FUNC == "AUTO_RELATED_MSE":
+      self._loss = loss.auto_ingore_related_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
     else:
       print('Loss type error.')
       exit(-1)
