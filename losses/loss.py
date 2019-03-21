@@ -3,8 +3,8 @@ import numpy as np
 import FLAGS
 from utils import tf_tool
 
-def related_reduce_sum_frame_batchsize_MSE(y1,y2):
-  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow((y1-y2)/tf.maximum(tf.abs(y1)+tf.abs(y2),1e-12), 2), 1), 1))
+def related_reduce_sum_frame_batchsize_MSE(y1,y2,ignore_threshold):
+  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow((y1-y2)/tf.maximum(tf.abs(y1)+tf.abs(y2),ignore_threshold), 2), 1), 1))
   return cost
 
 
