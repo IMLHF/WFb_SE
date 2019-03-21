@@ -190,3 +190,43 @@ def mfccs_form_realStft(mag_spectrograms, sample_rate, num_mel_bins, n_mfccs):
   mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(
     log_mel_spectrograms)[..., :n_mfccs]
   return mfccs
+
+
+def sum_attention_with_final_state(features, state, final_dim, units):
+  '''
+  features:
+    dim: [batch,time,final_dim]
+  '''
+  with tf.variable_scope('sum_attention_fc'):
+    # attention layer
+    with tf.variable_scope('attention_scorer'):
+      score_features_hidden_W = tf.keras.layers.Dense(units)
+      score_state_hidden_W = tf.keras.layers.Dense(units)
+      score_vec_W = tf.keras.layers.Dense(1)
+  state_with_time_axis = tf.expand_dims(state, -2) # [batch,1,final_dim]
+  score = tf.nn.tanh(score_features_hidden_W(features) + score_state_hidden_W(state_with_time_axis)) # [batch,time,units]
+  attention_weights = tf.nn.softmax(score_vec_W(score), axis=-2) # [batch,time,1]
+  context_vector = tf.multiply(attention_weights, features)
+  context_vector = tf.reduce_sum(context_vector, axis=-2)
+  return context_vector
+
+
+def sum_attention(inputs, batch, input_finnal_dim):
+  '''
+  inputs: func inputs of calculate audio-suitable log_bias
+    dims" [batch,time,fea_dim]
+  '''
+  fea_dim = input_finnal_dim
+  with tf.variable_scope('sum_attention_fc'):
+    # attention layer
+    with tf.variable_scope('attention_scorer'):
+      weights_scorer = tf.get_variable('weights_scorer', [fea_dim, 1],
+                                       initializer=tf.random_normal_initializer(stddev=0.01))
+      biases_scorer = tf.get_variable('biases_scorer', [1],
+                                      initializer=tf.constant_initializer(0.0))
+      attention_alpha_vec = tf.matmul(tf.reshape(inputs, [-1, input_finnal_dim]),
+                                      weights_scorer) + biases_scorer  # [batch*time,1]
+      attention_alpha_vec = tf.reshape(attention_alpha_vec,[batch,1,-1]) # [batch,1,time]
+      attention_alpha_vec = tf.nn.softmax(attention_alpha_vec, axis=-1)
+      attened_vec = tf.reshape(tf.matmul(attention_alpha_vec, inputs), [batch,-1])# [batch,fea_dim]
+      return attened_vec
