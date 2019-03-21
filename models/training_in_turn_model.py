@@ -8,7 +8,7 @@ from utils import tf_tool
 from losses import loss
 from utils.tf_tool import norm_mag_spec, norm_logmag_spec, rm_norm_mag_spec, rm_norm_logmag_spec
 from utils.tf_tool import normedLogmag2normedMag, normedMag2normedLogmag
-from utils.tf_tool import lstm_cell, GRU_cell, sum_attention_with_final_state
+from utils.tf_tool import lstm_cell, GRU_cell, sum_attention
 import FLAGS
 import numpy as np
 
@@ -110,11 +110,14 @@ class ALTER_Training_Model(object):
       logbias_net_outputs, fw_final_states, bw_final_states = result
 
       logbias_biRnn_out_size = FLAGS.PARAM.RNN_SIZE_LOGBIAS*2
-      # attend_fea = sum_attention(logbias_net_outputs,self._batch_size,logbias_biRnn_out_size)
-      attend_fea = sum_attention_with_final_state(logbias_net_outputs,
-                                                  tf.concat(-1, [fw_final_states,
-                                                                 bw_final_states]),
-                                                  logbias_biRnn_out_size, 2048)
+      # attend_fea = sum_attention_v2(logbias_net_outputs,self._batch_size,logbias_biRnn_out_size)
+      # print(np.shape(fw_final_states),np.shape(bw_final_states),np.shape(logbias_net_outputs))
+      # attend_fea = sum_attention_with_final_state(logbias_net_outputs,
+      #                                             tf.concat(-1, [fw_final_states,
+      #                                                            bw_final_states]),
+      #                                             logbias_biRnn_out_size, 1024)
+      attend_fea = sum_attention(logbias_net_outputs,
+                                 logbias_biRnn_out_size, 1024)
 
       with tf.variable_scope('fullconnectSuitableLogbias'):
         weights_logbias_fc = tf.get_variable('weights_logbias_fc', [logbias_biRnn_out_size, 1],
