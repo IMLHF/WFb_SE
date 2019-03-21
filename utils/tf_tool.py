@@ -211,7 +211,24 @@ def sum_attention_with_final_state(features, state, final_dim, units):
   return context_vector
 
 
-def sum_attention(inputs, batch, input_finnal_dim):
+def sum_attention(features, final_dim, units):
+  '''
+  features:
+    dim: [batch,time,final_dim]
+  '''
+  with tf.variable_scope('sum_attention_fc'):
+    # attention layer
+    with tf.variable_scope('attention_scorer'):
+      score_features_hidden_W = tf.keras.layers.Dense(units)
+      score_vec_W = tf.keras.layers.Dense(1)
+  score = tf.nn.tanh(score_features_hidden_W(features)) # [batch,time,units]
+  attention_weights = tf.nn.softmax(score_vec_W(score), axis=-2) # [batch,time,1]
+  context_vector = tf.multiply(attention_weights, features)
+  context_vector = tf.reduce_sum(context_vector, axis=-2)
+  return context_vector
+
+
+def sum_attention_v2(inputs, batch, input_finnal_dim):
   '''
   inputs: func inputs of calculate audio-suitable log_bias
     dims" [batch,time,fea_dim]
