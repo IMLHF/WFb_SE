@@ -8,7 +8,7 @@ from utils import tf_tool
 from losses import loss
 from utils.tf_tool import norm_mag_spec, norm_logmag_spec, rm_norm_mag_spec, rm_norm_logmag_spec
 from utils.tf_tool import normedLogmag2normedMag, normedMag2normedLogmag
-from utils.tf_tool import lstm_cell, GRU_cell
+from utils.tf_tool import lstm_cell, GRU_cell, CBHG, FrameProjection
 import FLAGS
 import numpy as np
 
@@ -184,6 +184,31 @@ class Model_Baseline(object):
                                                     self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
     # endregion
 
+    # region CBHG
+    if FLAGS.PARAM.USE_CBHG_POST_PROCESSING:
+      cbhg_kernels = 8 # All kernel sizes from 1 to cbhg_kernels will be used in the convolution bank of CBHG to act as "K-grams"
+      cbhg_conv_channels = 128 # Channels of the convolution bank
+      cbhg_pool_size = 2 # pooling size of the CBHG
+      cbhg_projection = 256 # projection channels of the CBHG (1st projection, 2nd is automatically set to num_mels)
+      cbhg_projection_kernel_size = 3 # kernel_size of the CBHG projections
+      cbhg_highwaynet_layers = 4 # Number of HighwayNet layers
+      cbhg_highway_units = 128 # Number of units used in HighwayNet fully connected layers
+      cbhg_rnn_units = 128 # Number of GRU units used in bidirectional RNN of CBHG block. CBHG output is 2x rnn_units in shape
+      batch_norm_position = 'after'
+      is_training = bool(behavior == self.train)
+      post_cbhg = CBHG(cbhg_kernels, cbhg_conv_channels, cbhg_pool_size, [cbhg_projection, 80],
+                       cbhg_projection_kernel_size, cbhg_highwaynet_layers,
+                       cbhg_highway_units, cbhg_rnn_units, batch_norm_position, is_training, name='CBHG_postnet')
+
+      #[batch_size, decoder_steps(mel_frames), cbhg_channels]
+      cbhg_in_projector = FrameProjection(80,scope="CBHG_IN_PROJ")
+      cbhg_inputs = cbhg_in_projector(self._y_estimation)
+
+      cbhg_outputs = post_cbhg(cbhg_inputs, None)
+
+      frame_projector = FrameProjection(FLAGS.PARAM.OUTPUT_SIZE,scope='CBHG_proj_to_spec')
+      self._y_estimation = frame_projector(cbhg_outputs)
+    # endregion
     self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
     if behavior == self.infer:
       return
