@@ -16,13 +16,13 @@ import numpy as np
 def sum_attention(inputs, batch, input_finnal_dim):
   '''
   inputs: func inputs of calculate audio-suitable log_bias
-    dims" [batch,time,features]
+    dims" [batch,time,fea_dim]
   '''
-  in_size = input_finnal_dim
+  fea_dim = input_finnal_dim
   with tf.variable_scope('sum_attention_fc'):
     # attention layer
     with tf.variable_scope('attention_scorer'):
-      weights_scorer = tf.get_variable('weights_scorer', [in_size, 1],
+      weights_scorer = tf.get_variable('weights_scorer', [fea_dim, 1],
                                        initializer=tf.random_normal_initializer(stddev=0.01))
       biases_scorer = tf.get_variable('biases_scorer', [1],
                                       initializer=tf.constant_initializer(0.0))
@@ -30,7 +30,7 @@ def sum_attention(inputs, batch, input_finnal_dim):
                                       weights_scorer) + biases_scorer  # [batch*time,1]
       attention_alpha_vec = tf.reshape(attention_alpha_vec,[batch,1,-1]) # [batch,1,time]
       attention_alpha_vec = tf.nn.softmax(attention_alpha_vec, axis=-1)
-      attened_vec = tf.reshape(tf.matmul(attention_alpha_vec, inputs), [batch,-1])# [batch,in_size]
+      attened_vec = tf.reshape(tf.matmul(attention_alpha_vec, inputs), [batch,-1])# [batch,fea_dim]
       return attened_vec
 
 
