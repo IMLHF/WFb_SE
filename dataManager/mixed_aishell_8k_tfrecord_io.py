@@ -16,6 +16,11 @@ from numpy import linalg
 from utils.audio_tool import _mix_wav_by_randomSNR, _mix_wav_randomLINEAR
 import FLAGS
 
+'''
+BUG:
+  label wav should multiply a mix-coef.
+  for example, mixed_wave = (clean_wave*a+noise*b)/(a+b), label = clean_wave*a.
+'''
 FILE_NAME = __file__[max(__file__.rfind('/')+1, 0):__file__.rfind('.')]
 
 
