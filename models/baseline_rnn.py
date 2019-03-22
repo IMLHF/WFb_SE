@@ -196,15 +196,13 @@ class Model_Baseline(object):
       cbhg_rnn_units = 128 # Number of GRU units used in bidirectional RNN of CBHG block. CBHG output is 2x rnn_units in shape
       batch_norm_position = 'after'
       is_training = bool(behavior == self.train)
-      post_cbhg = CBHG(cbhg_kernels, cbhg_conv_channels, cbhg_pool_size, [cbhg_projection, 80],
+      post_cbhg = CBHG(cbhg_kernels, cbhg_conv_channels, cbhg_pool_size, [cbhg_projection, FLAGS.PARAM.OUTPUT_SIZE],
                        cbhg_projection_kernel_size, cbhg_highwaynet_layers,
                        cbhg_highway_units, cbhg_rnn_units, batch_norm_position, is_training, name='CBHG_postnet')
 
       #[batch_size, decoder_steps(mel_frames), cbhg_channels]
-      cbhg_in_projector = FrameProjection(80,scope="CBHG_IN_PROJ")
-      cbhg_inputs = cbhg_in_projector(self._y_estimation)
-
-      cbhg_outputs = post_cbhg(cbhg_inputs, None)
+      self._cbhg_inputs_y_est = self._y_estimation
+      cbhg_outputs = post_cbhg(self._y_estimation, None)
 
       frame_projector = FrameProjection(FLAGS.PARAM.OUTPUT_SIZE,scope='CBHG_proj_to_spec')
       self._y_estimation = frame_projector(cbhg_outputs)
@@ -216,6 +214,9 @@ class Model_Baseline(object):
     # region get LOSS
     if FLAGS.PARAM.LOSS_FUNC == 'SPEC_MSE': # log_mag and mag MSE
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels)
+      if FLAGS.PARAM.USE_CBHG_POST_PROCESSING:
+        if FLAGS.PARAM.DOUBLE_LOSS:
+          self._loss = 0.25*loss.reduce_sum_frame_batchsize_MSE(self._cbhg_inputs_y_est,self._y_labels) + 0.75*self._loss
     elif FLAGS.PARAM.LOSS_FUNC == 'MFCC_SPEC_MSE':
       self._loss1, self._loss2 = loss.balanced_MFCC_AND_SPEC_MSE(self._y_estimation, self._y_labels,
                                                                  self._y_mag_estimation, self._y_mag_spec)
