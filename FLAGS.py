@@ -282,7 +282,7 @@ class C001_6_5(base_config): # DONE 15041
 
 class C001_7(base_config): # DONE 15041
   '''
-  related spectrum(mag) MSE
+  relative spectrum(mag) MSE
   '''
   CHECK_POINT = 'nnet_C001_7'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -296,7 +296,7 @@ class C001_7(base_config): # DONE 15041
 
 class C001_7_2(base_config): # DONE 15041
   '''
-  related spectrum(mag) MSE
+  relative spectrum(mag) MSE
   '''
   CHECK_POINT = 'nnet_C001_7_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -310,7 +310,7 @@ class C001_7_2(base_config): # DONE 15041
 
 class C001_7_3(base_config): # DONE 15041
   '''
-  related spectrum(mag) MSE
+  relative spectrum(mag) MSE
   '''
   CHECK_POINT = 'nnet_C001_7_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -324,7 +324,7 @@ class C001_7_3(base_config): # DONE 15041
 
 class C001_8_1(base_config): # DONE 15041
   '''
-  related spectrum(mag) MSE
+  relative spectrum(mag) MSE
   '''
   CHECK_POINT = 'nnet_C001_8_1'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -338,7 +338,7 @@ class C001_8_1(base_config): # DONE 15041
 
 class C001_8_2(base_config): # prepare 15041
   '''
-  related spectrum(mag) MSE
+  relative spectrum(mag) MSE
   '''
   CHECK_POINT = 'nnet_C001_8_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -352,7 +352,7 @@ class C001_8_2(base_config): # prepare 15041
 
 class C001_8_3(base_config): # prepare 15041
   '''
-  related spectrum(mag) MSE
+  relative spectrum(mag) MSE
   '''
   CHECK_POINT = 'nnet_C001_8_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
