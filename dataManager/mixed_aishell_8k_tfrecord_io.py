@@ -183,16 +183,16 @@ def _extract_feature_x_y_xtheta_ytheta(utt_dir1, utt_dir2):
   waveData2 = _get_padad_waveData(utt_dir2)
   # utt2作为噪音
   if FLAGS.PARAM.MIX_METHOD == 'SNR':
-    mixedData = _mix_wav_by_randomSNR(waveData1, waveData2)
+    mixedData, noise_alpha = _mix_wav_by_randomSNR(waveData1, waveData2)
   if FLAGS.PARAM.MIX_METHOD == 'LINEAR':
-    mixedData = _mix_wav_randomLINEAR(waveData1, waveData2)
+    mixedData, noise_alpha = _mix_wav_randomLINEAR(waveData1, waveData2)
 
   # write mixed wav
   # name1 = utt_dir1[utt_dir1.rfind('/')+1:utt_dir1.rfind('.')]
   # name2 = utt_dir2[utt_dir2.rfind('/')+1:]
   # utils.audio_tool.write_audio('mixwave/mixed_'+name1+"_"+name2,
   #                              mixedData,16000)
-
+  waveData1 = waveData1/(1.+noise_alpha)
   X = _extract_mag_spec(mixedData)
   Y = _extract_mag_spec(waveData1)
   x_theta = _extract_phase(mixedData)
