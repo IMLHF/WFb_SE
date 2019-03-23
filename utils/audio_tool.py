@@ -42,7 +42,7 @@ def _mix_wav_by_SNR(waveData, noise, snr):
 
   alpha = As/(An*(10**(snr/20))) if An != 0 else 0
   waveMix = (waveData+alpha*noise)/(1.0+alpha)
-  return waveMix
+  return waveMix, alpha
 
 
 def _mix_wav_by_randomSNR(waveData, noise):
@@ -54,7 +54,7 @@ def _mix_wav_by_randomSNR(waveData, noise):
 def _mix_wav_randomLINEAR(waveData, noise):
   coef = np.random.random()*(FLAGS.PARAM.MAX_COEF-FLAGS.PARAM.MIN_COEF)+FLAGS.PARAM.MIN_COEF
   waveMix = (waveData+coef*noise)/(1.0+coef)
-  return waveMix
+  return waveMix, coef
 
 
 def repeat_to_len(wave, repeat_len):
@@ -199,7 +199,7 @@ def gen_mixed_wav(ref_dir, noise_dir, mixed_dir, snr=0, force=False):
       if gen_mixed:
         noise_wave, noise_sr = read_audio(noise_file)
         noise_wave = repeat_to_len(noise_wave, ref_len)
-        mixed_wave = _mix_wav_by_SNR(ref_wave, noise_wave, snr)
+        mixed_wave, noise_alpha = _mix_wav_by_SNR(ref_wave, noise_wave, snr)
         write_audio(mixed_file,
                     mixed_wave, ref_sr)
         if noise_sr != ref_sr:
