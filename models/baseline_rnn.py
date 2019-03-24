@@ -130,7 +130,7 @@ class Model_Baseline(object):
       weights = tf.get_variable('weights1', [in_size, out_size],
                                 initializer=tf.random_normal_initializer(stddev=0.01))
       biases = tf.get_variable('biases1', [out_size],
-                               initializer=tf.constant_initializer(0.0))
+                               initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL))
     if FLAGS.PARAM.TIME_NOSOFTMAX_ATTENTION:
       with tf.variable_scope('fullconnectCoef'):
         weights_coef = tf.get_variable('weights_coef', [in_size, 1],
@@ -206,7 +206,18 @@ class Model_Baseline(object):
 
       frame_projector = FrameProjection(FLAGS.PARAM.OUTPUT_SIZE,scope='CBHG_proj_to_spec')
       self._y_estimation = frame_projector(cbhg_outputs)
+
+      if FLAGS.PARAM.DECODING_MASK_POSITION != FLAGS.PARAM.TRAINING_MASK_POSITION:
+        print('DECODING_MASK_POSITION must be equal to TRAINING_MASK_POSITION when use CBHG post processing.')
+        exit(-1)
+      if FLAGS.PARAM.DECODING_MASK_POSITION == 'mag':
+        self._y_mag_estimation = rm_norm_mag_spec(self._y_estimation, FLAGS.PARAM.MAG_NORM_MAX)
+      elif FLAGS.PARAM.DECODING_MASK_POSITION == 'logmag':
+        self._y_mag_estimation = rm_norm_logmag_spec(self._y_estimation, FLAGS.PARAM.MAG_NORM_MAX,
+                                                     self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
     # endregion
+
+
     self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
     if behavior == self.infer:
       return

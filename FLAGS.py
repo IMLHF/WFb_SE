@@ -82,6 +82,7 @@ class base_config:
   LABEL_TYPE = None  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = None  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = None  # should be same to TRAINING_MASK_POSITION
+  INIT_MASK_VAL = 0.0
   MIN_LOG_BIAS = 1e-12
   INIT_LOG_BIAS = 0 # real log_bias is MIN_LOG_BIAS+tf.nn.relu(INIT_LOG_BIAS)
   LOG_BIAS_TRAINABLE = False
@@ -322,7 +323,7 @@ class C001_7_3(base_config): # DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_1(base_config): # DONE 15041
+class C001_8_1(base_config): # ***DONE 15041
   '''
   relative spectrum(mag) MSE
   '''
@@ -336,7 +337,7 @@ class C001_8_1(base_config): # DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_2(base_config): # prepare 15041
+class C001_8_2(base_config): # *DONE 15041
   '''
   relative spectrum(mag) MSE
   '''
@@ -350,7 +351,7 @@ class C001_8_2(base_config): # prepare 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_3(base_config): # prepare 15041
+class C001_8_3(base_config): # DONE 15041
   '''
   relative spectrum(mag) MSE
   '''
@@ -361,6 +362,48 @@ class C001_8_3(base_config): # prepare 15041
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 10000
+  # MASK_TYPE = "PSM" # default
+
+
+class C001_8_4(base_config): # DONE 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_4'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 2000
+  # MASK_TYPE = "PSM" # default
+
+
+class C001_8_5(base_config): # DONE 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_5'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 5000
+  # MASK_TYPE = "PSM" # default
+
+
+class C001_8_6(base_config): # DONE 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_6'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 7000
   # MASK_TYPE = "PSM" # default
 
 
@@ -651,24 +694,26 @@ class C004_1_4_2(base_config):  # DONE 15041
   INIT_LOG_BIAS = 1e4
 
 
-class C004_1_4_3(base_config):  # prepare 15043
+class C004_1_4_3(base_config):  # RUNNING 15043
   CHECK_POINT = 'nnet_C004_1_4_3'
   INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   INIT_LOG_BIAS = 1e4
+  INIT_MASK_VAL = 1.0
   USE_CBHG_POST_PROCESSING = True
   DOUBLE_LOSS = False
 
 
-class C004_1_4_4(base_config):  # RUNNING 15043
+class C004_1_4_4(base_config):  # RUNNING 15041
   CHECK_POINT = 'nnet_C004_1_4_4'
   INPUT_TYPE = 'logmag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'logmag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   INIT_LOG_BIAS = 1e4
+  INIT_MASK_VAL = 1.0
   USE_CBHG_POST_PROCESSING = True
   DOUBLE_LOSS = True
 
@@ -797,5 +842,5 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-PARAM = C001_7_2
+PARAM = C004_1_4_4
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
