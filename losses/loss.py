@@ -11,7 +11,7 @@ def relative_reduce_sum_frame_batchsize_MSE(y1,y2,ignore_threshold):
 def auto_ingore_relative_reduce_sum_frame_batchsize_MSE(y1,y2,axis_fit_degree,index_=2.0):
   refer_sum = tf.maximum(tf.abs(y1)+tf.abs(y2),1e-12)
   small_val_debuff = tf.pow(refer_sum*axis_fit_degree*1.0,-1.0)+1.0-tf.pow(axis_fit_degree*1.0,-1.0)
-  relative_loss = (y1-y2)/refer_sum/small_val_debuff
+  relative_loss = tf.abs(y1-y2)/refer_sum/small_val_debuff
   cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(relative_loss, index_), 1), 1))
   return cost
 
