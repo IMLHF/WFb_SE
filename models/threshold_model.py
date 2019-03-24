@@ -302,6 +302,8 @@ class Threshold_Model(object):
       self._loss = loss.reduce_sum_frame_batchsize_MSE_EmphasizeLowerValue(self._y_estimation,
                                                                            self._y_labels,
                                                                            FLAGS.PARAM.POW_COEF)
+    elif FLAGS.PARAM.LOSS_FUNC == "AUTO_RELATED_MSE":
+      self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
     else:
       print('Loss type error.')
       exit(-1)
