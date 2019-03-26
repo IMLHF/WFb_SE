@@ -23,6 +23,7 @@ class base_config:
   MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
   LSTM_ACTIVATION = 'tanh'
   MASK_TYPE = "PSM"  # "PSM" or "IRM"
+  INPUT_BN = False
   '''
   LOSS_FUNC:
     "SPEC_MSE" :
@@ -31,8 +32,10 @@ class base_config:
     "SPEC_MSE_LOWF_EN" :
     "FAIR_SPEC_MSE" :
     "SPEC_MSE_FLEXIBLE_POW_C" :
+    "AUTO_RELATED_MSE" :
   '''
   LOSS_FUNC = "SPEC_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = None # for "AUTO_RELATED_MSE"
   KEEP_PROB = 0.8
   RNN_LAYER = 2
   CLIP_NORM = 5.0
@@ -407,6 +410,20 @@ class C001_8_6(base_config): # DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
+class C001_8_7(base_config): # RUNNING 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_7'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 500
+  # MASK_TYPE = "PSM" # default
+
+
 class C002_1(base_config): # DONE 15043
   SE_MODEL = models.threshold_model.Threshold_Model
   CHECK_POINT = 'nnet_C002_1'
@@ -443,6 +460,21 @@ class C002_2_2(base_config): # DONE 15041
   THRESHOLD_FUNC = base_config.EXPONENTIAL_FADE
   THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
   INIT_THRESHOLD_RECIPROCAL = 1e6
+  max_epochs = 15
+
+
+class C002_2_3(base_config): # DONE 15041
+  SE_MODEL = models.threshold_model.Threshold_Model
+  CHECK_POINT = 'nnet_C002_2_3'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  THRESHOLD_FUNC = base_config.EXPONENTIAL_FADE
+  THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
+  INIT_THRESHOLD_RECIPROCAL = 0.0
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
   max_epochs = 15
 
 
@@ -842,5 +874,5 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-PARAM = C004_1_4_4
+PARAM = C001_8_7
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)

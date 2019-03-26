@@ -60,6 +60,8 @@ class Model_Baseline(object):
       self._y_labels = self._norm_y_logmag_spec
 
     outputs = self.net_input
+    if FLAGS.PARAM.INPUT_BN:
+      outputs = tf.layers.batch_normalization(outputs, training=(behavior==self.train))
 
     lstm_attn_cell = lstm_cell
     if behavior != self.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
