@@ -36,6 +36,13 @@ def write_audio(file, data, sr):
   return sf.write(file, data/AMP_MAX, sr)
 
 
+def repeat_to_len(wave, repeat_len):
+  while len(wave) < repeat_len:
+    wave = np.tile(wave, 2)
+  wave = wave[0:repeat_len]
+  return wave
+
+
 def _mix_wav_by_SNR(waveData, noise, snr):
   As = linalg.norm(waveData)
   An = linalg.norm(noise)
@@ -55,13 +62,6 @@ def _mix_wav_randomLINEAR(waveData, noise):
   coef = np.random.random()*(FLAGS.PARAM.MAX_COEF-FLAGS.PARAM.MIN_COEF)+FLAGS.PARAM.MIN_COEF
   waveMix = (waveData+coef*noise)/(1.0+coef)
   return waveMix, coef
-
-
-def repeat_to_len(wave, repeat_len):
-  while len(wave) < repeat_len:
-    wave = np.tile(wave, 2)
-  wave = wave[0:repeat_len]
-  return wave
 
 
 def cal_SDR(src_ref, src_deg):
