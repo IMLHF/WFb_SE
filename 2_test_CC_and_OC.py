@@ -5,7 +5,7 @@ import os
 import gc
 from utils import spectrum_tool
 from utils import audio_tool
-from pypesq import pesq
+# from pypesq import pesq
 from FLAGS import PARAM
 import math
 from dataManager.mixed_aishell_8k_tfrecord_io import generate_tfrecord, get_batch_use_tfdata
