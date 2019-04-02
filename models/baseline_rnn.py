@@ -62,8 +62,13 @@ class Model_Baseline(object):
     outputs = self.net_input
     if FLAGS.PARAM.INPUT_BN:
       with tf.variable_scope('Batch_Norm_Layer'):
-        # outputs = tf.layers.batch_normalization(outputs, training=(behavior==self.train or behavior==self.validation))
-        outputs = tf.layers.batch_normalization(outputs, training=True)
+        if_BRN = (FLAGS.PARAM.MVN_TYPE == 'BRN')
+        if FLAGS.PARAM.SELF_BN:
+          outputs = tf.layers.batch_normalization(outputs, training=True, renorm=if_BRN)
+        else:
+          outputs = tf.layers.batch_normalization(outputs,
+                                                  training=(behavior == self.train or behavior == self.validation),
+                                                  renorm=if_BRN)
 
     lstm_attn_cell = lstm_cell
     if behavior != self.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
