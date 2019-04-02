@@ -45,7 +45,7 @@ class CBHG:
         #The convolution bank uses multiple different kernel sizes to have many insights of the input sequence
         #This makes one of the strengths of the CBHG block on sequences.
         conv_outputs = tf.concat(
-          [conv1d(inputs, k, self.conv_channels, tf.nn.relu, self.is_training, 0.5, self.bnorm, 'conv1d_{}'.format(k)) for k in range(1, self.K+1)],
+          [conv1d(inputs, k, self.conv_channels, tf.nn.relu, self.is_training, 0., self.bnorm, 'conv1d_{}'.format(k)) for k in range(1, self.K+1)],
           axis=-1
           )
 
@@ -57,8 +57,8 @@ class CBHG:
         padding='same')
 
       # Two projection layers
-      proj1_output = conv1d(maxpool_output, self.projection_kernel_size, self.projections[0], tf.nn.relu, self.is_training, 0.5, self.bnorm, 'proj1')
-      proj2_output = conv1d(proj1_output, self.projection_kernel_size, self.projections[1], lambda _: _, self.is_training, 0.5, self.bnorm, 'proj2')
+      proj1_output = conv1d(maxpool_output, self.projection_kernel_size, self.projections[0], tf.nn.relu, self.is_training, 0., self.bnorm, 'proj1')
+      proj2_output = conv1d(proj1_output, self.projection_kernel_size, self.projections[1], lambda _: _, self.is_training, 0., self.bnorm, 'proj2')
 
       #Residual connection
       highway_input = proj2_output + inputs
@@ -364,7 +364,7 @@ def conv1d(inputs, kernel_size, channels, activation, is_training, drop_rate, bn
       kernel_size=kernel_size,
       activation=activation if bnorm == 'after' else None,
       padding='SAME')
-    batched = tf.layers.batch_normalization(conv1d_output, training=is_training)
+    batched = tf.layers.batch_normalization(conv1d_output, training=True)
     activated = activation(batched) if bnorm == 'before' else batched
     return tf.layers.dropout(activated, rate=drop_rate, training=is_training,
                              name='dropout_{}'.format(scope))
