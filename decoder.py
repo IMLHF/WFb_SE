@@ -4,7 +4,7 @@ import sys
 import utils
 import os
 import gc
-from pypesq import pesq
+# from pypesq import pesq
 from utils import spectrum_tool
 from utils import audio_tool
 import utils.audio_tool
@@ -187,6 +187,7 @@ if __name__=='__main__':
       'exp/rnn_speech_enhancement/speech5_8k.wav',
       'exp/rnn_speech_enhancement/speech6_8k.wav',
       'exp/rnn_speech_enhancement/speech7_8k.wav',
+      'exp/real_test_fair/863_min/mixed_wav/863_1_8k_MIX_1_airplane.wav',
       # 'exp/rnn_speech_enhancement/decode_nnet_C001_3/nnet_C001_3_007_speech7_8k.wav'
   ]
 
@@ -221,11 +222,13 @@ if __name__=='__main__':
   elif int(sys.argv[1])==1:
     start_time = time.time()
     mixed_dirs = os.path.join('exp','real_test_fair','ITU_T_Test', 'mixed_wav')
+    # mixed_dirs = os.path.join('exp','real_test_fair','863_min', 'mixed_wav')
     mixed_list = os.listdir(mixed_dirs)
     mixed_list = [os.path.join(mixed_dirs,mixed_file) for mixed_file in mixed_list]
     mixed_list.sort()
 
     refer_dirs = os.path.join('exp','real_test_fair','ITU_T_Test', 'refer_wav')
+    # refer_dirs = os.path.join('exp','real_test_fair','863_min', 'refer_wav')
     refer_list_single = os.listdir(refer_dirs)
     refer_list_single = [os.path.join(refer_dirs,refer_file) for refer_file in refer_list_single]
     refer_list_single.sort()
@@ -234,5 +237,6 @@ if __name__=='__main__':
       for i in range(7):
         refer_list.append(wav_dir)
     decode_and_getMeature(mixed_list, refer_list, sess, model, decode_ans_file, False, 'real_testITU_T.txt')
+    # decode_and_getMeature(mixed_list, refer_list, sess, model, decode_ans_file, True, 'real_test863min.txt')
     print(ckpt)
     print("Cost time : %dS" % (time.time()-start_time))
