@@ -62,7 +62,8 @@ class Model_Baseline(object):
     outputs = self.net_input
     if FLAGS.PARAM.INPUT_BN:
       with tf.variable_scope('Batch_Norm_Layer'):
-        outputs = tf.layers.batch_normalization(outputs, training=(behavior==self.train or behavior==self.validation))
+        # outputs = tf.layers.batch_normalization(outputs, training=(behavior==self.train or behavior==self.validation))
+        outputs = tf.layers.batch_normalization(outputs, training=True)
 
     lstm_attn_cell = lstm_cell
     if behavior != self.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
@@ -198,6 +199,7 @@ class Model_Baseline(object):
       cbhg_highway_units = 128 # Number of units used in HighwayNet fully connected layers
       cbhg_rnn_units = 128 # Number of GRU units used in bidirectional RNN of CBHG block. CBHG output is 2x rnn_units in shape
       batch_norm_position = 'after'
+      # is_training = True
       is_training = bool(behavior == self.train)
       post_cbhg = CBHG(cbhg_kernels, cbhg_conv_channels, cbhg_pool_size, [cbhg_projection, FLAGS.PARAM.OUTPUT_SIZE],
                        cbhg_projection_kernel_size, cbhg_highwaynet_layers,
