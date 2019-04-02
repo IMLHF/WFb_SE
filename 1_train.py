@@ -32,7 +32,7 @@ def train_one_epoch(sess, tr_model):
            ])
       tr_loss += loss
       # print(loss,flush=True)
-      print(np.min(log_bias),np.max(log_bias),np.mean(log_bias),np.sqrt(np.var(log_bias)),flush=True)
+      # print(np.min(log_bias),np.max(log_bias),np.mean(log_bias),np.sqrt(np.var(log_bias)),flush=True)
       # print(np.min(threshold),np.max(threshold),np.mean(threshold),np.sqrt(np.var(threshold)),flush=True)
       # print("\r    Batch loss: %f" % loss, end="")
       if (i+1) % PARAM.minibatch_size == 0:
@@ -69,11 +69,12 @@ def eval_one_epoch(sess, val_model):
       # print(inputs)
       # exit(0)
       # print(loss2,'/',loss1)
-      sys.stdout.flush()
       val_loss += loss
+      # print(loss)
       # print(np.min(log_bias),np.max(log_bias),np.mean(log_bias),np.sqrt(np.var(log_bias)),flush=True)
       # print(np.min(threshold),np.max(threshold),np.mean(threshold),np.sqrt(np.var(threshold)),flush=True)
       # print("\r    Batch loss: %f" % loss, end="")
+      sys.stdout.flush()
       data_len += 1
     except tf.errors.OutOfRangeError:
       break
