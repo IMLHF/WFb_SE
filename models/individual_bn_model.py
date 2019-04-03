@@ -14,7 +14,7 @@ def indi_norm_mag_spec(fea,mean_,var_):
   return tf.nn.batch_normalization(fea,mean_,var_,1,0.5,1e-6)
 
 def rm_indi_norm_mag_spec(fea,mean_,var_):
-  new_fea = (fea-1.0)*2.0*var_+mean_
+  new_fea = (fea-1.0)*2.0*np.sqrt(var_)+mean_
   return new_fea
 
 
