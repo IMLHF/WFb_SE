@@ -25,8 +25,10 @@ class base_config:
   LSTM_ACTIVATION = 'tanh'
   MASK_TYPE = "PSM"  # "PSM" or "IRM"
   INPUT_BN = False
+  POST_BN =False
   MVN_TYPE = 'BN' # 'BN' or 'BRN'
   SELF_BN = False # if true: batch_normalization(training=True) both when training and decoding
+
   '''
   LOSS_FUNC:
     "SPEC_MSE" :
@@ -357,7 +359,7 @@ class C001_8_2(base_config): # *DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_2_2(base_config):  # FIXING 15041
+class C001_8_2_2(base_config):  # RUNNING 15043
   CHECK_POINT = 'nnet_C001_8_2_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -371,7 +373,7 @@ class C001_8_2_2(base_config):  # FIXING 15041
   # learning_rate = 0.0001
 
 
-class C001_8_2_3(base_config):  # FIXING 15041
+class C001_8_2_3(base_config):  # RUNNING 15123
   CHECK_POINT = 'nnet_C001_8_2_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -987,5 +989,5 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-PARAM = C001_8_11
+PARAM = C001_8_2_3
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
