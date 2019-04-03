@@ -357,7 +357,7 @@ class C001_8_2(base_config): # *DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_2_2(base_config):  # RUNNING 15041
+class C001_8_2_2(base_config):  # FIXING 15041
   CHECK_POINT = 'nnet_C001_8_2_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -371,7 +371,7 @@ class C001_8_2_2(base_config):  # RUNNING 15041
   # learning_rate = 0.0001
 
 
-class C001_8_2_3(base_config):  # RUNNING 15041
+class C001_8_2_3(base_config):  # FIXING 15041
   CHECK_POINT = 'nnet_C001_8_2_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -383,6 +383,36 @@ class C001_8_2_3(base_config):  # RUNNING 15041
   USE_CBHG_POST_PROCESSING = True
   DOUBLE_LOSS = True
   # learning_rate = 0.0001
+
+
+class C001_8_2_4(base_config): # DONE 15041
+  '''
+  relative spectrum(mag) MSE GRU
+  '''
+  CHECK_POINT = 'nnet_C001_8_4'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MODEL_TYPE = "BGRU"
+  # MASK_TYPE = "PSM" # default
+
+
+class C001_8_2_5(base_config): # RUNNING 15043
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_5'
+  batch_size = 1
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  # MASK_TYPE = "PSM" # default
 
 
 class C001_8_3(base_config): # DONE 15041
@@ -501,7 +531,7 @@ class C001_8_10(base_config): # DONE 15041
   SELF_BN = True
 
 
-class C001_8_11(base_config): # RUNNING 15041
+class C001_8_11(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE with INDIVIDUAL_BN
   '''
@@ -516,7 +546,7 @@ class C001_8_11(base_config): # RUNNING 15041
   USE_ESTIMATED_MEAN_VAR = False
 
 
-class C001_8_12(base_config): # RUNNING 15041
+class C001_8_12(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE with INDIVIDUAL_BN
   '''
@@ -529,7 +559,6 @@ class C001_8_12(base_config): # RUNNING 15041
   LOSS_FUNC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   USE_ESTIMATED_MEAN_VAR = True
-
 
 
 class C002_1(base_config): # DONE 15043
@@ -958,5 +987,5 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-PARAM = C001_8_9
+PARAM = C001_8_11
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
