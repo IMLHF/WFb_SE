@@ -11,10 +11,12 @@ import FLAGS
 import numpy as np
 
 def indi_norm_mag_spec(fea,mean_,var_):
-  return tf.nn.batch_normalization(fea,mean_,var_,1,0.5,1e-6)
+  # return tf.nn.batch_normalization(fea,mean_,var_,0.5,0.5,1e-6)
+  new_fea = 0.5*(fea-mean_)/(tf.sqrt(var_)+1e-6)+0.5
+  return new_fea
 
 def rm_indi_norm_mag_spec(fea,mean_,var_):
-  new_fea = (fea-1.0)*2.0*tf.sqrt(var_)+mean_
+  new_fea = (fea-0.5)*2.0*(tf.sqrt(var_)+1e-6)+mean_
   return new_fea
 
 
@@ -41,11 +43,11 @@ class INDIVIDUAL_BN_MODEL(object):
                                      initializer=tf.constant_initializer(FLAGS.PARAM.INIT_LOG_BIAS))
     self._real_logbias = self._log_bias + FLAGS.PARAM.MIN_LOG_BIAS
     self._x_mag_spec = x_mag_spec_batch
-    self.indi_mean_x, self.indi_var_x = tf.nn.moments(self._x_mag_spec,axes=0,keep_dims=True)
+    self.indi_mean_x, self.indi_var_x = tf.nn.moments(self._x_mag_spec,axes=[0,],keep_dims=True)
     self._norm_x_mag_spec = indi_norm_mag_spec(self._x_mag_spec,self.indi_mean_x,self.indi_var_x)
 
     self._y_mag_spec = y_mag_spec_batch
-    self.indi_mean_y, self.indi_var_y = tf.nn.moments(self._y_mag_spec,axes=0,keep_dims=True)
+    self.indi_mean_y, self.indi_var_y = tf.nn.moments(self._y_mag_spec,axes=[0,],keep_dims=True)
     self._norm_y_mag_spec = indi_norm_mag_spec(self._y_mag_spec,self.indi_mean_y,self.indi_var_y)
 
 
@@ -153,7 +155,7 @@ class INDIVIDUAL_BN_MODEL(object):
     if FLAGS.PARAM.USE_ESTIMATED_MEAN_VAR:
       tmp_mean, tmp_var = self.indi_mean_x, self.indi_var_x
     else:
-      tmp_mean, tmp_var = tf.nn.moments(self._mask*self._norm_x_mag_spec,axes=0,keep_dims=True)
+      tmp_mean, tmp_var = tf.nn.moments(self._mask*self._norm_x_mag_spec,axes=[0,],keep_dims=True)
     self._y_mag_estimation = rm_indi_norm_mag_spec(self._mask*self._norm_x_mag_spec,tmp_mean,tmp_var)
     '''
     _y_mag_estimation is estimated mag_spec
