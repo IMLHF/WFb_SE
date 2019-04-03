@@ -151,8 +151,8 @@ class Model_Baseline(object):
       mask = tf.multiply(raw_mask,
                          tf.reshape(batch_coef_vec,[self._batch_size,-1,1]))
     else:
-      linear_out = tf.matmul(outputs, weights) + biases
       if FLAGS.PARAM.POST_BN:
+        linear_out = tf.matmul(outputs, weights)
         with tf.variable_scope('POST_Batch_Norm_Layer'):
           if_BRN = (FLAGS.PARAM.MVN_TYPE == 'BRN')
           if FLAGS.PARAM.SELF_BN:
@@ -162,6 +162,8 @@ class Model_Baseline(object):
                                                        training=(
                                                            behavior == self.train or behavior == self.validation),
                                                        renorm=if_BRN)
+      else:
+        linear_out = tf.matmul(outputs, weights) + biases
       mask = tf.nn.relu(linear_out)
     # endregion
 
