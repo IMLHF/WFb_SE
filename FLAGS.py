@@ -546,6 +546,23 @@ class C001_8_11(base_config): # RUNNING 15123
   LOSS_FUNC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   USE_ESTIMATED_MEAN_VAR = False
+  BN_KEEP_DIMS=[0,]
+
+
+class C001_8_11_or_12_1(base_config): # prepare 15123
+  '''
+  relative spectrum(mag) MSE with INDIVIDUAL_BN
+  '''
+  SE_MODEL=models.individual_bn_model.INDIVIDUAL_BN_MODEL
+  CHECK_POINT = 'nnet_C001_8_11'
+  # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  # LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  # TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  # DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  USE_ESTIMATED_MEAN_VAR = False
+  BN_KEEP_DIMS=[0,1]
 
 
 class C001_8_12(base_config): # RUNNING 15123
@@ -561,6 +578,22 @@ class C001_8_12(base_config): # RUNNING 15123
   LOSS_FUNC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   USE_ESTIMATED_MEAN_VAR = True
+  BN_KEEP_DIMS=[0,]
+
+
+class C001_8_13(base_config): # RUNNING 15041
+  '''
+  relative spectrum(mag) MSE with POST_BN
+  '''
+  CHECK_POINT = 'nnet_C001_8_13'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  POST_BN = True
+  SELF_BN = False
 
 
 class C002_1(base_config): # DONE 15043
@@ -989,5 +1022,5 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-PARAM = C001_8_2_3
+PARAM = C001_8_11
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
