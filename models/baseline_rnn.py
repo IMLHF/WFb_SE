@@ -250,7 +250,8 @@ class Model_Baseline(object):
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels)
       if FLAGS.PARAM.USE_CBHG_POST_PROCESSING:
         if FLAGS.PARAM.DOUBLE_LOSS:
-          self._loss = 0.25*loss.reduce_sum_frame_batchsize_MSE(self._cbhg_inputs_y_est,self._y_labels) + 0.75*self._loss
+          self._loss = FLAGS.PARAM.CBHG_LOSS_COEF1*loss.reduce_sum_frame_batchsize_MSE(
+            self._cbhg_inputs_y_est,self._y_labels) + FLAGS.PARAM.CBHG_LOSS_COEF2*self._loss
     elif FLAGS.PARAM.LOSS_FUNC == 'MFCC_SPEC_MSE':
       self._loss1, self._loss2 = loss.balanced_MFCC_AND_SPEC_MSE(self._y_estimation, self._y_labels,
                                                                  self._y_mag_estimation, self._y_mag_spec)
