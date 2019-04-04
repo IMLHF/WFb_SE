@@ -152,7 +152,7 @@ class INDIVIDUAL_BN_MODEL(object):
 
 
     # region get infer spec
-    if FLAGS.PARAM.USE_ESTIMATED_MEAN_VAR:
+    if not FLAGS.PARAM.USE_ESTIMATED_MEAN_VAR:
       tmp_mean, tmp_var = self.indi_mean_x, self.indi_var_x
     else:
       tmp_mean, tmp_var = tf.nn.moments(self._mask*self._norm_x_mag_spec,axes=FLAGS.PARAM.BN_KEEP_DIMS,keep_dims=True)
