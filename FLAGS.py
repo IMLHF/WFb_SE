@@ -642,7 +642,7 @@ class C001_8_12_2(base_config): # CKPT Same To C001_8_11_2
   BN_KEEP_DIMS=[-1]
 
 
-class C001_8_13(base_config): # DONE 15041
+class C001_8_13(base_config): # RUNNING 15041
   '''
   relative spectrum(mag) MSE with POST_BN
   '''
