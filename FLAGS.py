@@ -13,12 +13,13 @@ class base_config:
   AUDIO_BITS = 16
   NFFT = 256
   FFT_DOT = 129
-  OVERLAP = 128
-  FS = 8000
-  MEL_BLANCE_COEF = 3.2e8
-  MFCC_BLANCE_COEF = 40
   INPUT_SIZE = FFT_DOT
   OUTPUT_SIZE = FFT_DOT
+  OVERLAP = 128
+  FS = 8000
+  LEN_WAWE_PAD_TO = FS*3  # Mixed wave length (FS*3 is 3 seconds)
+  MEL_BLANCE_COEF = 3.2e8
+  MFCC_BLANCE_COEF = 40
   LSTM_num_proj = None
   RNN_SIZE = 512
   MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
@@ -76,7 +77,6 @@ class base_config:
   MAX_TFRECORD_FILES_USED = 160  # <=TFRECORDS_NUM
   SHUFFLE = False
 
-  LEN_WAWE_PAD_TO = FS*3  # Mixed wave length (FS*3 is 3 seconds)
   '''
   UTT_SEG_FOR_MIX:(for close condition)
   [260,290] Separate utt to [0:260],[260,290],[290:end]
@@ -129,6 +129,34 @@ class base_config:
   POW_COEF = None
 
   USE_CBHG_POST_PROCESSING = False
+
+
+class C001_8_2_full(base_config):
+  batch_size = 360
+  PROCESS_NUM_GENERATE_TFERCORD = 32
+  GENERATE_TFRECORD = False
+  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/root1/worklhf/alldata/full_speaker_aishell2/aishell2_1891speaker_list_1_16k'
+  OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/root1/worklhf/alldata/full_speaker_aishell2/aishell2_100speaker_list_2_16k'
+  NOISE_DIR = '/home/root1/worklhf/alldata/many_noise_16k'
+  TFRECORDS_DIR = '/home/root1/worklhf/alldata/paper_se/paper_tfrecords_utt03s_16k_fullspeaker_snrmix_wavespan32767'
+  DATA_DICT_DIR = '_data/mixed_aishell'
+  UTT_SEG_FOR_MIX = [400, 460]
+  # DATASET_NAMES = ['train', 'validation', 'test_cc', 'test_oc']
+  DATASET_SIZES = [720000, 108000, 6000, 6000]
+  FS = 16000
+  LEN_WAWE_PAD_TO = FS*3
+  NFFT = 512
+  FFT_DOT = 257
+  INPUT_SIZE = FFT_DOT
+  OUTPUT_SIZE = FFT_DOT
+  OVERLAP = 256
+  CHECK_POINT = 'nnet_C001_8_2_full'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
 
 
 class C001_1(base_config): # *DONE 15041
@@ -359,6 +387,21 @@ class C001_8_2(base_config): # *DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
+class C001_8_2_fourLayerRNN(base_config): # RUNNING 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  RNN_LAYER = 4
+  CHECK_POINT = 'nnet_C001_8_2_fourLayerRNN'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  # MASK_TYPE = "PSM" # default
+
+
 class C001_8_2_2(base_config):  # DONE 15043
   CHECK_POINT = 'nnet_C001_8_2_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -384,8 +427,8 @@ class C001_8_2_3(base_config):  # DONE 15123
   # INIT_MASK_VAL = 1.0
   USE_CBHG_POST_PROCESSING = True
   DOUBLE_LOSS = True
-  CBHG_LOSS_COEF1 = 0.25
-  CBHG_LOSS_COEF2 = 0.75
+  CBHG_LOSS_COEF1 = 0.5
+  CBHG_LOSS_COEF2 = 0.5
   # learning_rate = 0.0001
 
 
@@ -548,7 +591,7 @@ class C001_8_11(base_config): # DONE 15123
   LOSS_FUNC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   USE_ESTIMATED_MEAN_VAR = False
-  BN_KEEP_DIMS=[0,]
+  BN_KEEP_DIMS=[-2,-1]
 
 
 class C001_8_11_2(base_config): # DONE 15123
@@ -564,10 +607,10 @@ class C001_8_11_2(base_config): # DONE 15123
   LOSS_FUNC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   USE_ESTIMATED_MEAN_VAR = False
-  BN_KEEP_DIMS=[0,1]
+  BN_KEEP_DIMS=[-1]
 
 
-class C001_8_12(base_config): # RUNNING 15123
+class C001_8_12(base_config): # CKPT Same To C001_8_11
   '''
   relative spectrum(mag) MSE with INDIVIDUAL_BN
   '''
@@ -580,10 +623,10 @@ class C001_8_12(base_config): # RUNNING 15123
   LOSS_FUNC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   USE_ESTIMATED_MEAN_VAR = True
-  BN_KEEP_DIMS=[0,]
+  BN_KEEP_DIMS=[-1,-2]
 
 
-class C001_8_12_2(base_config): # RUNNING 15123
+class C001_8_12_2(base_config): # CKPT Same To C001_8_11_2
   '''
   relative spectrum(mag) MSE with INDIVIDUAL_BN
   '''
@@ -596,7 +639,7 @@ class C001_8_12_2(base_config): # RUNNING 15123
   LOSS_FUNC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   USE_ESTIMATED_MEAN_VAR = True
-  BN_KEEP_DIMS=[0,1]
+  BN_KEEP_DIMS=[-1]
 
 
 class C001_8_13(base_config): # DONE 15041
@@ -1040,5 +1083,5 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-PARAM = C001_8_2_3
+PARAM = C001_8_2_fourLayerRNN
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
