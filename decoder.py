@@ -94,7 +94,10 @@ def decode_one_wav(sess, model, wavedata):
   # spectrum_tool.picture_spec(mask[0],"233")
   return reY, mask
 
-def decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, save_audio, ans_file):
+def decode_and_getMeature(mixed_file_list, ref_list, sess, model, decode_ans_file, save_audio, ans_file):
+  '''
+  (mixed_dir,ref_dir,sess,model,'decode_nnet_C001_8_2',False,'xxxans.txt')
+  '''
   if os.path.exists(os.path.join(decode_ans_file,ans_file)):
     os.remove(os.path.join(decode_ans_file,ans_file))
   pesq_raw_sum = 0
@@ -103,7 +106,7 @@ def decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_fi
   stoi_en_sum = 0
   sdr_raw_sum = 0
   sdr_en_sum = 0
-  for i, mixed_dir in enumerate(decode_file_list):
+  for i, mixed_dir in enumerate(mixed_file_list):
     print('\n',i+1,mixed_dir)
     waveData, sr = utils.audio_tool.read_audio(mixed_dir)
     reY, mask = decode_one_wav(sess,model,waveData)
@@ -176,39 +179,41 @@ if __name__=='__main__':
     os.makedirs(decode_ans_file)
   sess, model = build_session(ckpt, 1)
 
-  decode_file_list_8k = [
-      'exp/rnn_speech_enhancement/8k/s_2_00_MIX_1_clapping_8k.wav',
-      'exp/rnn_speech_enhancement/8k/s_8_01_MIX_4_rainning_8k.wav',
-      'exp/rnn_speech_enhancement/8k/s_8_21_MIX_3_factory_8k.wav',
-      'exp/rnn_speech_enhancement/8k/s_2_00_8k_raw.wav',
-      'exp/rnn_speech_enhancement/8k/s_8_01_8k_raw.wav',
-      'exp/rnn_speech_enhancement/8k/s_8_21_8k_raw.wav',
-      'exp/rnn_speech_enhancement/8k/speech1_8k.wav',
-      'exp/rnn_speech_enhancement/8k/speech5_8k.wav',
-      'exp/rnn_speech_enhancement/8k/speech6_8k.wav',
-      'exp/rnn_speech_enhancement/8k/speech7_8k.wav',
-      'exp/real_test_fair/863_min/mixed_wav/863_1_8k_MIX_1_airplane.wav',
-      # 'exp/rnn_speech_enhancement/decode_nnet_C001_3/nnet_C001_3_007_speech7_8k.wav'
-  ]
-
-  decode_file_list_16k = [
-      'exp/rnn_speech_enhancement/16k/s_2_00_MIX_1_clapping_16k.wav',
-      'exp/rnn_speech_enhancement/16k/s_8_01_MIX_4_rainning_16k.wav',
-      'exp/rnn_speech_enhancement/16k/s_8_21_MIX_3_factory_16k.wav',
-      'exp/rnn_speech_enhancement/16k/s_2_00_16k_raw.wav',
-      'exp/rnn_speech_enhancement/16k/s_8_01_16k_raw.wav',
-      'exp/rnn_speech_enhancement/16k/s_8_21_16k_raw.wav',
-      'exp/rnn_speech_enhancement/16k/speech0_16k.wav',
-      'exp/rnn_speech_enhancement/16k/speech1_16k.wav',
-      'exp/rnn_speech_enhancement/16k/speech6_16k.wav',
-      'exp/rnn_speech_enhancement/16k/speech7_16k.wav',
-      'exp/rnn_speech_enhancement/16k/863_1_16k_MIX_1_airplane.wav',
-  ]
-  # decode_file_list = decode_file_list_8k
-  decode_file_list = decode_file_list_16k
-
-
   if len(sys.argv)<=1:
+    decode_file_list_8k = [
+        'exp/rnn_speech_enhancement/8k/s_2_00_MIX_1_clapping_8k.wav',
+        'exp/rnn_speech_enhancement/8k/s_8_01_MIX_4_rainning_8k.wav',
+        'exp/rnn_speech_enhancement/8k/s_8_21_MIX_3_factory_8k.wav',
+        'exp/rnn_speech_enhancement/8k/s_2_00_8k_raw.wav',
+        'exp/rnn_speech_enhancement/8k/s_8_01_8k_raw.wav',
+        'exp/rnn_speech_enhancement/8k/s_8_21_8k_raw.wav',
+        'exp/rnn_speech_enhancement/8k/speech1_8k.wav',
+        'exp/rnn_speech_enhancement/8k/speech5_8k.wav',
+        'exp/rnn_speech_enhancement/8k/speech6_8k.wav',
+        'exp/rnn_speech_enhancement/8k/speech7_8k.wav',
+        'exp/real_test_fair/863_min/mixed_wav/863_1_8k_MIX_1_airplane.wav',
+        # 'exp/rnn_speech_enhancement/decode_nnet_C001_3/nnet_C001_3_007_speech7_8k.wav'
+    ]
+
+    decode_file_list_16k = [
+        'exp/rnn_speech_enhancement/16k/s_2_00_MIX_1_clapping_16k.wav',
+        'exp/rnn_speech_enhancement/16k/s_8_01_MIX_4_rainning_16k.wav',
+        'exp/rnn_speech_enhancement/16k/s_8_21_MIX_3_factory_16k.wav',
+        'exp/rnn_speech_enhancement/16k/s_2_00_16k_raw.wav',
+        'exp/rnn_speech_enhancement/16k/s_8_01_16k_raw.wav',
+        'exp/rnn_speech_enhancement/16k/s_8_21_16k_raw.wav',
+        'exp/rnn_speech_enhancement/16k/speech0_16k.wav',
+        'exp/rnn_speech_enhancement/16k/speech1_16k.wav',
+        'exp/rnn_speech_enhancement/16k/speech6_16k.wav',
+        'exp/rnn_speech_enhancement/16k/speech7_16k.wav',
+        'exp/rnn_speech_enhancement/16k/863_1_16k_MIX_1_airplane.wav',
+    ]
+    if PARAM.FS == 8000:
+      decode_file_list = decode_file_list_8k
+    elif PARAM.FS == 16000:
+      decode_file_list = decode_file_list_16k
+    else:
+      print('PARAM.FS error, exit.'),exit(-1)
     for i, mixed_dir in enumerate(decode_file_list):
       print(i+1,mixed_dir)
       waveData, sr = utils.audio_tool.read_audio(mixed_dir)
@@ -225,17 +230,27 @@ if __name__=='__main__':
       spectrum_tool.picture_spec(mask,
                                  os.path.join(decode_ans_file,
                                               (ckpt+'_%03d_' % (i+1))+file_name))
-  elif int(sys.argv[1])==0:
-    ref_list = [
-      'exp/rnn_speech_enhancement/8k/2_00_8k.wav',
-      'exp/rnn_speech_enhancement/8k/8_01_8k.wav',
-      'exp/rnn_speech_enhancement/8k/8_21_8k.wav',
-      'exp/rnn_speech_enhancement/8k/2_00_8k.wav',
-      'exp/rnn_speech_enhancement/8k/8_01_8k.wav',
-      'exp/rnn_speech_enhancement/8k/8_21_8k.wav',
-    ]
-    decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, True, 'sdr.txt')
-  elif int(sys.argv[1])==1:
+  elif int(sys.argv[1])==0: # decode exp/test_oc
+    mixed_dir = 'exp/test_oc/mixed_wav'
+    decode_file_list = os.listdir(mixed_dir)
+    decode_file_list = [os.path.join(mixed_dir,mixed) for mixed in decode_file_list]
+    decode_file_list.sort()
+
+    ref_dir = 'exp/test_oc/refer_wav'
+    ref_list = os.listdir(ref_dir)
+    ref_list = [os.path.join(ref_dir,ref) for ref in ref_list]
+    ref_list.sort()
+
+    # for mixed in decode_file_list:
+    #   if mixed.find('clean') != -1 or mixed.find('ref.wav')!=-1:
+    #     os.remove(mixed)
+
+    # for ref in ref_list:
+    #   if ref.find('clean') != -1 or ref.find('mixed.wav')!=-1:
+    #     os.remove(ref)
+
+    decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, False, 'test_oc.txt')
+  elif int(sys.argv[1])==1: # decode exp/real_test_fair
     start_time = time.time()
     mixed_dirs = os.path.join('exp','real_test_fair','ITU_T_Test', 'mixed_wav')
     # mixed_dirs = os.path.join('exp','real_test_fair','863_min', 'mixed_wav')
