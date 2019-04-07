@@ -176,20 +176,36 @@ if __name__=='__main__':
     os.makedirs(decode_ans_file)
   sess, model = build_session(ckpt, 1)
 
-  decode_file_list = [
-      'exp/rnn_speech_enhancement/s_2_00_MIX_1_clapping_8k.wav',
-      'exp/rnn_speech_enhancement/s_8_01_MIX_4_rainning_8k.wav',
-      'exp/rnn_speech_enhancement/s_8_21_MIX_3_factory_8k.wav',
-      'exp/rnn_speech_enhancement/s_2_00_8k_raw.wav',
-      'exp/rnn_speech_enhancement/s_8_01_8k_raw.wav',
-      'exp/rnn_speech_enhancement/s_8_21_8k_raw.wav',
-      'exp/rnn_speech_enhancement/speech1_8k.wav',
-      'exp/rnn_speech_enhancement/speech5_8k.wav',
-      'exp/rnn_speech_enhancement/speech6_8k.wav',
-      'exp/rnn_speech_enhancement/speech7_8k.wav',
+  decode_file_list_8k = [
+      'exp/rnn_speech_enhancement/8k/s_2_00_MIX_1_clapping_8k.wav',
+      'exp/rnn_speech_enhancement/8k/s_8_01_MIX_4_rainning_8k.wav',
+      'exp/rnn_speech_enhancement/8k/s_8_21_MIX_3_factory_8k.wav',
+      'exp/rnn_speech_enhancement/8k/s_2_00_8k_raw.wav',
+      'exp/rnn_speech_enhancement/8k/s_8_01_8k_raw.wav',
+      'exp/rnn_speech_enhancement/8k/s_8_21_8k_raw.wav',
+      'exp/rnn_speech_enhancement/8k/speech1_8k.wav',
+      'exp/rnn_speech_enhancement/8k/speech5_8k.wav',
+      'exp/rnn_speech_enhancement/8k/speech6_8k.wav',
+      'exp/rnn_speech_enhancement/8k/speech7_8k.wav',
       'exp/real_test_fair/863_min/mixed_wav/863_1_8k_MIX_1_airplane.wav',
       # 'exp/rnn_speech_enhancement/decode_nnet_C001_3/nnet_C001_3_007_speech7_8k.wav'
   ]
+
+  decode_file_list_16k = [
+      'exp/rnn_speech_enhancement/16k/s_2_00_MIX_1_clapping_16k.wav',
+      'exp/rnn_speech_enhancement/16k/s_8_01_MIX_4_rainning_16k.wav',
+      'exp/rnn_speech_enhancement/16k/s_8_21_MIX_3_factory_16k.wav',
+      'exp/rnn_speech_enhancement/16k/s_2_00_16k_raw.wav',
+      'exp/rnn_speech_enhancement/16k/s_8_01_16k_raw.wav',
+      'exp/rnn_speech_enhancement/16k/s_8_21_16k_raw.wav',
+      'exp/rnn_speech_enhancement/16k/speech0_16k.wav',
+      'exp/rnn_speech_enhancement/16k/speech1_16k.wav',
+      'exp/rnn_speech_enhancement/16k/speech6_16k.wav',
+      'exp/rnn_speech_enhancement/16k/speech7_16k.wav',
+      'exp/rnn_speech_enhancement/16k/863_1_16k_MIX_1_airplane.wav',
+  ]
+  # decode_file_list = decode_file_list_8k
+  decode_file_list = decode_file_list_16k
 
 
   if len(sys.argv)<=1:
@@ -211,12 +227,12 @@ if __name__=='__main__':
                                               (ckpt+'_%03d_' % (i+1))+file_name))
   elif int(sys.argv[1])==0:
     ref_list = [
-      'exp/rnn_speech_enhancement/2_00_8k.wav',
-      'exp/rnn_speech_enhancement/8_01_8k.wav',
-      'exp/rnn_speech_enhancement/8_21_8k.wav',
-      'exp/rnn_speech_enhancement/2_00_8k.wav',
-      'exp/rnn_speech_enhancement/8_01_8k.wav',
-      'exp/rnn_speech_enhancement/8_21_8k.wav',
+      'exp/rnn_speech_enhancement/8k/2_00_8k.wav',
+      'exp/rnn_speech_enhancement/8k/8_01_8k.wav',
+      'exp/rnn_speech_enhancement/8k/8_21_8k.wav',
+      'exp/rnn_speech_enhancement/8k/2_00_8k.wav',
+      'exp/rnn_speech_enhancement/8k/8_01_8k.wav',
+      'exp/rnn_speech_enhancement/8k/8_21_8k.wav',
     ]
     decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, True, 'sdr.txt')
   elif int(sys.argv[1])==1:
