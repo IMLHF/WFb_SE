@@ -191,7 +191,7 @@ if __name__=='__main__':
         'exp/rnn_speech_enhancement/8k/speech5_8k.wav',
         'exp/rnn_speech_enhancement/8k/speech6_8k.wav',
         'exp/rnn_speech_enhancement/8k/speech7_8k.wav',
-        'exp/real_test_fair/863_min/mixed_wav/863_1_8k_MIX_1_airplane.wav',
+        'exp/real_test_fair/863_min_8k/mixed_wav/863_1_8k_MIX_1_airplane.wav',
         # 'exp/rnn_speech_enhancement/decode_nnet_C001_3/nnet_C001_3_007_speech7_8k.wav'
     ]
 
