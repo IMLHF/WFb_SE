@@ -391,7 +391,7 @@ class C001_8_2_fixPSM(base_config): # RUNNING 15041
   '''
   relative spectrum(mag) MSE
   '''
-  CHECK_POINT = 'nnet_C001_8_2'
+  CHECK_POINT = 'nnet_C001_8_2_fixPSM'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
