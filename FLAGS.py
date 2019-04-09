@@ -24,7 +24,7 @@ class base_config:
   RNN_SIZE = 512
   MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
   LSTM_ACTIVATION = 'tanh'
-  MASK_TYPE = "PSM"  # "PSM" or "IRM"
+  MASK_TYPE = "PSM"  # "PSM" or "IRM" or "fixPSM"
   INPUT_BN = False
   POST_BN =False
   MVN_TYPE = 'BN' # 'BN' or 'BRN'
@@ -387,7 +387,21 @@ class C001_8_2(base_config): # *DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_2_fourLayerRNN(base_config): # RUNNING 15041
+class C001_8_2_fixPSM(base_config): # RUNNING 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MASK_TYPE = "fixPSM"
+
+
+class C001_8_2_fourLayerRNN(base_config): # DONE 15041
   '''
   relative spectrum(mag) MSE
   '''
@@ -642,7 +656,7 @@ class C001_8_12_2(base_config): # CKPT Same To C001_8_11_2
   BN_KEEP_DIMS=[-1]
 
 
-class C001_8_13(base_config): # RUNNING 15041
+class C001_8_13(base_config): # DONE 15041
   '''
   relative spectrum(mag) MSE with POST_BN
   '''
@@ -1083,5 +1097,5 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-PARAM = C001_8_2_fourLayerRNN
+PARAM = C001_8_2_fixPSM
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)

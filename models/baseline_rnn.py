@@ -196,6 +196,8 @@ class Model_Baseline(object):
       self._y_estimation = self._mask*self._norm_x_logmag_spec
     if FLAGS.PARAM.MASK_TYPE == 'PSM':
       self._y_labels *= tf.cos(self._x_theta-self._y_theta)
+    elif FLAGS.PARAM.MASK_TYPE == 'fixPSM':
+      self._y_labels *= (1.0+tf.cos(self._x_theta-self._y_theta))*0.5
     elif FLAGS.PARAM.MASK_TYPE == 'IRM':
       pass
     else:
