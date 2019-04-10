@@ -25,6 +25,7 @@ class base_config:
   MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
   LSTM_ACTIVATION = 'tanh'
   MASK_TYPE = "PSM"  # "PSM" or "IRM" or "fixPSM"
+  ReLU_MASK = True
   INPUT_BN = False
   POST_BN =False
   MVN_TYPE = 'BN' # 'BN' or 'BRN'
@@ -387,7 +388,7 @@ class C001_8_2(base_config): # *DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_2_fixPSM(base_config): # RUNNING 15041
+class C001_8_2_fixPSM(base_config): # DONE 15041
   '''
   relative spectrum(mag) MSE
   '''
@@ -399,6 +400,49 @@ class C001_8_2_fixPSM(base_config): # RUNNING 15041
   LOSS_FUNC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   MASK_TYPE = "fixPSM"
+
+
+class C001_8_2_realPSM(base_config): # RUNNING 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_realPSM'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  ReLU_MASK = False
+
+
+class C001_8_2_reluIRM(base_config): # RUNNING 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_reluIRM'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MASK_TYPE = 'IRM'
+
+
+class C001_8_2_realIRM(base_config): # RUNNING 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_realIRM'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MASK_TYPE = 'IRM'
+  ReLU_MASK = False
 
 
 class C001_8_2_fourLayerRNN(base_config): # DONE 15041
@@ -1097,5 +1141,5 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-PARAM = C001_8_2_fixPSM
+PARAM = C001_8_2_realIRM
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)

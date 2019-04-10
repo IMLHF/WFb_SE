@@ -169,7 +169,10 @@ class Model_Baseline(object):
           linear_out = tf.matmul(linear_out,weights2) + biases2
       else:
         linear_out = tf.matmul(outputs, weights) + biases
-      mask = tf.nn.relu(linear_out)
+      mask = linear_out
+      if FLAGS.PARAM.ReLU_MASK:
+        mask = tf.nn.relu(linear_out)
+
     # endregion
 
     self._mask = tf.reshape(
