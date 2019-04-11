@@ -95,7 +95,7 @@ def train():
           print("TFRecords preparation over.")
           # exit(0)  # set gen=True and exit to generate tfrecords
 
-        PSIRM = True if (PARAM.MASK_TYPE == 'PSM' or PARAM.MASK_TYPE == 'fixPSM') else False
+        PSIRM = True if PARAM.PIPLINE_GET_THETA else False
         x_batch_tr, y_batch_tr, Xtheta_batch_tr, Ytheta_batch_tr, lengths_batch_tr, iter_train = get_batch_use_tfdata(
             train_tfrecords,
             get_theta=PSIRM)

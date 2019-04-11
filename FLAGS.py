@@ -24,7 +24,8 @@ class base_config:
   RNN_SIZE = 512
   MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
   LSTM_ACTIVATION = 'tanh'
-  MASK_TYPE = "PSM"  # "PSM" or "IRM" or "fixPSM"
+  MASK_TYPE = "PSM"  # "PSM" or "IRM" or "fixPSM" or "AcutePM"
+  PIPLINE_GET_THETA = True
   ReLU_MASK = True
   INPUT_BN = False
   POST_BN =False
@@ -167,6 +168,7 @@ class C001_1(base_config): # *DONE 15041
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   MASK_TYPE = "IRM"
+  PIPLINE_GET_THETA = False
 
 
 class C001_2(base_config): # *DONE 15041
@@ -388,7 +390,7 @@ class C001_8_2(base_config): # *DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_2_fixPSM(base_config): # DONE 15041
+class C001_8_2_fixPSM(base_config): # *DONE 15041
   '''
   relative spectrum(mag) MSE
   '''
@@ -402,7 +404,22 @@ class C001_8_2_fixPSM(base_config): # DONE 15041
   MASK_TYPE = "fixPSM"
 
 
-class C001_8_2_realPSM(base_config): # RUNNING 15041
+class C001_8_2_realFixPSM(base_config): # DONE 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_realFixPSM'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MASK_TYPE = "fixPSM"
+  ReLU_MASK = False
+
+
+class C001_8_2_realPSM(base_config): # DONE 15041
   '''
   relative spectrum(mag) MSE
   '''
@@ -416,7 +433,7 @@ class C001_8_2_realPSM(base_config): # RUNNING 15041
   ReLU_MASK = False
 
 
-class C001_8_2_reluIRM(base_config): # RUNNING 15041
+class C001_8_2_reluIRM(base_config): # DONE 15041
   '''
   relative spectrum(mag) MSE
   '''
@@ -428,9 +445,10 @@ class C001_8_2_reluIRM(base_config): # RUNNING 15041
   LOSS_FUNC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   MASK_TYPE = 'IRM'
+  PIPLINE_GET_THETA = False
 
 
-class C001_8_2_realIRM(base_config): # RUNNING 15041
+class C001_8_2_realIRM(base_config): # DONE 15041
   '''
   relative spectrum(mag) MSE
   '''
@@ -442,6 +460,37 @@ class C001_8_2_realIRM(base_config): # RUNNING 15041
   LOSS_FUNC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   MASK_TYPE = 'IRM'
+  ReLU_MASK = False
+  PIPLINE_GET_THETA = False
+
+
+class C001_8_2_reluAcutePM(base_config): # RUNNING 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_reluAcutePM'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MASK_TYPE = "AcutePM" # default
+  ReLU_MASK = True
+
+
+class C001_8_2_realAcutePM(base_config): # prepare 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_realAcutePM'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MASK_TYPE = "AcutePM" # default
   ReLU_MASK = False
 
 
@@ -1141,5 +1190,5 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-PARAM = C001_8_2_realIRM
+PARAM = C001_8_2_reluAcutePM
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
