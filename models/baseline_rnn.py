@@ -284,6 +284,9 @@ class Model_Baseline(object):
       self._loss = loss.relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,FLAGS.PARAM.RELATED_MSE_IGNORE_TH)
     elif FLAGS.PARAM.LOSS_FUNC == "AUTO_RELATED_MSE":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
+    elif FLAGS.PARAM.LOSS_FUNC == "AUTO_RELATED_MSE_USE_COS":
+      self._loss = loss.cos_auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,
+                                                                                FLAGS.PARAM.COS_AUTO_RELATED_MSE_W)
     else:
       print('Loss type error.')
       exit(-1)

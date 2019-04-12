@@ -40,10 +40,13 @@ class base_config:
     "SPEC_MSE_LOWF_EN" :
     "FAIR_SPEC_MSE" :
     "SPEC_MSE_FLEXIBLE_POW_C" :
+    "RELATED_MSE" :
     "AUTO_RELATED_MSE" :
+    "AUTO_RELATED_MSE_USE_COS" :
   '''
   LOSS_FUNC = "SPEC_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = None # for "AUTO_RELATED_MSE"
+  COS_AUTO_RELATED_MSE_W = None # for "AUTO_RELATED_MSE_USE_COS"
   KEEP_PROB = 0.8
   RNN_LAYER = 2
   CLIP_NORM = 5.0
@@ -65,7 +68,7 @@ class base_config:
   end_halving_impr = 0.0005
   # The num of threads to read tfrecords files.
   num_threads_processing_data = 16
-  RESTORE_PHASE = 'GRIFFIN_LIM'  # 'MIXED','GRIFFIN_LIM'.
+  RESTORE_PHASE = 'MIXED'  # 'MIXED','GRIFFIN_LIM'.
   GRIFFIN_ITERNUM = 50
   minibatch_size = 400  # batch num to show
   CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_1_8k'
@@ -464,7 +467,7 @@ class C001_8_2_realIRM(base_config): # DONE 15041
   PIPLINE_GET_THETA = False
 
 
-class C001_8_2_reluAcutePM(base_config): # RUNNING 15041
+class C001_8_2_reluAcutePM(base_config): # DONE 15041
   '''
   relative spectrum(mag) MSE
   '''
@@ -479,7 +482,7 @@ class C001_8_2_reluAcutePM(base_config): # RUNNING 15041
   ReLU_MASK = True
 
 
-class C001_8_2_realAcutePM(base_config): # prepare 15041
+class C001_8_2_realAcutePM(base_config): # DONE 15041
   '''
   relative spectrum(mag) MSE
   '''
@@ -554,7 +557,7 @@ class C001_8_2_4(base_config): # DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_2_5(base_config): # RUNNING 15043
+class C001_8_2_5(base_config): # DONE 15043
   '''
   relative spectrum(mag) MSE
   '''
@@ -762,6 +765,49 @@ class C001_8_13(base_config): # DONE 15041
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   POST_BN = True
   SELF_BN = False
+
+
+class C001_9_1(base_config): # RUNNING 15123
+  '''
+  cos relative spectrum(mag) MSE
+  '''
+  PI = 3.1415926
+  CHECK_POINT = 'nnet_C001_9_1'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE_USE_COS"
+  COS_AUTO_RELATED_MSE_W = PI
+  # MASK_TYPE = "PSM" # default
+
+
+class C001_9_2(base_config): # RUNNING 15043
+  '''
+  cos relative spectrum(mag) MSE
+  '''
+  PI = 3.1415926
+  CHECK_POINT = 'nnet_C001_9_2'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE_USE_COS"
+  COS_AUTO_RELATED_MSE_W = PI*1.25
+
+
+class C001_9_3(base_config): # prepare 15043
+  '''
+  cos relative spectrum(mag) MSE
+  '''
+  PI = 3.1415926
+  CHECK_POINT = 'nnet_C001_9_3'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE_USE_COS"
+  COS_AUTO_RELATED_MSE_W = PI*1.5
 
 
 class C002_1(base_config): # DONE 15043
@@ -1190,5 +1236,5 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-PARAM = C001_8_2_reluAcutePM
+PARAM = C001_9_2
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)

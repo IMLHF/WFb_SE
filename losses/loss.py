@@ -16,6 +16,15 @@ def auto_ingore_relative_reduce_sum_frame_batchsize_MSE(y1,y2,axis_fit_degree,in
   return cost
 
 
+def cos_auto_ingore_relative_reduce_sum_frame_batchsize_MSE(y1,y2,w,index_=2.0):
+  refer_sum = tf.maximum(tf.abs(y1)+tf.abs(y2),1e-12)
+  relative_loss = tf.abs(y1-y2)/refer_sum
+  small_val_debuff_useCOS = (1.0-tf.cos(refer_sum*w))*0.5
+  relative_cost = relative_loss*small_val_debuff_useCOS
+  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(relative_cost, index_), 1), 1))
+  return cost
+
+
 def logbias_de_reduce_sum_frame_batchsize_MSE(y1,y2,logbias):
   cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(y1-y2, 2), -1), -1)+tf.pow(logbias/5000,2))
   return cost
