@@ -334,6 +334,13 @@ class Trainable_Logbias_Model(object):
     return self._y_theta
 
   @property
+  def y_theta_estimation(self):
+    '''
+    estimate y_theta placeholder
+    '''
+    return None
+
+  @property
   def lengths(self):
     '''
     description: dynamic time length

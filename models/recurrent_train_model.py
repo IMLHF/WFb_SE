@@ -290,6 +290,13 @@ class Model_Recurrent_Train(object):
     return self._y_theta
 
   @property
+  def y_theta_estimation(self):
+    '''
+    estimate y_theta placeholder
+    '''
+    return None
+
+  @property
   def lengths(self):
     '''
     description: dynamic time length
