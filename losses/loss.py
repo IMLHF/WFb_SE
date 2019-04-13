@@ -5,7 +5,7 @@ from utils import tf_tool
 
 
 def magnitude_weighted_cos_deltaTheta(theta1,theta2,mag_spec,index_=2.0):
-  cost = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(tf.multiply(1.0-tf.cos(theta1-theta2), mag_spec)),
+  cost = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(tf.multiply(1.0-tf.cos(theta1-theta2), mag_spec*10.0)),
                                              index_),
                                       1))
   return cost
