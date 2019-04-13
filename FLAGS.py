@@ -164,7 +164,7 @@ class C001_8_2_full(base_config):
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
 
 
-class C001_1(base_config): # *DONE 15041
+class C001_1(base_config): # *DONE 15043
   CHECK_POINT = 'nnet_C001_1'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -174,12 +174,33 @@ class C001_1(base_config): # *DONE 15041
   PIPLINE_GET_THETA = False
 
 
-class C001_2(base_config): # *DONE 15041
+class C001_1_2(base_config): # RUNNING 15123
+  CHECK_POINT = 'nnet_C001_1'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  MASK_TYPE = "IRM"
+  PIPLINE_GET_THETA = False
+  ReLU_MASK = False
+
+
+class C001_2(base_config): # *DONE 15043
   CHECK_POINT = 'nnet_C001_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  # MASK_TYPE = "PSM" # default
+
+
+class C001_2_2(base_config): # RUNNING 15123
+  CHECK_POINT = 'nnet_C001_2'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
 
 
@@ -767,7 +788,7 @@ class C001_8_13(base_config): # DONE 15041
   SELF_BN = False
 
 
-class C001_9_1(base_config): # RUNNING 15123
+class C001_9_1(base_config): # DONE 15123
   '''
   cos relative spectrum(mag) MSE
   '''
@@ -782,7 +803,7 @@ class C001_9_1(base_config): # RUNNING 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C001_9_2(base_config): # RUNNING 15043
+class C001_9_2(base_config): # DONE 15123
   '''
   cos relative spectrum(mag) MSE
   '''
@@ -1236,5 +1257,17 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-PARAM = C001_9_2
+class C007_1(base_config): # prepare 15041
+  CHECK_POINT = 'nnet_C007_1'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC = "AUTO_RELATED_MSE"
+
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  # MASK_TYPE = "PSM" # default
+
+
+PARAM = C001_2_2
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
