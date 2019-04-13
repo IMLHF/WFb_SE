@@ -1,3 +1,8 @@
+'''
+for :
+   models.training_in_turn_model
+'''
+
 import time
 import tensorflow as tf
 import numpy as np

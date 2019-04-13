@@ -1,3 +1,14 @@
+'''
+for :
+   models.baseline_rnn
+   models.individual_bn_model
+   models.recurrent_train_model
+   models.threshold_model
+   models.threshold_per_frame_model
+   models.trainable_logbias_model
+'''
+
+
 import time
 import tensorflow as tf
 import numpy as np
