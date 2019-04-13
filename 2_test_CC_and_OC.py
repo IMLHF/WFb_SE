@@ -191,5 +191,5 @@ if __name__ == "__main__":
   os.environ['CUDA_VISIBLE_DEVICES'] = sys.argv[1]
   tf.logging.set_verbosity(tf.logging.INFO)
   test_CC_or_OC(str(sys.argv[2]))
-  # python3 2_test_CC_and_OC.py "" test_cc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_testcc.log
-  # python3 2_test_CC_and_OC.py "" test_oc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_testoc.log
+  # python3 2_test_CC_and_OC.py "" test_cc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_rePhaseMixed_testcc.log
+  # python3 2_test_CC_and_OC.py "" test_oc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_rePhaseMixed_testoc.log
