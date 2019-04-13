@@ -71,13 +71,14 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
         print('  |-Decoding...')
       time_save = time.time()
       sys.stdout.flush()
-      mask, x_mag, x_theta, y_mag, y_theta, y_mag_est, batch_size = sess.run([model.mask,
-                                                                              model.x_mag,
-                                                                              model.x_theta,
-                                                                              model.y_mag,
-                                                                              model.y_theta,
-                                                                              model.y_mag_estimation,
-                                                                              model.batch_size])
+      mask, x_mag, x_theta, y_mag, y_theta, y_mag_est, y_theta_est, batch_size = sess.run([model.mask,
+                                                                                           model.x_mag,
+                                                                                           model.x_theta,
+                                                                                           model.y_mag,
+                                                                                           model.y_theta,
+                                                                                           model.y_mag_estimation,
+                                                                                           model.y_theta_estimation,
+                                                                                           model.batch_size])
       x_wav = [spectrum_tool.librosa_istft(
           x_mag_t*np.exp(1j*x_theta_t),
           PARAM.NFFT, PARAM.OVERLAP) for x_mag_t, x_theta_t in zip(x_mag, x_theta)]
@@ -87,12 +88,21 @@ def get_PESQ_STOI_SDR(test_set_tfrecords_dir, ckpt_dir, set_name):
       if PARAM.RESTORE_PHASE == 'MIXED':
         y_spec_est = [y_mag_est_t*np.exp(1j*x_theta_t) for y_mag_est_t, x_theta_t in zip(y_mag_est, x_theta)]
         y_wav_est = [spectrum_tool.librosa_istft(y_spec_est_t, PARAM.NFFT, PARAM.OVERLAP) for y_spec_est_t in y_spec_est]
-      elif PARAM.RESTORE_PHASE =='GRIFFIN_LIM':
+      elif PARAM.RESTORE_PHASE == 'GRIFFIN_LIM':
         y_wav_est = [spectrum_tool.griffin_lim(y_mag_est_t,
                                                PARAM.NFFT,
                                                PARAM.OVERLAP,
                                                PARAM.GRIFFIN_ITERNUM,
                                                x_wav_t) for y_mag_est_t, x_wav_t in zip(y_mag_est, x_wav)]
+      elif PARAM.RESTORE_PHASE == 'ESTIMATE':
+        if y_theta_est is None:
+          print('Model cannot estimate y_theta.')
+          exit(-1)
+        y_spec_est = [y_mag_est_t*np.exp(1j*y_theta_est_t) for y_mag_est_t, y_theta_est_t in zip(y_mag_est, y_theta_est)]
+        y_wav_est = [spectrum_tool.librosa_istft(y_spec_est_t, PARAM.NFFT, PARAM.OVERLAP) for y_spec_est_t in y_spec_est]
+      else:
+        print('RESTORE_PHASE error.')
+        exit(-1)
 
       # Prevent overflow (else PESQ crashed)
       abs_max = (2 ** (PARAM.AUDIO_BITS - 1) - 1)

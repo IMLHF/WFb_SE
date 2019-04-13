@@ -63,8 +63,8 @@ def decode_one_wav(sess, model, wavedata):
   length = np.shape(x_spec_t)[0]
   x_spec = np.array([x_spec_t], dtype=np.float32)
   lengths = np.array([length], dtype=np.int32)
-  y_mag_estimation, mask, x_mag, norm_x_mag, norm_logmag = sess.run(
-      [model.y_mag_estimation, model.mask,
+  y_theta_est, y_mag_estimation, mask, x_mag, norm_x_mag, norm_logmag = sess.run(
+      [model.y_theta_estimation, model.y_mag_estimation, model.mask,
        model._x_mag_spec, model._norm_x_mag_spec, model._norm_x_logmag_spec],
       feed_dict={
           model.x_mag: x_spec,
@@ -85,6 +85,15 @@ def decode_one_wav(sess, model, wavedata):
                                     PARAM.OVERLAP,
                                     PARAM.GRIFFIN_ITERNUM,
                                     wavedata)
+  elif PARAM.RESTORE_PHASE == 'ESTIMATE':
+    if y_theta_est is None:
+      print('Model cannot estimate y_theta.')
+      exit(-1)
+    y_mag_estimation = y_mag_estimation*np.exp(1j*y_theta_est)
+    reY = spectrum_tool.librosa_istft(y_mag_estimation, PARAM.NFFT, PARAM.OVERLAP)
+  else:
+    print('RESTORE_PHASE error.')
+    exit(-1)
 
   # print(np.shape(mask), np.max(mask), np.min(mask))
   # print(np.shape(x_mag), np.max(x_mag), np.min(x_mag))

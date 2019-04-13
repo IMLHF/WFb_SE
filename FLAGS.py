@@ -76,7 +76,7 @@ class base_config:
   end_halving_impr = 0.0005
   # The num of threads to read tfrecords files.
   num_threads_processing_data = 16
-  RESTORE_PHASE = 'MIXED'  # 'MIXED','GRIFFIN_LIM'.
+  RESTORE_PHASE = 'MIXED'  # 'MIXED','GRIFFIN_LIM',"ESTIMATE".
   GRIFFIN_ITERNUM = 50
   minibatch_size = 400  # batch num to show
   CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_1_8k'
@@ -1253,6 +1253,7 @@ class C006_2_1(base_config): # DONE 15043
 
 class C007_1(base_config): # prepare 15041
   SE_MODEL = models.complex_mask_model
+  RESTORE_PHASE = "ESTIMATE"
   CHECK_POINT = 'nnet_C007_1'
   # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   # LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -1272,6 +1273,7 @@ class C007_1(base_config): # prepare 15041
 
 class C007_2(base_config): # prepare 15041
   SE_MODEL = models.complex_mask_model
+  RESTORE_PHASE = "ESTIMATE"
   CHECK_POINT = 'nnet_C007_2'
   # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   # LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -1292,6 +1294,7 @@ class C007_2(base_config): # prepare 15041
 
 class C007_3(base_config): # prepare 15041
   SE_MODEL = models.complex_mask_model
+  RESTORE_PHASE = "ESTIMATE"
   CHECK_POINT = 'nnet_C007_3'
   # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   # LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
