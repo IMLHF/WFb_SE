@@ -45,6 +45,13 @@ class base_config:
     "AUTO_RELATED_MSE_USE_COS" :
   '''
   LOSS_FUNC_FOR_MAG_SPEC = "SPEC_MSE"
+  '''
+  "MAG_WEIGHTED_COS":
+  '''
+  LOSS_FUNC_FOR_PHASE_SPEC = None
+  MAG_LOSS_COEF = None
+  PHASE_LOSS_COEF = None
+  PI = 3.1415927
   AUTO_RELATED_MSE_AXIS_FIT_DEG = None # for "AUTO_RELATED_MSE"
   COS_AUTO_RELATED_MSE_W = None # for "AUTO_RELATED_MSE_USE_COS"
   KEEP_PROB = 0.8
@@ -792,7 +799,7 @@ class C001_9_1(base_config): # DONE 15123
   '''
   cos relative spectrum(mag) MSE
   '''
-  PI = 3.1415926
+  PI = 3.1415927
   CHECK_POINT = 'nnet_C001_9_1'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -807,7 +814,7 @@ class C001_9_2(base_config): # DONE 15123
   '''
   cos relative spectrum(mag) MSE
   '''
-  PI = 3.1415926
+  PI = 3.1415927
   CHECK_POINT = 'nnet_C001_9_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -815,20 +822,6 @@ class C001_9_2(base_config): # DONE 15123
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE_USE_COS"
   COS_AUTO_RELATED_MSE_W = PI*1.25
-
-
-class C001_9_3(base_config): # prepare 15043
-  '''
-  cos relative spectrum(mag) MSE
-  '''
-  PI = 3.1415926
-  CHECK_POINT = 'nnet_C001_9_3'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE_USE_COS"
-  COS_AUTO_RELATED_MSE_W = PI*1.5
 
 
 class C002_1(base_config): # DONE 15043
@@ -1259,15 +1252,58 @@ class C006_2_1(base_config): # DONE 15043
 
 class C007_1(base_config): # prepare 15041
   CHECK_POINT = 'nnet_C007_1'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  # LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  # TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  # DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-
+  LOSS_FUNC_FOR_PHASE_SPEC = "COS" # ****
+  MAG_LOSS_COEF = 1.0
+  PHASE_LOSS_COEF = 1.0
+  PHASE_LOSS_INDEX = 2.0 # ****
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  FFT_DOT = 129
+  INPUT_SIZE = FFT_DOT*2
+  OUTPUT_SIZE = FFT_DOT*2
+  RNN_SIZE = 512 # ****
+  # MASK_TYPE = "PSM" # default
+
+class C007_2(base_config): # prepare 15041
+  CHECK_POINT = 'nnet_C007_2'
+  # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  # LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  # TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  # DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  LOSS_FUNC_FOR_PHASE_SPEC = "MAG_WEIGHTED_COS"
+  MAG_LOSS_COEF = 1.0
+  PHASE_LOSS_COEF = 1.0
+  PHASE_LOSS_INDEX = 2.0
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  FFT_DOT = 129
+  INPUT_SIZE = FFT_DOT*2
+  OUTPUT_SIZE = FFT_DOT*2
+  RNN_SIZE = 512
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C001_2_2
+class C007_3(base_config): # prepare 15041
+  CHECK_POINT = 'nnet_C007_3'
+  # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  # LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  # TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  # DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  LOSS_FUNC_FOR_PHASE_SPEC = "MAG_WEIGHTED_COS or COS"
+  MAG_LOSS_COEF = 1.0
+  PHASE_LOSS_COEF = 1.0
+  PHASE_LOSS_INDEX = 2.0
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  FFT_DOT = 129
+  INPUT_SIZE = FFT_DOT*2
+  OUTPUT_SIZE = FFT_DOT*2
+  RNN_SIZE = 1024
+  # MASK_TYPE = "PSM" # default
+
+PARAM = C007_1
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
