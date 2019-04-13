@@ -50,7 +50,9 @@ class ComplexMask_Model(object):
     self._norm_y_theta = self._y_theta/(2.0*FLAGS.PARAM.PI)+0.5
     self._model_type = FLAGS.PARAM.MODEL_TYPE
 
-    self.net_input = tf.concat(-1,[self._norm_x_mag_spec,self._x_theta])
+    self.net_input = tf.concat([self._norm_x_mag_spec,self._x_theta],axis=-1)
+    self._y_mag_labels = self._norm_y_mag_spec
+    self._y_theta_labels = self._norm_y_theta
 
     outputs = self.net_input
     if FLAGS.PARAM.INPUT_BN:
@@ -164,7 +166,21 @@ class ComplexMask_Model(object):
     self._mask = tf.reshape(
         mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
 
+    # mask type
+    if FLAGS.PARAM.MASK_TYPE == 'PSM':
+      self._y_mag_labels *= tf.cos(self._x_theta-self._y_theta)
+    elif FLAGS.PARAM.MASK_TYPE == 'fixPSM':
+      self._y_mag_labels *= (1.0+tf.cos(self._x_theta-self._y_theta))*0.5
+    elif FLAGS.PARAM.MASK_TYPE == 'AcutePM':
+      self._y_mag_labels *= tf.nn.relu(tf.cos(self._x_theta-self._y_theta))
+    elif FLAGS.PARAM.MASK_TYPE == 'IRM':
+      pass
+    else:
+      tf.logging.error('Mask type error.')
+      exit(-1)
+
     # region get infer spec
+    print(np.shape(self._mask),np.shape(self.net_input))
     self._y_est = self._mask*self.net_input # est->estimation
     self._norm_y_mag_est = tf.slice(self._y_est,[0,0,0],[-1,-1,FLAGS.PARAM.FFT_DOT])
     self._norm_y_theta_est = tf.slice(self._y_est,[0,0,FLAGS.PARAM.FFT_DOT],[-1,-1,-1])
@@ -178,17 +194,17 @@ class ComplexMask_Model(object):
 
     # region get LOSS
     if FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'SPEC_MSE': # log_mag and mag MSE
-      self._mag_loss = loss.reduce_sum_frame_batchsize_MSE(self._norm_y_mag_est,self._norm_y_mag_spec)
+      self._mag_loss = loss.reduce_sum_frame_batchsize_MSE(self._norm_y_mag_est,self._y_mag_labels)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "RELATED_MSE":
       self._mag_loss = loss.relative_reduce_sum_frame_batchsize_MSE(self._norm_y_mag_est,
-                                                                    self._norm_y_mag_spec,
+                                                                    self._y_mag_labels,
                                                                     FLAGS.PARAM.RELATED_MSE_IGNORE_TH)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE":
       self._mag_loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._norm_y_mag_est,
-                                                                                self._norm_y_mag_spec,
+                                                                                self._y_mag_labels,
                                                                                 FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE_USE_COS":
-      self._mag_loss = loss.cos_auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._norm_y_mag_est, self._norm_y_mag_spec,
+      self._mag_loss = loss.cos_auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._norm_y_mag_est, self._y_mag_labels,
                                                                                     FLAGS.PARAM.COS_AUTO_RELATED_MSE_W)
     else:
       tf.logging.error('Magnitude_Loss type error.')
@@ -196,11 +212,11 @@ class ComplexMask_Model(object):
 
     if FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == "MAG_WEIGHTED_COS":
       self._phase_loss = loss.magnitude_weighted_cos_deltaTheta(self._norm_y_theta_est,
-                                                                self._norm_y_theta,
+                                                                self._y_theta_labels,
                                                                 self._norm_y_mag_spec,
                                                                 index_=FLAGS.PARAM.PHASE_LOSS_INDEX)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'COS':
-      self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(1.0-tf.cos(self._norm_y_theta_est, self._norm_y_theta)),
+      self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(1.0-tf.cos(self._norm_y_theta_est-self._y_theta_labels)),
                                                              FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
     else:
       tf.logging.error('Phase_Loss type error.')
