@@ -6,6 +6,7 @@ import models.threshold_per_frame_model
 import models.trainable_logbias_model
 import models.training_in_turn_model
 import models.individual_bn_model
+import models.complex_mask_model
 
 
 class base_config:
@@ -1251,6 +1252,7 @@ class C006_2_1(base_config): # DONE 15043
 
 
 class C007_1(base_config): # prepare 15041
+  SE_MODEL = models.complex_mask_model
   CHECK_POINT = 'nnet_C007_1'
   # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   # LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -1269,6 +1271,7 @@ class C007_1(base_config): # prepare 15041
   # MASK_TYPE = "PSM" # default
 
 class C007_2(base_config): # prepare 15041
+  SE_MODEL = models.complex_mask_model
   CHECK_POINT = 'nnet_C007_2'
   # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   # LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -1288,6 +1291,7 @@ class C007_2(base_config): # prepare 15041
 
 
 class C007_3(base_config): # prepare 15041
+  SE_MODEL = models.complex_mask_model
   CHECK_POINT = 'nnet_C007_3'
   # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   # LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
