@@ -258,33 +258,33 @@ class Model_Baseline(object):
       return
 
     # region get LOSS
-    if FLAGS.PARAM.LOSS_FUNC == 'SPEC_MSE': # log_mag and mag MSE
+    if FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'SPEC_MSE': # log_mag and mag MSE
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels)
       if FLAGS.PARAM.USE_CBHG_POST_PROCESSING:
         if FLAGS.PARAM.DOUBLE_LOSS:
           self._loss = FLAGS.PARAM.CBHG_LOSS_COEF1*loss.reduce_sum_frame_batchsize_MSE(
             self._cbhg_inputs_y_est,self._y_labels) + FLAGS.PARAM.CBHG_LOSS_COEF2*self._loss
-    elif FLAGS.PARAM.LOSS_FUNC == 'MFCC_SPEC_MSE':
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'MFCC_SPEC_MSE':
       self._loss1, self._loss2 = loss.balanced_MFCC_AND_SPEC_MSE(self._y_estimation, self._y_labels,
                                                                  self._y_mag_estimation, self._y_mag_spec)
       self._loss = FLAGS.PARAM.SPEC_LOSS_COEF*self._loss1 + FLAGS.PARAM.MFCC_LOSS_COEF*self._loss2
-    elif FLAGS.PARAM.LOSS_FUNC == 'MEL_SPEC_MSE':
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'MEL_SPEC_MSE':
       self._loss1, self._loss2 = loss.balanced_MEL_AND_SPEC_MSE(self._y_estimation, self._y_labels,
                                                                 self._y_mag_estimation, self._y_mag_spec)
       self._loss = FLAGS.PARAM.SPEC_LOSS_COEF*self._loss1 + FLAGS.PARAM.MEL_LOSS_COEF*self._loss2
-    elif FLAGS.PARAM.LOSS_FUNC == "SPEC_MSE_LOWF_EN":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "SPEC_MSE_LOWF_EN":
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
-    elif FLAGS.PARAM.LOSS_FUNC == "FAIR_SPEC_MSE":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "FAIR_SPEC_MSE":
       self._loss = loss.fair_reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
-    elif FLAGS.PARAM.LOSS_FUNC == "SPEC_MSE_FLEXIBLE_POW_C":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "SPEC_MSE_FLEXIBLE_POW_C":
       self._loss = loss.reduce_sum_frame_batchsize_MSE_EmphasizeLowerValue(self._y_estimation,
                                                                            self._y_labels,
                                                                            FLAGS.PARAM.POW_COEF)
-    elif FLAGS.PARAM.LOSS_FUNC == "RELATED_MSE":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "RELATED_MSE":
       self._loss = loss.relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,FLAGS.PARAM.RELATED_MSE_IGNORE_TH)
-    elif FLAGS.PARAM.LOSS_FUNC == "AUTO_RELATED_MSE":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
-    elif FLAGS.PARAM.LOSS_FUNC == "AUTO_RELATED_MSE_USE_COS":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE_USE_COS":
       self._loss = loss.cos_auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,
                                                                                 FLAGS.PARAM.COS_AUTO_RELATED_MSE_W)
     else:

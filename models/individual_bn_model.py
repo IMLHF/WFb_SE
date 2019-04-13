@@ -184,19 +184,19 @@ class INDIVIDUAL_BN_MODEL(object):
       return
 
     # region get LOSS
-    if FLAGS.PARAM.LOSS_FUNC == 'SPEC_MSE': # log_mag and mag MSE
+    if FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'SPEC_MSE': # log_mag and mag MSE
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels)
-    elif FLAGS.PARAM.LOSS_FUNC == "SPEC_MSE_LOWF_EN":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "SPEC_MSE_LOWF_EN":
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
-    elif FLAGS.PARAM.LOSS_FUNC == "FAIR_SPEC_MSE":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "FAIR_SPEC_MSE":
       self._loss = loss.fair_reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
-    elif FLAGS.PARAM.LOSS_FUNC == "SPEC_MSE_FLEXIBLE_POW_C":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "SPEC_MSE_FLEXIBLE_POW_C":
       self._loss = loss.reduce_sum_frame_batchsize_MSE_EmphasizeLowerValue(self._y_estimation,
                                                                            self._y_labels,
                                                                            FLAGS.PARAM.POW_COEF)
-    elif FLAGS.PARAM.LOSS_FUNC == "RELATED_MSE":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "RELATED_MSE":
       self._loss = loss.relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,FLAGS.PARAM.RELATED_MSE_IGNORE_TH)
-    elif FLAGS.PARAM.LOSS_FUNC == "AUTO_RELATED_MSE":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
     else:
       print('Loss type error.')

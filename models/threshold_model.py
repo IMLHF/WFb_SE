@@ -284,25 +284,25 @@ class Threshold_Model(object):
       return
 
     # region get LOSS
-    if FLAGS.PARAM.LOSS_FUNC == 'SPEC_MSE': # log_mag and mag MSE
+    if FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'SPEC_MSE': # log_mag and mag MSE
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels)
-    elif FLAGS.PARAM.LOSS_FUNC == 'MFCC_SPEC_MSE':
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'MFCC_SPEC_MSE':
       self._loss1, self._loss2 = loss.balanced_MFCC_AND_SPEC_MSE(self._y_estimation, self._y_labels,
                                                                  self._y_mag_estimation, self._y_mag_spec)
       self._loss = FLAGS.PARAM.SPEC_LOSS_COEF*self._loss1 + FLAGS.PARAM.MFCC_LOSS_COEF*self._loss2
-    elif FLAGS.PARAM.LOSS_FUNC == 'MEL_SPEC_MSE':
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'MEL_SPEC_MSE':
       self._loss1, self._loss2 = loss.balanced_MEL_AND_SPEC_MSE(self._y_estimation, self._y_labels,
                                                                 self._y_mag_estimation, self._y_mag_spec)
       self._loss = FLAGS.PARAM.SPEC_LOSS_COEF*self._loss1 + FLAGS.PARAM.MEL_LOSS_COEF*self._loss2
-    elif FLAGS.PARAM.LOSS_FUNC == "SPEC_MSE_LOWF_EN":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "SPEC_MSE_LOWF_EN":
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
-    elif FLAGS.PARAM.LOSS_FUNC == "FAIR_SPEC_MSE":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "FAIR_SPEC_MSE":
       self._loss = loss.fair_reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
-    elif FLAGS.PARAM.LOSS_FUNC == "SPEC_MSE_FLEXIBLE_POW_C":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "SPEC_MSE_FLEXIBLE_POW_C":
       self._loss = loss.reduce_sum_frame_batchsize_MSE_EmphasizeLowerValue(self._y_estimation,
                                                                            self._y_labels,
                                                                            FLAGS.PARAM.POW_COEF)
-    elif FLAGS.PARAM.LOSS_FUNC == "AUTO_RELATED_MSE":
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
     else:
       print('Loss type error.')
