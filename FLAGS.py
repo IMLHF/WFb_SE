@@ -1272,7 +1272,7 @@ class C007_1(base_config): # RUNNING 15123
   INPUT_SIZE = FFT_DOT*2
   OUTPUT_SIZE = FFT_DOT*2
   RNN_SIZE = 512 # ****
-  # MASK_TYPE = "PSM" # default
+  MASK_TYPE = "IRM"
 
 class C007_2(base_config): # RUNNING 15123
   '''
@@ -1295,7 +1295,7 @@ class C007_2(base_config): # RUNNING 15123
   INPUT_SIZE = FFT_DOT*2
   OUTPUT_SIZE = FFT_DOT*2
   RNN_SIZE = 512
-  # MASK_TYPE = "PSM" # default
+  MASK_TYPE = "IRM"
 
 
 class C007_3(base_config): # RUNNING 15041
@@ -1319,7 +1319,7 @@ class C007_3(base_config): # RUNNING 15041
   INPUT_SIZE = FFT_DOT*2
   OUTPUT_SIZE = FFT_DOT*2
   RNN_SIZE = 1024
-  # MASK_TYPE = "PSM" # default
+  MASK_TYPE = "IRM"
 
 PARAM = C007_1
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
