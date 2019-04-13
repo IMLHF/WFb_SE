@@ -180,7 +180,6 @@ class ComplexMask_Model(object):
       exit(-1)
 
     # region get infer spec
-    print(np.shape(self._mask),np.shape(self.net_input))
     self._y_est = self._mask*self.net_input # est->estimation
     self._norm_y_mag_est = tf.slice(self._y_est,[0,0,0],[-1,-1,FLAGS.PARAM.FFT_DOT])
     self._norm_y_theta_est = tf.slice(self._y_est,[0,0,FLAGS.PARAM.FFT_DOT],[-1,-1,-1])
