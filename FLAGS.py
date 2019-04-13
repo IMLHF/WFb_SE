@@ -1251,8 +1251,11 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-class C007_1(base_config): # prepare 15041
-  SE_MODEL = models.complex_mask_model
+class C007_1(base_config): # RUNNING 15123
+  '''
+  cos
+  '''
+  SE_MODEL = models.complex_mask_model.ComplexMask_Model
   RESTORE_PHASE = "ESTIMATE"
   CHECK_POINT = 'nnet_C007_1'
   # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -1271,8 +1274,11 @@ class C007_1(base_config): # prepare 15041
   RNN_SIZE = 512 # ****
   # MASK_TYPE = "PSM" # default
 
-class C007_2(base_config): # prepare 15041
-  SE_MODEL = models.complex_mask_model
+class C007_2(base_config): # RUNNING 15123
+  '''
+  magnitude weighted cos
+  '''
+  SE_MODEL = models.complex_mask_model.ComplexMask_Model
   RESTORE_PHASE = "ESTIMATE"
   CHECK_POINT = 'nnet_C007_2'
   # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -1292,8 +1298,11 @@ class C007_2(base_config): # prepare 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C007_3(base_config): # prepare 15041
-  SE_MODEL = models.complex_mask_model
+class C007_3(base_config): # RUNNING 15041
+  '''
+  rnn_size:1024
+  '''
+  SE_MODEL = models.complex_mask_model.ComplexMask_Model
   RESTORE_PHASE = "ESTIMATE"
   CHECK_POINT = 'nnet_C007_3'
   # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'

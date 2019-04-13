@@ -16,7 +16,7 @@ import FLAGS
 import numpy as np
 
 
-class Model_Baseline(object):
+class ComplexMask_Model(object):
   infer = 'infer'
   train = 'train'
   validation = 'validation'
