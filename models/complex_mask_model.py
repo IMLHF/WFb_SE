@@ -1,5 +1,8 @@
 # speech enhancement
-
+'''
+training script:
+    1_complexMask_train.py
+'''
 import tensorflow as tf
 import time
 import sys
@@ -32,32 +35,22 @@ class Model_Baseline(object):
       assert(y_mag_spec_batch is not None)
       assert(theta_x_batch is not None)
       assert(theta_y_batch is not None)
-    self._log_bias = tf.get_variable('logbias', [1], trainable=FLAGS.PARAM.LOG_BIAS_TRAINABLE,
-                                     initializer=tf.constant_initializer(FLAGS.PARAM.INIT_LOG_BIAS))
-    self._real_logbias = self._log_bias + FLAGS.PARAM.MIN_LOG_BIAS
     self._x_mag_spec = x_mag_spec_batch
     self._norm_x_mag_spec = norm_mag_spec(self._x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
-    self._norm_x_logmag_spec = norm_logmag_spec(self._x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX, self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
 
     self._y_mag_spec = y_mag_spec_batch
     self._norm_y_mag_spec = norm_mag_spec(self._y_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
-    self._norm_y_logmag_spec = norm_logmag_spec(self._y_mag_spec, FLAGS.PARAM.MAG_NORM_MAX, self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
 
     self._lengths = lengths_batch
     self._batch_size = tf.shape(self._lengths)[0]
 
     self._x_theta = theta_x_batch
     self._y_theta = theta_y_batch
+    self._norm_x_theta = self._x_theta/(2.0*FLAGS.PARAM.PI)+0.5
+    self._norm_y_theta = self._y_theta/(2.0*FLAGS.PARAM.PI)+0.5
     self._model_type = FLAGS.PARAM.MODEL_TYPE
 
-    if FLAGS.PARAM.INPUT_TYPE == 'mag':
-      self.net_input = self._norm_x_mag_spec
-    elif FLAGS.PARAM.INPUT_TYPE == 'logmag':
-      self.net_input = self._norm_x_logmag_spec
-    if FLAGS.PARAM.LABEL_TYPE == 'mag':
-      self._y_labels = self._norm_y_mag_spec
-    elif FLAGS.PARAM.LABEL_TYPE == 'logmag':
-      self._y_labels = self._norm_y_logmag_spec
+    self.net_input = tf.concat(-1,[self._norm_x_mag_spec,self._x_theta])
 
     outputs = self.net_input
     if FLAGS.PARAM.INPUT_BN:
@@ -82,47 +75,40 @@ class Model_Baseline(object):
         return tf.contrib.rnn.DropoutWrapper(GRU_cell(n_units, act),
                                              output_keep_prob=FLAGS.PARAM.KEEP_PROB)
 
-    if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM':
-      with tf.variable_scope('BLSTM'):
+    with tf.variable_scope("BiRNN"):
+      if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM':
+        with tf.variable_scope('BLSTM'):
 
-        lstm_fw_cell = tf.contrib.rnn.MultiRNNCell(
-            [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
-                            FLAGS.PARAM.LSTM_num_proj,
-                            FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
-        lstm_bw_cell = tf.contrib.rnn.MultiRNNCell(
-            [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
-                            FLAGS.PARAM.LSTM_num_proj,
-                            FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+          lstm_fw_cell = tf.contrib.rnn.MultiRNNCell(
+              [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                              FLAGS.PARAM.LSTM_num_proj,
+                              FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+          lstm_bw_cell = tf.contrib.rnn.MultiRNNCell(
+              [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                              FLAGS.PARAM.LSTM_num_proj,
+                              FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+          fw_cell = lstm_fw_cell._cells
+          bw_cell = lstm_bw_cell._cells
 
-        fw_cell = lstm_fw_cell._cells
-        bw_cell = lstm_bw_cell._cells
-        result = rnn.stack_bidirectional_dynamic_rnn(
-            cells_fw=fw_cell,
-            cells_bw=bw_cell,
-            inputs=outputs,
-            dtype=tf.float32,
-            sequence_length=self._lengths)
-        outputs, fw_final_states, bw_final_states = result
+      if FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
+        with tf.variable_scope('BGRU'):
 
-    if FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
-      with tf.variable_scope('BGRU'):
+          gru_fw_cell = tf.contrib.rnn.MultiRNNCell(
+              [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                             FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+          gru_bw_cell = tf.contrib.rnn.MultiRNNCell(
+              [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                             FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+          fw_cell = gru_fw_cell._cells
+          bw_cell = gru_bw_cell._cells
 
-        gru_fw_cell = tf.contrib.rnn.MultiRNNCell(
-            [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
-                           FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
-        gru_bw_cell = tf.contrib.rnn.MultiRNNCell(
-            [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
-                           FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
-
-        fw_cell = gru_fw_cell._cells
-        bw_cell = gru_bw_cell._cells
-        result = rnn.stack_bidirectional_dynamic_rnn(
-            cells_fw=fw_cell,
-            cells_bw=bw_cell,
-            inputs=outputs,
-            dtype=tf.float32,
-            sequence_length=self._lengths)
-        outputs, fw_final_states, bw_final_states = result
+      result = rnn.stack_bidirectional_dynamic_rnn(
+          cells_fw=fw_cell,
+          cells_bw=bw_cell,
+          inputs=outputs,
+          dtype=tf.float32,
+          sequence_length=self._lengths)
+      outputs, fw_final_states, bw_final_states = result
 
     # region full connection get mask
     # calcu rnn output size
@@ -178,80 +164,13 @@ class Model_Baseline(object):
     self._mask = tf.reshape(
         mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
 
-
     # region get infer spec
-    if FLAGS.PARAM.DECODING_MASK_POSITION == 'mag':
-      self._y_mag_estimation = rm_norm_mag_spec(self._mask*self._norm_x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
-    elif FLAGS.PARAM.DECODING_MASK_POSITION == 'logmag':
-      self._y_mag_estimation = rm_norm_logmag_spec(self._mask*self._norm_x_logmag_spec,
-                                                   FLAGS.PARAM.MAG_NORM_MAX,
-                                                   self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
-    '''
-    _y_mag_estimation is estimated mag_spec
-    _y_estimation is loss_targe, mag_sepec or logmag_spec
-    '''
+    self._y_est = self._mask*self.net_input # est->estimation
+    self._norm_y_mag_est = tf.slice(self._y_est,[0,0,0],[-1,-1,FLAGS.PARAM.FFT_DOT])
+    self._norm_y_theta_est = tf.slice(self._y_est,[0,0,FLAGS.PARAM.FFT_DOT],[-1,-1,-1])
+    self._y_mag_est = rm_norm_mag_spec(self._norm_y_mag_est, FLAGS.PARAM.MAG_NORM_MAX)
+    self._y_theta_est = (self._norm_y_theta_est-0.5)*2.0*FLAGS.PARAM.PI
     # endregion
-
-    # region prepare y_estimation and y_labels
-    if FLAGS.PARAM.TRAINING_MASK_POSITION == 'mag':
-      self._y_estimation = self._mask*self._norm_x_mag_spec
-    elif FLAGS.PARAM.TRAINING_MASK_POSITION == 'logmag':
-      self._y_estimation = self._mask*self._norm_x_logmag_spec
-    if FLAGS.PARAM.MASK_TYPE == 'PSM':
-      self._y_labels *= tf.cos(self._x_theta-self._y_theta)
-    elif FLAGS.PARAM.MASK_TYPE == 'fixPSM':
-      self._y_labels *= (1.0+tf.cos(self._x_theta-self._y_theta))*0.5
-    elif FLAGS.PARAM.MASK_TYPE == 'AcutePM':
-      self._y_labels *= tf.nn.relu(tf.cos(self._x_theta-self._y_theta))
-    elif FLAGS.PARAM.MASK_TYPE == 'IRM':
-      pass
-    else:
-      tf.logging.error('Mask type error.')
-      exit(-1)
-
-    if FLAGS.PARAM.TRAINING_MASK_POSITION != FLAGS.PARAM.LABEL_TYPE:
-      if FLAGS.PARAM.LABEL_TYPE == 'mag':
-        self._y_estimation = normedLogmag2normedMag(self._y_estimation, FLAGS.PARAM.MAG_NORM_MAX,
-                                                    self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
-      elif FLAGS.PARAM.LABEL_TYPE == 'logmag':
-        self._y_estimation = normedMag2normedLogmag(self._y_estimation, FLAGS.PARAM.MAG_NORM_MAX,
-                                                    self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
-    # endregion
-
-    # region CBHG
-    if FLAGS.PARAM.USE_CBHG_POST_PROCESSING:
-      cbhg_kernels = 8 # All kernel sizes from 1 to cbhg_kernels will be used in the convolution bank of CBHG to act as "K-grams"
-      cbhg_conv_channels = 128 # Channels of the convolution bank
-      cbhg_pool_size = 2 # pooling size of the CBHG
-      cbhg_projection = 256 # projection channels of the CBHG (1st projection, 2nd is automatically set to num_mels)
-      cbhg_projection_kernel_size = 3 # kernel_size of the CBHG projections
-      cbhg_highwaynet_layers = 4 # Number of HighwayNet layers
-      cbhg_highway_units = 128 # Number of units used in HighwayNet fully connected layers
-      cbhg_rnn_units = 128 # Number of GRU units used in bidirectional RNN of CBHG block. CBHG output is 2x rnn_units in shape
-      batch_norm_position = 'after'
-      # is_training = True
-      is_training = bool(behavior == self.train)
-      post_cbhg = CBHG(cbhg_kernels, cbhg_conv_channels, cbhg_pool_size, [cbhg_projection, FLAGS.PARAM.OUTPUT_SIZE],
-                       cbhg_projection_kernel_size, cbhg_highwaynet_layers,
-                       cbhg_highway_units, cbhg_rnn_units, batch_norm_position, is_training, name='CBHG_postnet')
-
-      #[batch_size, decoder_steps(mel_frames), cbhg_channels]
-      self._cbhg_inputs_y_est = self._y_estimation
-      cbhg_outputs = post_cbhg(self._y_estimation, None)
-
-      frame_projector = FrameProjection(FLAGS.PARAM.OUTPUT_SIZE,scope='CBHG_proj_to_spec')
-      self._y_estimation = frame_projector(cbhg_outputs)
-
-      if FLAGS.PARAM.DECODING_MASK_POSITION != FLAGS.PARAM.TRAINING_MASK_POSITION:
-        print('DECODING_MASK_POSITION must be equal to TRAINING_MASK_POSITION when use CBHG post processing.')
-        exit(-1)
-      if FLAGS.PARAM.DECODING_MASK_POSITION == 'mag':
-        self._y_mag_estimation = rm_norm_mag_spec(self._y_estimation, FLAGS.PARAM.MAG_NORM_MAX)
-      elif FLAGS.PARAM.DECODING_MASK_POSITION == 'logmag':
-        self._y_mag_estimation = rm_norm_logmag_spec(self._y_estimation, FLAGS.PARAM.MAG_NORM_MAX,
-                                                     self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
-    # endregion
-
 
     self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
     if behavior == self.infer:
@@ -259,37 +178,35 @@ class Model_Baseline(object):
 
     # region get LOSS
     if FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'SPEC_MSE': # log_mag and mag MSE
-      self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels)
-      if FLAGS.PARAM.USE_CBHG_POST_PROCESSING:
-        if FLAGS.PARAM.DOUBLE_LOSS:
-          self._loss = FLAGS.PARAM.CBHG_LOSS_COEF1*loss.reduce_sum_frame_batchsize_MSE(
-            self._cbhg_inputs_y_est,self._y_labels) + FLAGS.PARAM.CBHG_LOSS_COEF2*self._loss
-    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'MFCC_SPEC_MSE':
-      self._loss1, self._loss2 = loss.balanced_MFCC_AND_SPEC_MSE(self._y_estimation, self._y_labels,
-                                                                 self._y_mag_estimation, self._y_mag_spec)
-      self._loss = FLAGS.PARAM.SPEC_LOSS_COEF*self._loss1 + FLAGS.PARAM.MFCC_LOSS_COEF*self._loss2
-    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'MEL_SPEC_MSE':
-      self._loss1, self._loss2 = loss.balanced_MEL_AND_SPEC_MSE(self._y_estimation, self._y_labels,
-                                                                self._y_mag_estimation, self._y_mag_spec)
-      self._loss = FLAGS.PARAM.SPEC_LOSS_COEF*self._loss1 + FLAGS.PARAM.MEL_LOSS_COEF*self._loss2
-    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "SPEC_MSE_LOWF_EN":
-      self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
-    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "FAIR_SPEC_MSE":
-      self._loss = loss.fair_reduce_sum_frame_batchsize_MSE(self._y_estimation, self._y_labels)
-    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "SPEC_MSE_FLEXIBLE_POW_C":
-      self._loss = loss.reduce_sum_frame_batchsize_MSE_EmphasizeLowerValue(self._y_estimation,
-                                                                           self._y_labels,
-                                                                           FLAGS.PARAM.POW_COEF)
+      self._mag_loss = loss.reduce_sum_frame_batchsize_MSE(self._norm_y_mag_est,self._norm_y_mag_spec)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "RELATED_MSE":
-      self._loss = loss.relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,FLAGS.PARAM.RELATED_MSE_IGNORE_TH)
+      self._mag_loss = loss.relative_reduce_sum_frame_batchsize_MSE(self._norm_y_mag_est,
+                                                                    self._norm_y_mag_spec,
+                                                                    FLAGS.PARAM.RELATED_MSE_IGNORE_TH)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE":
-      self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
+      self._mag_loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._norm_y_mag_est,
+                                                                                self._norm_y_mag_spec,
+                                                                                FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE_USE_COS":
-      self._loss = loss.cos_auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,
-                                                                                FLAGS.PARAM.COS_AUTO_RELATED_MSE_W)
+      self._mag_loss = loss.cos_auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._norm_y_mag_est, self._norm_y_mag_spec,
+                                                                                    FLAGS.PARAM.COS_AUTO_RELATED_MSE_W)
     else:
-      print('Loss type error.')
+      tf.logging.error('Magnitude_Loss type error.')
       exit(-1)
+
+    if FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == "MAG_WEIGHTED_COS":
+      self._phase_loss = loss.magnitude_weighted_cos_deltaTheta(self._norm_y_theta_est,
+                                                                self._norm_y_theta,
+                                                                self._norm_y_mag_spec,
+                                                                index_=FLAGS.PARAM.PHASE_LOSS_INDEX)
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'COS':
+      self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(1.0-tf.cos(self._norm_y_theta_est, self._norm_y_theta)),
+                                                             FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
+    else:
+      tf.logging.error('Phase_Loss type error.')
+      exit(-1)
+
+    self._loss = self._mag_loss+self._phase_loss
     # endregion
 
     if behavior == self.validation:
@@ -313,22 +230,13 @@ class Model_Baseline(object):
     session.run(self._lr_update, feed_dict={self._new_lr: lr_value})
 
   @property
-  def log_bias(self):
-    '''
-    description: logbias of log(x+logbias)
-    type: >0
-    dims: [0]
-    '''
-    return self._real_logbias
-
-  @property
   def y_mag_estimation(self):
     '''
     description: model outputs
     type: enhanced spectrum
     dims: [batch,time,frequence]
     '''
-    return self._y_mag_estimation
+    return self._y_mag_est
 
   @property
   def x_mag(self):
@@ -375,6 +283,17 @@ class Model_Baseline(object):
     '''
     return self._y_theta
 
+
+  @property
+  def y_theta_estimation(self):
+    '''
+    description: estimated angle of clean_spec
+    type:
+    dims: [batch, time, frequence]
+    '''
+    return self._y_theta_est
+
+
   @property
   def lengths(self):
     '''
@@ -410,6 +329,27 @@ class Model_Baseline(object):
     dims: [0]
     '''
     return self._loss
+
+
+  @property
+  def mag_loss(self):
+    '''
+    description: mag_loss
+    type:
+    dims: [0]
+    '''
+    return self._mag_loss
+
+
+  @property
+  def phase_loss(self):
+    '''
+    description: phase_loss
+    type:
+    dims: [0]
+    '''
+    return self._phase_loss
+
 
   @property
   def train_op(self):
