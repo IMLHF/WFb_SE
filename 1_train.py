@@ -103,7 +103,7 @@ def train():
         train_tfrecords, val_tfrecords, _, _ = generate_tfrecord(
             gen=PARAM.GENERATE_TFRECORD)
         if PARAM.GENERATE_TFRECORD:
-          print("TFRecords preparation over.")
+          tf.logging.info("TFRecords preparation over.")
           # exit(0)  # set gen=True and exit to generate tfrecords
 
         PSIRM = True if PARAM.PIPLINE_GET_THETA else False
