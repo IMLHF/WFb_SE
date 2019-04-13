@@ -107,7 +107,7 @@ def balanced_MEL_AND_SPEC_MSE_Recurrent_Train(y_est1, y_est2, y_est_label,
 def reduce_sum_frame_batchsize_MSE_LOW_FS_IMPROVE(y1, y2):
   loss1 = reduce_sum_frame_batchsize_MSE(y1, y2)
   low_frequence = 2000
-  low_frequence_point = int(FLAGS.PARAM.OUTPUT_SIZE*(low_frequence/(FLAGS.PARAM.FS/2)))
+  low_frequence_point = int(FLAGS.PARAM.FFT_DOT*(low_frequence/(FLAGS.PARAM.FS/2)))
   loss2 = reduce_sum_frame_batchsize_MSE(tf.slice(y1, [0, 0, 0], [-1, -1, low_frequence_point]),
                                          tf.slice(y2, [0, 0, 0], [-1, -1, low_frequence_point]))
   return loss1+loss2

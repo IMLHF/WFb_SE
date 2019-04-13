@@ -20,11 +20,11 @@ def build_session(ckpt_dir,batch_size,finalizeG=True):
   with g.as_default():
     with tf.device('/cpu:0'):
       with tf.name_scope('input'):
-        x_batch = tf.placeholder(tf.float32,shape=[batch_size,None,PARAM.INPUT_SIZE],name='x_batch')
+        x_batch = tf.placeholder(tf.float32,shape=[batch_size,None,PARAM.FFT_DOT],name='x_batch')
         lengths_batch = tf.placeholder(tf.int32,shape=[batch_size],name='lengths_batch')
-        y_batch = tf.placeholder(tf.float32,shape=[batch_size,None,PARAM.INPUT_SIZE],name='y_batch')
-        x_theta = tf.placeholder(tf.float32,shape=[batch_size,None,PARAM.INPUT_SIZE],name='x_theta')
-        y_theta = tf.placeholder(tf.float32,shape=[batch_size,None,PARAM.INPUT_SIZE],name='y_theta')
+        y_batch = tf.placeholder(tf.float32,shape=[batch_size,None,PARAM.FFT_DOT],name='y_batch')
+        x_theta = tf.placeholder(tf.float32,shape=[batch_size,None,PARAM.FFT_DOT],name='x_theta')
+        y_theta = tf.placeholder(tf.float32,shape=[batch_size,None,PARAM.FFT_DOT],name='y_theta')
     with tf.name_scope('model'):
       model = PARAM.SE_MODEL(x_batch,
                              lengths_batch,

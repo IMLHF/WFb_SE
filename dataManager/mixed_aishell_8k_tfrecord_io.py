@@ -208,13 +208,13 @@ def _extract_feature_x_y_xtheta_ytheta(utt_dir1, utt_dir2):
 
 def parse_func(example_proto):
   sequence_features = {
-      'inputs': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.INPUT_SIZE],
+      'inputs': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.FFT_DOT],# x_spec
                                            dtype=tf.float32),
-      'labels': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.OUTPUT_SIZE],
+      'labels': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.FFT_DOT],# y_spec
                                            dtype=tf.float32),
-      'xtheta': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.INPUT_SIZE],
+      'xtheta': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.FFT_DOT],
                                            dtype=tf.float32),
-      'ytheta': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.OUTPUT_SIZE],
+      'ytheta': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.FFT_DOT],
                                            dtype=tf.float32),
   }
   _, sequence = tf.parse_single_sequence_example(
@@ -225,13 +225,13 @@ def parse_func(example_proto):
 
 def parse_func_with_theta(example_proto):
   sequence_features = {
-      'inputs': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.INPUT_SIZE],
+      'inputs': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.FFT_DOT],
                                            dtype=tf.float32),
-      'labels': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.OUTPUT_SIZE],
+      'labels': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.FFT_DOT],
                                            dtype=tf.float32),
-      'xtheta': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.INPUT_SIZE],
+      'xtheta': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.FFT_DOT],
                                            dtype=tf.float32),
-      'ytheta': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.OUTPUT_SIZE],
+      'ytheta': tf.FixedLenSequenceFeature(shape=[FLAGS.PARAM.FFT_DOT],
                                            dtype=tf.float32),
   }
   _, sequence = tf.parse_single_sequence_example(
@@ -249,13 +249,13 @@ def _gen_tfrecord_minprocess(
       X_Y_Xtheta_Ytheta = _extract_feature_x_y_xtheta_ytheta(index_[0],
                                                              index_[1])
       X = np.reshape(np.array(X_Y_Xtheta_Ytheta[0], dtype=np.float32),
-                     newshape=[-1, FLAGS.PARAM.INPUT_SIZE])
+                     newshape=[-1, FLAGS.PARAM.FFT_DOT])
       Y = np.reshape(np.array(X_Y_Xtheta_Ytheta[1], dtype=np.float32),
-                     newshape=[-1, FLAGS.PARAM.OUTPUT_SIZE])
+                     newshape=[-1, FLAGS.PARAM.FFT_DOT])
       Xtheta = np.reshape(np.array(X_Y_Xtheta_Ytheta[2], dtype=np.float32),
-                          newshape=[-1, FLAGS.PARAM.INPUT_SIZE])
+                          newshape=[-1, FLAGS.PARAM.FFT_DOT])
       Ytheta = np.reshape(np.array(X_Y_Xtheta_Ytheta[3], dtype=np.float32),
-                          newshape=[-1, FLAGS.PARAM.OUTPUT_SIZE])
+                          newshape=[-1, FLAGS.PARAM.FFT_DOT])
       # print(np.mean(X),np.sqrt(np.var(X)),np.median(X),np.max(X),np.min(X))
       # print(np.mean(X),np.sqrt(np.var(X)),np.median(X),np.max(Y),np.min(Y))
       input_features = [
@@ -395,9 +395,9 @@ def get_batch_use_tfdata(tfrecords_list, get_theta=True):
   #     num_parallel_calls=NNET_PARAM.num_threads_processing_data)
   # dataset = dataset.padded_batch(
   #     NNET_PARAM.batch_size,
-  #     padded_shapes=([None, NNET_PARAM.INPUT_SIZE],
-  #                    [None, NNET_PARAM.OUTPUT_SIZE],
-  #                    [None, NNET_PARAM.OUTPUT_SIZE],
+  #     padded_shapes=([None, NNET_PARAM.FFT_DOT],
+  #                    [None, NNET_PARAM.FFT_DOT],
+  #                    [None, NNET_PARAM.FFT_DOT],
   #                    []))
   # endregion
   # !map_and_batch efficient is better than map+paded_batch
