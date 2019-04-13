@@ -3,6 +3,14 @@ import numpy as np
 import FLAGS
 from utils import tf_tool
 
+
+def magnitude_weighted_cos_deltaTheta(theta1,theta2,mag_spec,index_=2.0):
+  cost = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(tf.multiply(1.0-tf.cos(theta1-theta2), mag_spec)),
+                                             index_),
+                                      1))
+  return cost
+
+
 def relative_reduce_sum_frame_batchsize_MSE(y1,y2,ignore_threshold):
   cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow((y1-y2)/tf.maximum(tf.abs(y1)+tf.abs(y2),ignore_threshold), 2), 1), 1))
   return cost
