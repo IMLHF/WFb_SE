@@ -172,7 +172,6 @@ def train():
     # endregion
 
     # epochs training
-    reject_num = 0
     for epoch in range(PARAM.start_epoch, PARAM.max_epochs):
       sess.run([iter_train.initializer, iter_val.initializer])
       start_time = time.time()
@@ -196,11 +195,10 @@ def train():
       ckpt_path = os.path.join(ckpt_dir, ckpt_name)
 
       # Relative loss between previous and current val_loss
-      rel_impr = np.abs(loss_prev - val_loss) / loss_prev
+      rel_impr = (loss_prev - val_loss) / loss_prev
       # Accept or reject new parameters
       msg = ""
       if val_loss < loss_prev:
-        reject_num = 0
         tr_model.saver.save(sess, ckpt_path)
         # Logging train loss along with validation loss
         loss_prev = val_loss
@@ -214,7 +212,6 @@ def train():
             "NNET Accepted", ckpt_name, end_time - start_time)
         tf.logging.info(msg)
       else:
-        reject_num += 1
         tr_model.saver.restore(sess, best_path)
         msg = ("Train Iteration %03d: \n"
                "    Train.LOSS %.4f, lrate%e, Val.LOSS %.4f, avglog_bias %f,\n"
@@ -228,8 +225,7 @@ def train():
         f.writelines(msg+'\n')
 
       # Start halving when improvement is lower than start_halving_impr
-      if (rel_impr < PARAM.start_halving_impr) or (reject_num >= 2):
-        reject_num = 0
+      if rel_impr < PARAM.start_halving_impr:
         model_lr *= PARAM.halving_factor
         tr_model.assign_lr(sess, model_lr)
 
