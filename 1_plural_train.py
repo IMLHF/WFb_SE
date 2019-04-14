@@ -204,7 +204,7 @@ def train():
       rel_impr_phase = (loss_phase_prev - val_loss_phase) / loss_phase_prev
       # Accept or reject new parameters
       msg = ""
-      if val_loss_mag < loss_mag_prev and val_loss_phase < loss_phase_prev:
+      if (val_loss_mag < loss_mag_prev and val_loss_phase < loss_phase_prev) or (rel_impr_mag+rel_impr_phase)>0.0:
         tr_model.saver.save(sess, ckpt_path)
         # Logging train loss along with validation loss
         loss_prev = val_loss
