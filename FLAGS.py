@@ -7,6 +7,7 @@ import models.trainable_logbias_model
 import models.training_in_turn_model
 import models.individual_bn_model
 import models.complex_mask_model
+import models.individual_plural_model
 
 
 class base_config:
