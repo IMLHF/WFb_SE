@@ -1,6 +1,6 @@
 '''
 for :
-   models.complex_mask_model
+   models.plural_mask_model
 '''
 
 
@@ -265,5 +265,5 @@ if __name__ == '__main__':
   os.environ['CUDA_VISIBLE_DEVICES'] = sys.argv[1]
   tf.logging.set_verbosity(tf.logging.INFO)
   tf.app.run(main=main)
-  # mkdir exp && mkdir exp/rnn_speech_enhancement && python3 1_complexMask_train.py 1 2>&1 | tee exp/rnn_speech_enhancement/nnet_CXXX_train_full.log
-  # python3 1_complexMask_train.py 1 2>&1 | tee exp/rnn_speech_enhancement/nnet_CXXX_train_full.log
+  # mkdir exp && mkdir exp/rnn_speech_enhancement && python3 1_plural_train.py 1 2>&1 | tee exp/rnn_speech_enhancement/nnet_CXXX_train_full.log
+  # python3 1_plural_train.py 1 2>&1 | tee exp/rnn_speech_enhancement/nnet_CXXX_train_full.log
