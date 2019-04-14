@@ -60,15 +60,20 @@ def decode_one_wav(sess, model, wavedata):
   x_spec_t = spectrum_tool.magnitude_spectrum_librosa_stft(wavedata,
                                                            PARAM.NFFT,
                                                            PARAM.OVERLAP)
+  x_phase_t = spectrum_tool.phase_spectrum_librosa_stft(wavedata,
+                                                        PARAM.NFFT,
+                                                        PARAM.OVERLAP)
   length = np.shape(x_spec_t)[0]
   x_spec = np.array([x_spec_t], dtype=np.float32)
+  x_theta = np.array([x_phase_t], dtype=np.float32)
   lengths = np.array([length], dtype=np.int32)
-  y_theta_est, y_mag_estimation, mask, x_mag, norm_x_mag, norm_logmag = sess.run(
+  y_theta_est, y_mag_estimation, mask, x_mag, = sess.run(
       [model.y_theta_estimation, model.y_mag_estimation, model.mask,
-       model._x_mag_spec, model._norm_x_mag_spec, model._norm_x_logmag_spec],
+       model._x_mag_spec, ],
       feed_dict={
           model.x_mag: x_spec,
           model.lengths: lengths,
+          model.x_theta: x_theta,
       })
 
   y_mag_estimation = np.array(y_mag_estimation[0])
@@ -190,32 +195,45 @@ if __name__=='__main__':
 
   if len(sys.argv)<=1:
     decode_file_list_8k = [
-        'exp/rnn_speech_enhancement/8k/s_2_00_MIX_1_clapping_8k.wav',
-        'exp/rnn_speech_enhancement/8k/s_8_01_MIX_4_rainning_8k.wav',
-        'exp/rnn_speech_enhancement/8k/s_8_21_MIX_3_factory_8k.wav',
-        'exp/rnn_speech_enhancement/8k/s_2_00_8k_raw.wav',
-        'exp/rnn_speech_enhancement/8k/s_8_01_8k_raw.wav',
-        'exp/rnn_speech_enhancement/8k/s_8_21_8k_raw.wav',
-        'exp/rnn_speech_enhancement/8k/speech1_8k.wav',
-        'exp/rnn_speech_enhancement/8k/speech5_8k.wav',
-        'exp/rnn_speech_enhancement/8k/speech6_8k.wav',
-        'exp/rnn_speech_enhancement/8k/speech7_8k.wav',
-        'exp/real_test_fair/863_min_8k/mixed_wav/863_1_8k_MIX_1_airplane.wav',
-        # 'exp/rnn_speech_enhancement/decode_nnet_C001_3/nnet_C001_3_007_speech7_8k.wav'
+        "exp/rnn_speech_enhancement/8k/2_00_8k_raw.wav",
+        "exp/rnn_speech_enhancement/8k/8_01_8k_raw.wav",
+        "exp/rnn_speech_enhancement/8k/8_21_8k_raw.wav",
+        "exp/rnn_speech_enhancement/8k/_M1002_MIX_1_airplane_8k.wav",
+        "exp/rnn_speech_enhancement/8k/_M1002_MIX_2_clapping_8k.wav",
+        "exp/rnn_speech_enhancement/8k/_M1002_MIX_3_motor_8k.wav",
+        "exp/rnn_speech_enhancement/8k/_M1002_MIX_4_market_8k.wav",
+        "exp/rnn_speech_enhancement/8k/_M1002_MIX_5_wind_8k.wav",
+        "exp/rnn_speech_enhancement/8k/_M1002_MIX_6_factory_8k.wav",
+        "exp/rnn_speech_enhancement/8k/_M1002_MIX_7_rainning_8k.wav",
+        "exp/rnn_speech_enhancement/8k/s_2_00_MIX_1_clapping.wav",
+        "exp/rnn_speech_enhancement/8k/s_8_01_MIX_4_rainning_8k.wav",
+        "exp/rnn_speech_enhancement/8k/s_8_21_MIX_3_factory_8k.wav",
+        "exp/rnn_speech_enhancement/8k/speech0_8k.wav",
+        "exp/rnn_speech_enhancement/8k/speech1_8k.wav",
+        "exp/rnn_speech_enhancement/8k/speech5_8k.wav",
+        "exp/rnn_speech_enhancement/8k/speech6_8k.wav",
+        "exp/rnn_speech_enhancement/8k/speech7_8k.wav",
     ]
 
     decode_file_list_16k = [
-        'exp/rnn_speech_enhancement/16k/s_2_00_MIX_1_clapping_16k.wav',
-        'exp/rnn_speech_enhancement/16k/s_8_01_MIX_4_rainning_16k.wav',
-        'exp/rnn_speech_enhancement/16k/s_8_21_MIX_3_factory_16k.wav',
-        'exp/rnn_speech_enhancement/16k/s_2_00_16k_raw.wav',
-        'exp/rnn_speech_enhancement/16k/s_8_01_16k_raw.wav',
-        'exp/rnn_speech_enhancement/16k/s_8_21_16k_raw.wav',
-        'exp/rnn_speech_enhancement/16k/speech0_16k.wav',
-        'exp/rnn_speech_enhancement/16k/speech1_16k.wav',
-        'exp/rnn_speech_enhancement/16k/speech6_16k.wav',
-        'exp/rnn_speech_enhancement/16k/speech7_16k.wav',
-        'exp/rnn_speech_enhancement/16k/863_1_16k_MIX_1_airplane.wav',
+        "exp/rnn_speech_enhancement/16k/2_00_16k_raw.wav",
+        "exp/rnn_speech_enhancement/16k/8_01_16k_raw.wav",
+        "exp/rnn_speech_enhancement/16k/8_21_16k_raw.wav",
+        "exp/rnn_speech_enhancement/16k/_M1002_MIX_1_airplane_16k.wav",
+        "exp/rnn_speech_enhancement/16k/_M1002_MIX_2_clapping_16k.wav",
+        "exp/rnn_speech_enhancement/16k/_M1002_MIX_3_motor_16k.wav",
+        "exp/rnn_speech_enhancement/16k/_M1002_MIX_4_market_16k.wav",
+        "exp/rnn_speech_enhancement/16k/_M1002_MIX_5_wind_16k.wav",
+        "exp/rnn_speech_enhancement/16k/_M1002_MIX_6_factory_16k.wav",
+        "exp/rnn_speech_enhancement/16k/_M1002_MIX_7_rainning_16k.wav",
+        "exp/rnn_speech_enhancement/16k/s_2_00_MIX_1_clapping.wav",
+        "exp/rnn_speech_enhancement/16k/s_8_01_MIX_4_rainning_16k.wav",
+        "exp/rnn_speech_enhancement/16k/s_8_21_MIX_3_factory_16k.wav",
+        "exp/rnn_speech_enhancement/16k/speech0_16k.wav",
+        "exp/rnn_speech_enhancement/16k/speech1_16k.wav",
+        "exp/rnn_speech_enhancement/16k/speech5_16k.wav",
+        "exp/rnn_speech_enhancement/16k/speech6_16k.wav",
+        "exp/rnn_speech_enhancement/16k/speech7_16k.wav",
     ]
     if PARAM.FS == 8000:
       decode_file_list = decode_file_list_8k
