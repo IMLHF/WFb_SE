@@ -1,7 +1,7 @@
 # speech enhancement
 '''
 training script:
-    1_complexMask_train.py
+    1_plural_train.py
 '''
 import tensorflow as tf
 import time
@@ -16,7 +16,7 @@ import FLAGS
 import numpy as np
 
 
-class ComplexMask_Model(object):
+class PluralMask_Model(object):
   infer = 'infer'
   train = 'train'
   validation = 'validation'
