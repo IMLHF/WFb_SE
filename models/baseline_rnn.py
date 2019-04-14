@@ -192,23 +192,7 @@ class Model_Baseline(object):
     '''
     # endregion
 
-    # region prepare y_estimation and y_labels
-    if FLAGS.PARAM.TRAINING_MASK_POSITION == 'mag':
-      self._y_estimation = self._mask*self._norm_x_mag_spec
-    elif FLAGS.PARAM.TRAINING_MASK_POSITION == 'logmag':
-      self._y_estimation = self._mask*self._norm_x_logmag_spec
-    if FLAGS.PARAM.MASK_TYPE == 'PSM':
-      self._y_labels *= tf.cos(self._x_theta-self._y_theta)
-    elif FLAGS.PARAM.MASK_TYPE == 'fixPSM':
-      self._y_labels *= (1.0+tf.cos(self._x_theta-self._y_theta))*0.5
-    elif FLAGS.PARAM.MASK_TYPE == 'AcutePM':
-      self._y_labels *= tf.nn.relu(tf.cos(self._x_theta-self._y_theta))
-    elif FLAGS.PARAM.MASK_TYPE == 'IRM':
-      pass
-    else:
-      tf.logging.error('Mask type error.')
-      exit(-1)
-
+    # region prepare y_estimation
     if FLAGS.PARAM.TRAINING_MASK_POSITION != FLAGS.PARAM.LABEL_TYPE:
       if FLAGS.PARAM.LABEL_TYPE == 'mag':
         self._y_estimation = normedLogmag2normedMag(self._y_estimation, FLAGS.PARAM.MAG_NORM_MAX,
@@ -257,7 +241,25 @@ class Model_Baseline(object):
     if behavior == self.infer:
       return
 
-    # region get LOSS
+    # region get labels LOSS
+    # Labels
+    if FLAGS.PARAM.TRAINING_MASK_POSITION == 'mag':
+      self._y_estimation = self._mask*self._norm_x_mag_spec
+    elif FLAGS.PARAM.TRAINING_MASK_POSITION == 'logmag':
+      self._y_estimation = self._mask*self._norm_x_logmag_spec
+    if FLAGS.PARAM.MASK_TYPE == 'PSM':
+      self._y_labels *= tf.cos(self._x_theta-self._y_theta)
+    elif FLAGS.PARAM.MASK_TYPE == 'fixPSM':
+      self._y_labels *= (1.0+tf.cos(self._x_theta-self._y_theta))*0.5
+    elif FLAGS.PARAM.MASK_TYPE == 'AcutePM':
+      self._y_labels *= tf.nn.relu(tf.cos(self._x_theta-self._y_theta))
+    elif FLAGS.PARAM.MASK_TYPE == 'IRM':
+      pass
+    else:
+      tf.logging.error('Mask type error.')
+      exit(-1)
+
+    # LOSS
     if FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'SPEC_MSE': # log_mag and mag MSE
       self._loss = loss.reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels)
       if FLAGS.PARAM.USE_CBHG_POST_PROCESSING:
@@ -378,9 +380,9 @@ class Model_Baseline(object):
   @property
   def y_theta_estimation(self):
     '''
-    estimate y_theta placeholder
+    estimate y_theta_est placeholder
     '''
-    return None
+    return self._lengths
 
   @property
   def lengths(self):

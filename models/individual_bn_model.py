@@ -289,9 +289,9 @@ class INDIVIDUAL_BN_MODEL(object):
   @property
   def y_theta_estimation(self):
     '''
-    estimate y_theta placeholder
+    estimate y_theta_est placeholder
     '''
-    return None
+    return self._lengths
 
   @property
   def lengths(self):
