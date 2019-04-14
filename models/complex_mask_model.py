@@ -31,9 +31,9 @@ class ComplexMask_Model(object):
     '''
     behavior = 'train/validation/infer'
     '''
+    assert(theta_x_batch is not None)
     if behavior != self.infer:
       assert(y_mag_spec_batch is not None)
-      assert(theta_x_batch is not None)
       assert(theta_y_batch is not None)
     self._x_mag_spec = x_mag_spec_batch
     self._norm_x_mag_spec = norm_mag_spec(self._x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
