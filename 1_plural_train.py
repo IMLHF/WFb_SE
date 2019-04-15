@@ -238,16 +238,16 @@ def train():
         tr_model.assign_lr(sess, model_lr)
 
       # Stopping criterion
-      if rel_impr_mag < PARAM.end_halving_impr and rel_impr_phase < PARAM.end_halving_impr:
-        if epoch < PARAM.min_epochs:
-          tf.logging.info(
-              "we were supposed to finish, but we continue as "
-              "min_epochs : %s" % PARAM.min_epochs)
-          continue
-        else:
-          tf.logging.info(
-              "finished, too small rel. improvement %g,%g" % (rel_impr_mag,rel_impr_phase))
-          break
+      # if rel_impr_mag < PARAM.end_halving_impr and rel_impr_phase < PARAM.end_halving_impr:
+      #   if epoch < PARAM.min_epochs:
+      #     tf.logging.info(
+      #         "we were supposed to finish, but we continue as "
+      #         "min_epochs : %s" % PARAM.min_epochs)
+      #     continue
+      #   else:
+      #     tf.logging.info(
+      #         "finished, too small rel. improvement %g,%g" % (rel_impr_mag,rel_impr_phase))
+      #     break
 
     sess.close()
     tf.logging.info("Done training")
