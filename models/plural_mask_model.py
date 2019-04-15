@@ -116,7 +116,6 @@ class PluralMask_Model(object):
     # region full connection get mask
     # calcu rnn output size
     in_size = FLAGS.PARAM.RNN_SIZE
-    mask = None
     if self._model_type.upper()[0] == 'B':  # bidirection
       rnn_output_num = FLAGS.PARAM.RNN_SIZE*2
       if FLAGS.PARAM.MODEL_TYPE == 'BLSTM' and (not (FLAGS.PARAM.LSTM_num_proj is None)):
@@ -124,48 +123,25 @@ class PluralMask_Model(object):
       in_size = rnn_output_num
     outputs = tf.reshape(outputs, [-1, in_size])
     out_size = FLAGS.PARAM.OUTPUT_SIZE
-    with tf.variable_scope('fullconnectOut'):
-      weights = tf.get_variable('weights1', [in_size, out_size],
-                                initializer=tf.random_normal_initializer(stddev=0.01))
-      biases = tf.get_variable('biases1', [out_size],
-                               initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL))
-    if FLAGS.PARAM.TIME_NOSOFTMAX_ATTENTION:
-      with tf.variable_scope('fullconnectCoef'):
-        weights_coef = tf.get_variable('weights_coef', [in_size, 1],
-                                       initializer=tf.random_normal_initializer(mean=1.0, stddev=0.01))
-        biases_coef = tf.get_variable('biases_coef', [1],
-                                      initializer=tf.constant_initializer(0.0))
-      raw_mask = tf.reshape(tf.matmul(outputs, weights) + biases, [self._batch_size,-1,FLAGS.PARAM.OUTPUT_SIZE]) # [batch,time,fre]
-      batch_coef_vec = tf.nn.relu(tf.reshape(tf.matmul(outputs, weights_coef) + biases_coef, [self._batch_size,-1])) # [batch, time]
-      mask = tf.multiply(raw_mask,
-                         tf.reshape(batch_coef_vec,[self._batch_size,-1,1]))
-    else:
-      if FLAGS.PARAM.POST_BN:
-        linear_out = tf.matmul(outputs, weights)
-        with tf.variable_scope('POST_Batch_Norm_Layer'):
-          if_BRN = (FLAGS.PARAM.MVN_TYPE == 'BRN')
-          if FLAGS.PARAM.SELF_BN:
-            linear_out = tf.layers.batch_normalization(linear_out, training=True, renorm=if_BRN)
-          else:
-            linear_out = tf.layers.batch_normalization(linear_out,
-                                                       training=(
-                                                           behavior == self.train or behavior == self.validation),
-                                                       renorm=if_BRN)
-          weights2 = tf.get_variable('weights1', [out_size, out_size],
-                                     initializer=tf.random_normal_initializer(stddev=0.01))
-          biases2 = tf.get_variable('biases1', [out_size],
-                                    initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL))
-          linear_out = tf.matmul(linear_out,weights2) + biases2
-      else:
-        linear_out = tf.matmul(outputs, weights) + biases
-      mask = linear_out
-      if FLAGS.PARAM.ReLU_MASK:
-        mask = tf.nn.relu(linear_out)
+    with tf.variable_scope('fullconnectOut1'):
+      out1_dense1 = tf.keras.layers.Dense(out_size,activation='tanh')
+      out1_dense2 = tf.keras.layers.Dense(out_size//2,
+                                          activation='relu' if FLAGS.PARAM.ReLU_MASK else None,
+                                          bias_initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL))
+    with tf.variable_scope('fullconnectOut2'):
+      out2_dense1 = tf.keras.layers.Dense(out_size,activation='tanh')
+      out2_dense2 = tf.keras.layers.Dense(out_size//2,
+                                          activation='relu' if FLAGS.PARAM.ReLU_MASK else None,
+                                          bias_initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL))
 
+    self._mask1 = out1_dense2(out1_dense1(outputs))
+    self._mask2 = out2_dense2(out2_dense1(outputs))
+
+    self._mask1 = tf.reshape(self._mask1, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE//2])
+    self._mask2 = tf.reshape(self._mask2, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE//2])
+
+    self._mask = tf.concat([self.mask1,self.mask2],axis=-1)
     # endregion
-
-    self._mask = tf.reshape(
-        mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
 
     # mask type
     if FLAGS.PARAM.MASK_TYPE == 'PSM':
@@ -181,9 +157,11 @@ class PluralMask_Model(object):
       exit(-1)
 
     # region get infer spec
-    self._y_est = self._mask*self.net_input # est->estimation
-    self._norm_y_mag_est = tf.slice(self._y_est,[0,0,0],[-1,-1,FLAGS.PARAM.FFT_DOT])
-    self._norm_y_theta_est = tf.slice(self._y_est,[0,0,FLAGS.PARAM.FFT_DOT],[-1,-1,-1])
+    # self._y_est = self._mask*self.net_input # est->estimation
+    # self._norm_y_mag_est = tf.slice(self._y_est,[0,0,0],[-1,-1,FLAGS.PARAM.FFT_DOT])
+    # self._norm_y_theta_est = tf.slice(self._y_est,[0,0,FLAGS.PARAM.FFT_DOT],[-1,-1,-1])
+    self._norm_y_mag_est = self._mask1*self._norm_x_mag_spec
+    self._norm_y_theta_est = self._mask2*self._x_theta
     self._y_mag_est = rm_norm_mag_spec(self._norm_y_mag_est, FLAGS.PARAM.MAG_NORM_MAX)
     # self._y_theta_est = (self._norm_y_theta_est-0.5)*2.0*FLAGS.PARAM.PI
     self._y_theta_est = self._norm_y_theta_est
