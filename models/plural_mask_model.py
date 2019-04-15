@@ -124,23 +124,40 @@ class PluralMask_Model(object):
     outputs = tf.reshape(outputs, [-1, in_size])
     out_size = FLAGS.PARAM.OUTPUT_SIZE
     with tf.variable_scope('fullconnectOut1'):
-      out1_dense1 = tf.keras.layers.Dense(out_size,activation='tanh')
-      out1_dense2 = tf.keras.layers.Dense(out_size//2,
-                                          activation='relu' if FLAGS.PARAM.ReLU_MASK else None,
-                                          bias_initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL))
-    with tf.variable_scope('fullconnectOut2'):
-      out2_dense1 = tf.keras.layers.Dense(out_size,activation='tanh')
-      out2_dense2 = tf.keras.layers.Dense(out_size//2,
-                                          activation='relu' if FLAGS.PARAM.ReLU_MASK else None,
-                                          bias_initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL))
+      # out1_dense1 = tf.keras.layers.Dense(out_size,activation='tanh',name="fc1_w1")
+      # out1_dense2 = tf.keras.layers.Dense(out_size//2,
+      #                                     activation='relu' if FLAGS.PARAM.ReLU_MASK else None,
+      #                                     bias_initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL),
+      #                                     name="fc1_w2")
+      out1_w1 = tf.get_variable('weights1', [in_size, out_size],
+                                initializer=tf.random_normal_initializer(stddev=0.01))
+      out1_b1 = tf.get_variable('biases1', [out_size],
+                                initializer=tf.random_normal_initializer(stddev=0.01))
+      out1_w2 = tf.get_variable('weights2', [out_size, out_size//2],
+                                initializer=tf.random_normal_initializer(stddev=0.01))
+      out1_b2 = tf.get_variable('biases2', [out_size//2],
+                                initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL))
+      self._mask1 = tf.matmul(tf.nn.tanh(tf.matmul(outputs,out1_w1)+out1_b1),out1_w2)+out1_b2
+      if FLAGS.PARAM.ReLU_MASK:
+        self._mask1 = tf.nn.relu(self._mask1)
 
-    self._mask1 = out1_dense2(out1_dense1(outputs))
-    self._mask2 = out2_dense2(out2_dense1(outputs))
+    with tf.variable_scope('fullconnectOut2'):
+      out2_w1 = tf.get_variable('weights1', [in_size, out_size],
+                                initializer=tf.random_normal_initializer(stddev=0.01))
+      out2_b1 = tf.get_variable('biases1', [out_size],
+                                initializer=tf.random_normal_initializer(stddev=0.01))
+      out2_w2 = tf.get_variable('weights2', [out_size, out_size//2],
+                                initializer=tf.random_normal_initializer(stddev=0.01))
+      out2_b2 = tf.get_variable('biases2', [out_size//2],
+                                initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL))
+      self._mask2 = tf.matmul(tf.nn.tanh(tf.matmul(outputs,out2_w1)+out2_b1),out2_w2)+out2_b2
+      if FLAGS.PARAM.ReLU_MASK:
+        self._mask2 = tf.nn.relu(self._mask2)
 
     self._mask1 = tf.reshape(self._mask1, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE//2])
     self._mask2 = tf.reshape(self._mask2, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE//2])
 
-    self._mask = tf.concat([self.mask1,self.mask2],axis=-1)
+    self._mask = tf.concat([self._mask1,self._mask2],axis=-1)
     # endregion
 
     # mask type
@@ -202,6 +219,9 @@ class PluralMask_Model(object):
                                                              FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
     elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'MAG_WEIGHTED_ABSOLUTE':
       self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(self._y_theta_est-self._y_theta_labels)*self._norm_y_mag_spec*10.0,
+                                                             FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'MIXMAG_WEIGHTED_ABSOLUTE':
+      self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(self._y_theta_est-self._y_theta_labels)*self._norm_x_mag_spec*10.0,
                                                              FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
     else:
       tf.logging.error('Phase_Loss type error.')
