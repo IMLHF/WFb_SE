@@ -7,9 +7,19 @@ CPU = '/cpu:0'
 
 class HighwayNet:
   def __init__(self, units, name=None):
+    # self.input_units = input_units
     self.units = units
     self.scope = 'HighwayNet' if name is None else name
 
+    # with tf.variable_scope(self.scope):
+    #   self.H_w = tf.get_variable('weights_H', [self.input_units, self.units],
+    #                              initializer=tf.random_normal_initializer(stddev=0.01))
+    #   self.H_b = tf.get_variable('biases_H', [self.units],
+    #                              initializer=tf.random_normal_initializer(stddev=0.01))
+    #   self.T_w = tf.get_variable('weights_T', [self.input_units, self.units],
+    #                              initializer=tf.random_normal_initializer(stddev=0.01))
+    #   self.T_b = tf.get_variable('biases_T', [self.units],
+    #                              initializer=tf.constant_initializer(-1.))
     self.H_layer = tf.layers.Dense(units=self.units, activation=tf.nn.relu, name='H')
     self.T_layer = tf.layers.Dense(units=self.units, activation=tf.nn.sigmoid, name='T', bias_initializer=tf.constant_initializer(-1.))
 
@@ -17,6 +27,8 @@ class HighwayNet:
     with tf.variable_scope(self.scope):
       H = self.H_layer(inputs)
       T = self.T_layer(inputs)
+      # H = tf.nn.relu(tf.matmul(inputs,self.H_w)+self.H_b)
+      # T = tf.nn.sigmoid(tf.matmul(inputs,self.T_w)+self.T_b)
       return H * T + inputs * (1. - T)
 
 
@@ -34,7 +46,7 @@ class CBHG:
     self.scope = 'CBHG' if name is None else name
 
     self.highway_units = highway_units
-    self.highwaynet_layers = [HighwayNet(highway_units, name='{}_highwaynet_{}'.format(self.scope, i+1)) for i in range(n_highwaynet_layers)]
+    self.highwaynet_layers = [HighwayNet(highway_units, name='{}_highwaynet_{}_'.format(self.scope, i+1)) for i in range(n_highwaynet_layers)]
     self._fw_cell = tf.nn.rnn_cell.GRUCell(rnn_units, name='{}_forward_RNN'.format(self.scope))
     self._bw_cell = tf.nn.rnn_cell.GRUCell(rnn_units, name='{}_backward_RNN'.format(self.scope))
 
@@ -45,7 +57,7 @@ class CBHG:
         #The convolution bank uses multiple different kernel sizes to have many insights of the input sequence
         #This makes one of the strengths of the CBHG block on sequences.
         conv_outputs = tf.concat(
-          [conv1d(inputs, k, self.conv_channels, tf.nn.relu, self.is_training, 0.2, self.bnorm, 'conv1d_{}'.format(k)) for k in range(1, self.K+1)],
+          [conv1d(inputs, k, self.conv_channels, tf.nn.relu, self.is_training, 0.2, self.bnorm, 'conv1d_{}_'.format(k)) for k in range(1, self.K+1)],
           axis=-1
           )
 
@@ -99,6 +111,11 @@ class FrameProjection:
 
     self.scope = 'Linear_projection' if scope is None else scope
     self.dense = tf.layers.Dense(units=shape, activation=activation, name='projection_{}'.format(self.scope))
+    # with tf.variable_scope(self.scope):
+    #   self._w = tf.get_variable('weights', [self.input_units, self.units],
+    #                             initializer=tf.random_normal_initializer(stddev=0.01))
+    #   self._b = tf.get_variable('biases', [self.units],
+    #                             initializer=tf.random_normal_initializer(stddev=0.01))
 
   def __call__(self, inputs):
     with tf.variable_scope(self.scope):
@@ -107,7 +124,9 @@ class FrameProjection:
       # output = tf.layers.dense(inputs, units=self.shape, activation=self.activation,
       #   name='projection_{}'.format(self.scope))
       output = self.dense(inputs)
-
+      # output = tf.matmul(inputs,self._w)+self._b
+      # if self.activation is not None:
+      #   output = self.activation(output)
       return output
 
 
@@ -306,9 +325,9 @@ def sum_attention_with_final_state(features, state, final_dim, units):
   with tf.variable_scope('sum_attention_fc'):
     # attention layer
     with tf.variable_scope('attention_scorer'):
-      score_features_hidden_W = tf.keras.layers.Dense(units)
-      score_state_hidden_W = tf.keras.layers.Dense(units)
-      score_vec_W = tf.keras.layers.Dense(1)
+      score_features_hidden_W = tf.layers.Dense(units)
+      score_state_hidden_W = tf.layers.Dense(units)
+      score_vec_W = tf.layers.Dense(1)
   state_with_time_axis = tf.expand_dims(state, -2) # [batch,1,final_dim]
   score = tf.nn.tanh(score_features_hidden_W(features) + score_state_hidden_W(state_with_time_axis)) # [batch,time,units]
   attention_weights = tf.nn.softmax(score_vec_W(score), axis=-2) # [batch,time,1]
@@ -325,8 +344,8 @@ def sum_attention(features, final_dim, units):
   with tf.variable_scope('sum_attention_fc'):
     # attention layer
     with tf.variable_scope('attention_scorer'):
-      score_features_hidden_W = tf.keras.layers.Dense(units)
-      score_vec_W = tf.keras.layers.Dense(1)
+      score_features_hidden_W = tf.layers.Dense(units)
+      score_vec_W = tf.layers.Dense(1)
   score = tf.nn.tanh(score_features_hidden_W(features)) # [batch,time,units]
   attention_weights = tf.nn.softmax(score_vec_W(score), axis=-2) # [batch,time,1]
   context_vector = tf.multiply(attention_weights, features)
