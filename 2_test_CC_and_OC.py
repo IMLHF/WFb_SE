@@ -7,6 +7,7 @@ from utils import spectrum_tool
 from utils import audio_tool
 # from pypesq import pesq
 from FLAGS import PARAM
+import FLAGS
 import math
 from dataManager.mixed_aishell_8k_tfrecord_io import generate_tfrecord, get_batch_use_tfdata
 import time
@@ -200,6 +201,16 @@ def test_CC_or_OC(test_set_name):
 if __name__ == "__main__":
   os.environ['CUDA_VISIBLE_DEVICES'] = sys.argv[1]
   tf.logging.set_verbosity(tf.logging.INFO)
+  print('FLAGS.PARAM:')
+  supper_dict = FLAGS.base_config.__dict__
+  self_dict = PARAM.__dict__
+  self_dict_keys = self_dict.keys()
+  for key,val in supper_dict.items():
+    if key in self_dict_keys:
+      print('%s:%s' % (key,self_dict[key]))
+    else:
+      print('%s:%s' % (key,val))
+  print('\n'.join(['%s:%s' % item for item in PARAM.__dict__.items()]))
   test_CC_or_OC(str(sys.argv[2]))
-  # python3 2_test_CC_and_OC.py "" test_cc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_rePhaseMixed_testcc.log
-  # python3 2_test_CC_and_OC.py "" test_oc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_rePhaseMixed_testoc.log
+  # python3 2_test_CC_and_OC.py "" test_cc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_XXXPhase_testcc.log
+  # python3 2_test_CC_and_OC.py "" test_oc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_XXXPhase_testoc.log
