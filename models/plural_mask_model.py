@@ -219,6 +219,9 @@ class PluralMask_Model(object):
     elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'COS':
       self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(1.0-tf.cos(self._y_theta_est-self._y_theta_labels)),
                                                              FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'ABSOLUTE':
+      self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(self._y_theta_est-self._y_theta_labels),
+                                                             FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
     else:
       tf.logging.error('Phase_Loss type error.')
       exit(-1)
