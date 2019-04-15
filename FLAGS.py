@@ -48,6 +48,9 @@ class base_config:
   '''
   LOSS_FUNC_FOR_MAG_SPEC = "SPEC_MSE"
   '''
+  "ABSOLUTE"
+  "MAG_WEIGHTED_ABSOLUTE":
+  "COS"
   "MAG_WEIGHTED_COS":
   '''
   LOSS_FUNC_FOR_PHASE_SPEC = None
@@ -1252,7 +1255,51 @@ class C006_2_1(base_config): # DONE 15043
   TRAIN_TYPE = 'MASKNET' # 'LOGBIASNET' 'MASKNET' 'BOTH'
 
 
-class C007_1(base_config): # RUNNING 15123
+class C007_0(base_config): # DONE 15123
+  '''
+  absolute
+  '''
+  SE_MODEL = models.plural_mask_model.PluralMask_Model
+  RESTORE_PHASE = "ESTIMATE"
+  CHECK_POINT = 'nnet_C007_0'
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  LOSS_FUNC_FOR_PHASE_SPEC = "ABSOLUTE" # ****
+  MAG_LOSS_COEF = 1.0
+  PHASE_LOSS_COEF = 1.0
+  PHASE_LOSS_INDEX = 2.0 # ****
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  FFT_DOT = 129
+  INPUT_SIZE = FFT_DOT*2
+  OUTPUT_SIZE = FFT_DOT*2
+  RNN_SIZE = 512 # ****
+  MASK_TYPE = "IRM"
+  # INIT_MASK_VAL = 1.0
+  ReLU_MASK = False
+
+
+class C007_0_1(base_config): # RUNNING 15123
+  '''
+  weighted absolute
+  '''
+  SE_MODEL = models.plural_mask_model.PluralMask_Model
+  RESTORE_PHASE = "ESTIMATE"
+  CHECK_POINT = 'nnet_C007_0'
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  LOSS_FUNC_FOR_PHASE_SPEC = "MAG_WEIGHTED_ABSOLUTE" # ****
+  MAG_LOSS_COEF = 1.0
+  PHASE_LOSS_COEF = 1.0
+  PHASE_LOSS_INDEX = 2.0 # ****
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  FFT_DOT = 129
+  INPUT_SIZE = FFT_DOT*2
+  OUTPUT_SIZE = FFT_DOT*2
+  RNN_SIZE = 512 # ****
+  MASK_TYPE = "IRM"
+  # INIT_MASK_VAL = 1.0
+  ReLU_MASK = False
+
+
+class C007_1(base_config): # DONE 15123
   '''
   cos
   '''
@@ -1274,9 +1321,10 @@ class C007_1(base_config): # RUNNING 15123
   OUTPUT_SIZE = FFT_DOT*2
   RNN_SIZE = 512 # ****
   MASK_TYPE = "IRM"
+  # INIT_MASK_VAL = 1.0
   ReLU_MASK = False
 
-class C007_2(base_config): # RUNNING 15123
+class C007_2(base_config): # DONE 15123
   '''
   magnitude weighted cos
   '''
@@ -1298,10 +1346,11 @@ class C007_2(base_config): # RUNNING 15123
   OUTPUT_SIZE = FFT_DOT*2
   RNN_SIZE = 512
   MASK_TYPE = "IRM"
+  # INIT_MASK_VAL = 1.0
   ReLU_MASK = False
 
 
-class C007_3(base_config): # RUNNING 15123
+class C007_3(base_config): # DONE 15123
   '''
   rnn_size:1024
   '''
@@ -1325,5 +1374,5 @@ class C007_3(base_config): # RUNNING 15123
   MASK_TYPE = "IRM"
   ReLU_MASK = False
 
-PARAM = C007_2
+PARAM = C007_0_1
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)

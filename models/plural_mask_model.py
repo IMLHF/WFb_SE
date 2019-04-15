@@ -211,16 +211,19 @@ class PluralMask_Model(object):
       tf.logging.error('Magnitude_Loss type error.')
       exit(-1)
 
-    if FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == "MAG_WEIGHTED_COS":
+    if FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'COS':
+      self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(1.0-tf.cos(self._y_theta_est-self._y_theta_labels)),
+                                                             FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'MAG_WEIGHTED_COS':
       self._phase_loss = loss.magnitude_weighted_cos_deltaTheta(self._y_theta_est,
                                                                 self._y_theta_labels,
                                                                 self._norm_y_mag_spec,
                                                                 index_=FLAGS.PARAM.PHASE_LOSS_INDEX)
-    elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'COS':
-      self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(1.0-tf.cos(self._y_theta_est-self._y_theta_labels)),
-                                                             FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
     elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'ABSOLUTE':
       self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(self._y_theta_est-self._y_theta_labels),
+                                                             FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'MAG_WEIGHTED_ABSOLUTE':
+      self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(self._y_theta_est-self._y_theta_labels)*self._norm_y_mag_spec*10.0,
                                                              FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
     else:
       tf.logging.error('Phase_Loss type error.')
