@@ -46,13 +46,14 @@ class PluralMask_Model(object):
 
     self._x_theta = theta_x_batch
     self._y_theta = theta_y_batch
-    self._norm_x_theta = self._x_theta/(2.0*FLAGS.PARAM.PI)+0.5
-    self._norm_y_theta = self._y_theta/(2.0*FLAGS.PARAM.PI)+0.5
+    # self._norm_x_theta = self._x_theta/(2.0*FLAGS.PARAM.PI)+0.5
+    # self._norm_y_theta = self._y_theta/(2.0*FLAGS.PARAM.PI)+0.5
     self._model_type = FLAGS.PARAM.MODEL_TYPE
 
     self.net_input = tf.concat([self._norm_x_mag_spec,self._x_theta],axis=-1)
     self._y_mag_labels = self._norm_y_mag_spec
-    self._y_theta_labels = self._norm_y_theta
+    # self._y_theta_labels = self._norm_y_theta
+    self._y_theta_labels = self._y_theta
 
     outputs = self.net_input
     if FLAGS.PARAM.INPUT_BN:
@@ -184,7 +185,8 @@ class PluralMask_Model(object):
     self._norm_y_mag_est = tf.slice(self._y_est,[0,0,0],[-1,-1,FLAGS.PARAM.FFT_DOT])
     self._norm_y_theta_est = tf.slice(self._y_est,[0,0,FLAGS.PARAM.FFT_DOT],[-1,-1,-1])
     self._y_mag_est = rm_norm_mag_spec(self._norm_y_mag_est, FLAGS.PARAM.MAG_NORM_MAX)
-    self._y_theta_est = (self._norm_y_theta_est-0.5)*2.0*FLAGS.PARAM.PI
+    # self._y_theta_est = (self._norm_y_theta_est-0.5)*2.0*FLAGS.PARAM.PI
+    self._y_theta_est = self._norm_y_theta_est
     # endregion
 
     self.saver = tf.train.Saver(tf.trainable_variables(), max_to_keep=30)
@@ -210,12 +212,12 @@ class PluralMask_Model(object):
       exit(-1)
 
     if FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == "MAG_WEIGHTED_COS":
-      self._phase_loss = loss.magnitude_weighted_cos_deltaTheta(self._norm_y_theta_est,
+      self._phase_loss = loss.magnitude_weighted_cos_deltaTheta(self._y_theta_est,
                                                                 self._y_theta_labels,
                                                                 self._norm_y_mag_spec,
                                                                 index_=FLAGS.PARAM.PHASE_LOSS_INDEX)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'COS':
-      self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(1.0-tf.cos(self._norm_y_theta_est-self._y_theta_labels)),
+      self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(1.0-tf.cos(self._y_theta_est-self._y_theta_labels)),
                                                              FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
     else:
       tf.logging.error('Phase_Loss type error.')
