@@ -178,6 +178,10 @@ class Model_Baseline(object):
     self._mask = tf.reshape(
         mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
 
+    if FLAGS.PARAM.TRAINING_MASK_POSITION == 'mag':
+      self._y_estimation = self._mask*self._norm_x_mag_spec
+    elif FLAGS.PARAM.TRAINING_MASK_POSITION == 'logmag':
+      self._y_estimation = self._mask*self._norm_x_logmag_spec
 
     # region get infer spec
     if FLAGS.PARAM.DECODING_MASK_POSITION == 'mag':
@@ -212,7 +216,7 @@ class Model_Baseline(object):
       cbhg_highwaynet_layers = 4 # Number of HighwayNet layers
       cbhg_highway_units = 128 # Number of units used in HighwayNet fully connected layers
       cbhg_rnn_units = 128 # Number of GRU units used in bidirectional RNN of CBHG block. CBHG output is 2x rnn_units in shape
-      batch_norm_position = 'after'
+      batch_norm_position = 'before'
       # is_training = True
       is_training = bool(behavior == self.train)
       post_cbhg = CBHG(cbhg_kernels, cbhg_conv_channels, cbhg_pool_size, [cbhg_projection, FLAGS.PARAM.OUTPUT_SIZE],
@@ -243,10 +247,6 @@ class Model_Baseline(object):
 
     # region get labels LOSS
     # Labels
-    if FLAGS.PARAM.TRAINING_MASK_POSITION == 'mag':
-      self._y_estimation = self._mask*self._norm_x_mag_spec
-    elif FLAGS.PARAM.TRAINING_MASK_POSITION == 'logmag':
-      self._y_estimation = self._mask*self._norm_x_logmag_spec
     if FLAGS.PARAM.MASK_TYPE == 'PSM':
       self._y_labels *= tf.cos(self._x_theta-self._y_theta)
     elif FLAGS.PARAM.MASK_TYPE == 'fixPSM':
