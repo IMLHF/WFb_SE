@@ -15,6 +15,7 @@ import shutil
 import wave
 import gc
 from FLAGS import PARAM
+import FLAGS
 from tensorflow.python import debug as tf_debug
 from dataManager.mixed_aishell_8k_tfrecord_io import generate_tfrecord, get_batch_use_tfdata
 
@@ -257,7 +258,16 @@ def main(argv):
   if not os.path.exists(PARAM.SAVE_DIR):
     os.makedirs(PARAM.SAVE_DIR)
   print('FLAGS.PARAM:')
-  print('\n'.join(['%s:%s' % item for item in PARAM.__dict__.items()]))
+  supper_dict = FLAGS.base_config.__dict__
+  self_dict = PARAM.__dict__
+  self_dict_keys = self_dict.keys()
+  for key,val in supper_dict.items():
+    if key in self_dict_keys:
+      print('%s:%s' % (key,self_dict[key]))
+    else:
+      print('%s:%s' % (key,val))
+  # print('\n'.join(['%s:%s' % item for item in PARAM.supper().__dict__.items()]))
+  # print('\n'.join(['%s:%s' % item for item in PARAM.__dict__.items()]))
   train()
 
 
