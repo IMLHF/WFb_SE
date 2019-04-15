@@ -233,7 +233,7 @@ def train():
         f.writelines(msg+'\n')
 
       # Start halving when improvement is lower than start_halving_impr
-      if (rel_impr_mag < PARAM.start_halving_impr) or (rel_impr_phase < PARAM.start_halving_impr):
+      if (rel_impr_mag < PARAM.start_halving_impr and rel_impr_phase < PARAM.start_halving_impr) or (rel_impr_mag+rel_impr_phase)<0.0:
         model_lr *= PARAM.halving_factor
         tr_model.assign_lr(sess, model_lr)
 
@@ -257,6 +257,8 @@ def main(argv):
   if not os.path.exists(PARAM.SAVE_DIR):
     os.makedirs(PARAM.SAVE_DIR)
   train()
+  print('FLAGS.PARAM:')
+  print('\n'.join(['%s:%s' % item for item in PARAM.__dict__.items()]))
 
 
 if __name__ == '__main__':

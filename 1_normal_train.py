@@ -249,6 +249,8 @@ def main(argv):
   if not os.path.exists(PARAM.SAVE_DIR):
     os.makedirs(PARAM.SAVE_DIR)
   train()
+  print('FLAGS.PARAM:')
+  print('\n'.join(['%s:%s' % item for item in PARAM.__dict__.items()]))
 
 
 if __name__ == '__main__':
