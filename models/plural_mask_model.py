@@ -199,6 +199,11 @@ class PluralMask_Model(object):
                                                                 self._y_theta_labels,
                                                                 self._norm_y_mag_spec,
                                                                 index_=FLAGS.PARAM.PHASE_LOSS_INDEX)
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'MIXMAG_WEIGHTED_COS':
+      self._phase_loss = loss.magnitude_weighted_cos_deltaTheta(self._y_theta_est,
+                                                                self._y_theta_labels,
+                                                                self._norm_x_mag_spec,
+                                                                index_=FLAGS.PARAM.PHASE_LOSS_INDEX)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_PHASE_SPEC == 'ABSOLUTE':
       self._phase_loss = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(self._y_theta_est-self._y_theta_labels),
                                                              FLAGS.PARAM.PHASE_LOSS_INDEX), 1))
