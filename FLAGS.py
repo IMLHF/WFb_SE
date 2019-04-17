@@ -548,7 +548,7 @@ class C001_8_2_fourLayerRNN(base_config): # DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_2_reluPOW2FixPSM(base_config): # RUNNING 15123
+class C001_8_2_reluPow2FixPSM(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE
   '''
@@ -564,7 +564,7 @@ class C001_8_2_reluPOW2FixPSM(base_config): # RUNNING 15123
   ReLU_MASK = True
 
 
-class C001_8_2_realPOW2FixPSM(base_config): # RUNNING 15123
+class C001_8_2_realPow2FixPSM(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE
   '''
@@ -1458,5 +1458,5 @@ class C007_3(base_config): # RUNNING 15041
   MASK_TYPE = "IRM"
   ReLU_MASK = False
 
-PARAM = C007_3
+PARAM = C001_8_2_reluPow2FixPSM
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
