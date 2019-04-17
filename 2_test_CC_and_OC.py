@@ -200,6 +200,7 @@ def test_CC_or_OC(test_set_name):
 
 if __name__ == "__main__":
   os.environ['CUDA_VISIBLE_DEVICES'] = sys.argv[1]
+  # os.environ['OMP_NUM_THREADS'] = '8'
   tf.logging.set_verbosity(tf.logging.INFO)
   print('FLAGS.PARAM:')
   supper_dict = FLAGS.base_config.__dict__
@@ -212,5 +213,5 @@ if __name__ == "__main__":
       print('%s:%s' % (key,val))
   print('\n'.join(['%s:%s' % item for item in PARAM.__dict__.items()]))
   test_CC_or_OC(str(sys.argv[2]))
-  # python3 2_test_CC_and_OC.py "" test_cc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_XXXPhase_testcc.log
-  # python3 2_test_CC_and_OC.py "" test_oc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_XXXPhase_testoc.log
+  # OMP_NUM_THREADS=1 python3 2_test_CC_and_OC.py "" test_cc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_XXXPhase_testcc.log
+  # OMP_NUM_THREADS=1 python3 2_test_CC_and_OC.py "" test_oc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_XXXPhase_testoc.log
