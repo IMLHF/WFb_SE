@@ -254,7 +254,7 @@ class Model_Baseline(object):
     elif FLAGS.PARAM.MASK_TYPE == 'AcutePM':
       self._y_labels *= tf.nn.relu(tf.cos(self._x_theta-self._y_theta))
     elif FLAGS.PARAM.MASK_TYPE == 'PowFixPSM':
-      self._y_labels *= tf.pow((1.0+tf.cos(self._x_theta-self._y_theta))*0.5,
+      self._y_labels *= tf.pow(tf.abs((1.0+tf.cos(self._x_theta-self._y_theta))*0.5),
                                FLAGS.PARAM.POW_FIX_PSM_COEF)
     elif FLAGS.PARAM.MASK_TYPE == 'IRM':
       pass

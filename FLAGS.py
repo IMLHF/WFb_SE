@@ -189,7 +189,7 @@ class C001_1(base_config): # *DONE 15043
   PIPLINE_GET_THETA = False
 
 
-class C001_1_2(base_config): # RUNNING 15123
+class C001_1_2(base_config): # DONE 15041
   CHECK_POINT = 'nnet_C001_1'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -209,7 +209,7 @@ class C001_2(base_config): # *DONE 15043
   # MASK_TYPE = "PSM" # default
 
 
-class C001_2_2(base_config): # RUNNING 15123
+class C001_2_2(base_config): # DONE 15041
   CHECK_POINT = 'nnet_C001_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -550,6 +550,7 @@ class C001_8_2_fourLayerRNN(base_config): # DONE 15041
 
 class C001_8_2_reluPow2FixPSM(base_config): # RUNNING 15123
   '''
+  C001_8_2_reluPow2FixPSM
   relative spectrum(mag) MSE
   '''
   CHECK_POINT = 'nnet_C001_8_2_reluPow2FixPSM'
@@ -566,6 +567,7 @@ class C001_8_2_reluPow2FixPSM(base_config): # RUNNING 15123
 
 class C001_8_2_realPow2FixPSM(base_config): # RUNNING 15123
   '''
+  C001_8_2_realPow2FixPSM.
   relative spectrum(mag) MSE
   '''
   CHECK_POINT = 'nnet_C001_8_2_realPow2FixPSM'
@@ -1458,5 +1460,5 @@ class C007_3(base_config): # RUNNING 15041
   MASK_TYPE = "IRM"
   ReLU_MASK = False
 
-PARAM = C001_8_2_reluPow2FixPSM
+PARAM = C001_8_2_realPow2FixPSM
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
