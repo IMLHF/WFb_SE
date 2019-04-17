@@ -26,7 +26,8 @@ class base_config:
   RNN_SIZE = 512
   MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
   LSTM_ACTIVATION = 'tanh'
-  MASK_TYPE = "PSM"  # "PSM" or "IRM" or "fixPSM" or "AcutePM"
+  MASK_TYPE = "PSM"  # "PSM" or "IRM" or "fixPSM" or "AcutePM" or "PowFixPSM"
+  POW_FIX_PSM_COEF = None # for MASK_TYPE = "PowFixPSM"
   PIPLINE_GET_THETA = True
   ReLU_MASK = True
   INPUT_BN = False
@@ -50,8 +51,10 @@ class base_config:
   '''
   "ABSOLUTE"
   "MAG_WEIGHTED_ABSOLUTE":
+  "MIXMAG_WEIGHTED_ABSOLUTE"
   "COS"
   "MAG_WEIGHTED_COS":
+  "MIXMAG_WEIGHTED_COS":
   '''
   LOSS_FUNC_FOR_PHASE_SPEC = None
   MAG_LOSS_COEF = None
@@ -545,6 +548,38 @@ class C001_8_2_fourLayerRNN(base_config): # DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
+class C001_8_2_reluPOW2FixPSM(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_reluPow2FixPSM'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MASK_TYPE = "PowFixPSM"
+  POW_FIX_PSM_COEF = 2.0
+  ReLU_MASK = True
+
+
+class C001_8_2_realPOW2FixPSM(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_realPow2FixPSM'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MASK_TYPE = "PowFixPSM"
+  POW_FIX_PSM_COEF = 2.0
+  ReLU_MASK = False
+
+
 class C001_8_2_2(base_config):  # DONE 15043
   CHECK_POINT = 'nnet_C001_8_2_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -559,7 +594,7 @@ class C001_8_2_2(base_config):  # DONE 15043
   # learning_rate = 0.0001
 
 
-class C001_8_2_3(base_config):  # DONE 15123
+class C001_8_2_3(base_config):  # DONE 15043
   CHECK_POINT = 'nnet_C001_8_2_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -1277,15 +1312,37 @@ class C007_0(base_config): # DONE 15123
   ReLU_MASK = False
 
 
-class C007_0_1(base_config): # RUNNING 15123
+class C007_0_1(base_config): # DONE 15123
   '''
   weighted absolute
   '''
   SE_MODEL = models.plural_mask_model.PluralMask_Model
   RESTORE_PHASE = "ESTIMATE"
-  CHECK_POINT = 'nnet_C007_0'
+  CHECK_POINT = 'nnet_C007_0_1'
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
   LOSS_FUNC_FOR_PHASE_SPEC = "MAG_WEIGHTED_ABSOLUTE" # ****
+  MAG_LOSS_COEF = 1.0
+  PHASE_LOSS_COEF = 1.0
+  PHASE_LOSS_INDEX = 2.0 # ****
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  FFT_DOT = 129
+  INPUT_SIZE = FFT_DOT*2
+  OUTPUT_SIZE = FFT_DOT*2
+  RNN_SIZE = 512 # ****
+  MASK_TYPE = "IRM"
+  # INIT_MASK_VAL = 1.0
+  ReLU_MASK = False
+
+
+class C007_0_2(base_config): # DONE 15123
+  '''
+  weighted absolute
+  '''
+  SE_MODEL = models.plural_mask_model.PluralMask_Model
+  RESTORE_PHASE = "ESTIMATE"
+  CHECK_POINT = 'nnet_C007_0_2'
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  LOSS_FUNC_FOR_PHASE_SPEC = "MIXMAG_WEIGHTED_ABSOLUTE" # ****
   MAG_LOSS_COEF = 1.0
   PHASE_LOSS_COEF = 1.0
   PHASE_LOSS_INDEX = 2.0 # ****
@@ -1324,6 +1381,7 @@ class C007_1(base_config): # DONE 15123
   # INIT_MASK_VAL = 1.0
   ReLU_MASK = False
 
+
 class C007_2(base_config): # DONE 15123
   '''
   magnitude weighted cos
@@ -1350,7 +1408,33 @@ class C007_2(base_config): # DONE 15123
   ReLU_MASK = False
 
 
-class C007_3(base_config): # DONE 15123
+class C007_2_1(base_config): # RUNNING 15041
+  '''
+  magnitude weighted cos
+  '''
+  SE_MODEL = models.plural_mask_model.PluralMask_Model
+  RESTORE_PHASE = "ESTIMATE"
+  CHECK_POINT = 'nnet_C007_2_1'
+  # INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  # LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  # TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  # DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  LOSS_FUNC_FOR_PHASE_SPEC = "MIXMAG_WEIGHTED_COS"
+  MAG_LOSS_COEF = 1.0
+  PHASE_LOSS_COEF = 1.0
+  PHASE_LOSS_INDEX = 2.0
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  FFT_DOT = 129
+  INPUT_SIZE = FFT_DOT*2
+  OUTPUT_SIZE = FFT_DOT*2
+  RNN_SIZE = 512
+  MASK_TYPE = "IRM"
+  # INIT_MASK_VAL = 1.0
+  ReLU_MASK = False
+
+
+class C007_3(base_config): # RUNNING 15041
   '''
   rnn_size:1024
   '''
@@ -1374,5 +1458,5 @@ class C007_3(base_config): # DONE 15123
   MASK_TYPE = "IRM"
   ReLU_MASK = False
 
-PARAM = C007_0_1
+PARAM = C007_3
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
