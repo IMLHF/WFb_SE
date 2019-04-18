@@ -76,8 +76,8 @@ def balanced_MEL_AND_SPEC_MSE(y1,y2,spec_est,spec_label):
     dim: [batch,time,frequence]
   '''
   spec_loss = reduce_sum_frame_batchsize_MSE(y1, y2)
-  mel_est = tf_tool.melspec_form_realStft(spec_est, FLAGS.PARAM.FS, 20)
-  mel_label = tf_tool.melspec_form_realStft(spec_label, FLAGS.PARAM.FS, 20)
+  mel_est = tf_tool.melspec_form_realStft(spec_est, FLAGS.PARAM.FS, 80)
+  mel_label = tf_tool.melspec_form_realStft(spec_label, FLAGS.PARAM.FS, 80)
   balance_coef = FLAGS.PARAM.MEL_BLANCE_COEF
   mel_loss = reduce_mean_MSE(mel_est, mel_label) / balance_coef # loss1/loss2 ~=3.2e8
   return spec_loss, mel_loss
