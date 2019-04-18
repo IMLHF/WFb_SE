@@ -39,7 +39,7 @@ class base_config:
   LOSS_FUNC_FOR_MAG_SPEC:
     "SPEC_MSE" :
     "MFCC_SPEC_MSE" :
-    "MEL_SPEC_MSE" :
+    "MEL_MAG_MSE" :
     "SPEC_MSE_LOWF_EN" :
     "FAIR_SPEC_MSE" :
     "SPEC_MSE_FLEXIBLE_POW_C" :
@@ -258,7 +258,7 @@ class C001_4_0(base_config): # DONE 15041
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "MEL_SPEC_MSE"
+  LOSS_FUNC_FOR_MAG_SPEC = "MEL_MAG_MSE"
   SPEC_LOSS_COEF = 0.0
   MEL_LOSS_COEF = 10.0
 
@@ -269,7 +269,7 @@ class C001_4_1(base_config): # DONE 15041
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "MEL_SPEC_MSE"
+  LOSS_FUNC_FOR_MAG_SPEC = "MEL_MAG_MSE"
   SPEC_LOSS_COEF = 5.0
   MEL_LOSS_COEF = 5.0
 
@@ -280,7 +280,7 @@ class C001_4_2(base_config): # DONE 15041
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "MEL_SPEC_MSE"
+  LOSS_FUNC_FOR_MAG_SPEC = "MEL_MAG_MSE"
   SPEC_LOSS_COEF = 8.0
   MEL_LOSS_COEF = 2.0
 
@@ -291,7 +291,7 @@ class C001_4_3(base_config): # DONE 15123
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "MEL_SPEC_MSE"
+  LOSS_FUNC_FOR_MAG_SPEC = "MEL_MAG_MSE"
   SPEC_LOSS_COEF = 2.0
   MEL_LOSS_COEF = 8.0
 

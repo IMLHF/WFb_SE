@@ -196,7 +196,7 @@ class Model_Recurrent_Train(object):
           self._y_estimation, self._y_estimation2, self._y_labels,
           self._y_mag_estimation, self._y_mag_estimation2, self._y_mag_spec)
       self._loss = 0.5*self._loss1 + 0.5*self._loss2
-    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'MEL_SPEC_MSE':
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'MEL_MAG_MSE':
       self._loss1, self._loss2 = loss.balanced_MEL_AND_SPEC_MSE_Recurrent_Train(
           self._y_estimation, self._y_estimation2, self._y_labels,
           self._y_mag_estimation, self._y_mag_estimation2, self._y_mag_spec)
