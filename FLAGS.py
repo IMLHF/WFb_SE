@@ -20,7 +20,7 @@ class base_config:
   OVERLAP = 128
   FS = 8000
   LEN_WAWE_PAD_TO = FS*3  # Mixed wave length (FS*3 is 3 seconds)
-  MEL_BLANCE_COEF = 3.2e8
+  MEL_BLANCE_COEF = 3.2e7
   MFCC_BLANCE_COEF = 40
   LSTM_num_proj = None
   RNN_SIZE = 512
@@ -150,6 +150,8 @@ class base_config:
 
   USE_CBHG_POST_PROCESSING = False
 
+  SPEC_EST_BIAS = 0.0
+
 
 class C001_8_2_full(base_config):
   batch_size = 360
@@ -250,37 +252,48 @@ class C001_3_2(base_config): # DONE 15041
   MFCC_LOSS_COEF = 0.2
 
 
-class C001_4(base_config): # DONE 15041
-  CHECK_POINT = 'nnet_C001_4'
+class C001_4_0(base_config): # RUNNING 15041
+  CHECK_POINT = 'nnet_C001_4_0'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "MEL_SPEC_MSE"
-  SPEC_LOSS_COEF = 0.5
-  MEL_LOSS_COEF = 0.5
+  SPEC_LOSS_COEF = 0.0
+  MEL_LOSS_COEF = 10.0
 
 
-class C001_4_2(base_config): # DONE 15041
+class C001_4_1(base_config): # RUNNING 15041
+  CHECK_POINT = 'nnet_C001_4_1'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "MEL_SPEC_MSE"
+  SPEC_LOSS_COEF = 5.0
+  MEL_LOSS_COEF = 5.0
+
+
+class C001_4_2(base_config): # RUNNING 15041
   CHECK_POINT = 'nnet_C001_4_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "MEL_SPEC_MSE"
-  SPEC_LOSS_COEF = 0.8
-  MEL_LOSS_COEF = 0.2
+  SPEC_LOSS_COEF = 8.0
+  MEL_LOSS_COEF = 2.0
 
 
-class C001_4_3(base_config): # DONE 15041
+class C001_4_3(base_config): # RUNNING 15123
   CHECK_POINT = 'nnet_C001_4_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "MEL_SPEC_MSE"
-  SPEC_LOSS_COEF = 0.2
-  MEL_LOSS_COEF = 0.8
+  SPEC_LOSS_COEF = 2.0
+  MEL_LOSS_COEF = 8.0
 
 
 class C001_5(base_config): # DONE 15041
@@ -429,6 +442,22 @@ class C001_8_2(base_config): # *DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
+class C001_8_2_logAndRelative(base_config): # RUNNING 15041
+  '''
+  C001_8_2_logAndRelative:
+    log_bias = 1e4
+    AFD = 1000
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_logAndRelative'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'logmag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  INIT_LOG_BIAS = 1e4
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+
+
 class C001_8_2_fixPSM(base_config): # *DONE 15041
   '''
   relative spectrum(mag) MSE
@@ -548,6 +577,26 @@ class C001_8_2_fourLayerRNN(base_config): # DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
+class C001_8_2_addMusic(base_config): # RUNNING 15043
+  '''
+  relative spectrum(mag) MSE
+  '''
+  RNN_LAYER = 4
+  GENERATE_TFRECORD = True
+  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_1_8k'
+  OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_2_8k'
+  NOISE_DIR = '/home/student/work/lhf/alldata/many_noise_and_music_8k'
+  TFRECORDS_DIR = '/home/student/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_8k_snrmix_wavespan32767_addMusic'
+  CHECK_POINT = 'nnet_C001_8_2_addMusic'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  # MASK_TYPE = "PSM" # default
+
+
 class C001_8_2_reluPow2FixPSM(base_config): # DONE 15123
   '''
   C001_8_2_reluPow2FixPSM
@@ -614,7 +663,6 @@ class C001_8_2_realPowDot5FixPSM(base_config): # RUNNING 15123
   MASK_TYPE = "PowFixPSM"
   POW_FIX_PSM_COEF = 0.5
   ReLU_MASK = False
-
 
 
 class C001_8_2_2(base_config):  # DONE 15043
@@ -872,18 +920,18 @@ class C001_8_13(base_config): # DONE 15041
   SELF_BN = False
 
 
-class C001_9_1(base_config): # DONE 15123
+class C001_9_1(base_config): # prepare 15123
   '''
-  cos relative spectrum(mag) MSE
+  relative spectrum(mag) MSE.
+  (y_spec_est+1.0)*mask.
   '''
-  PI = 3.1415927
   CHECK_POINT = 'nnet_C001_9_1'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE_USE_COS"
-  COS_AUTO_RELATED_MSE_W = PI
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  SPEC_EST_BIAS = 0.5
   # MASK_TYPE = "PSM" # default
 
 
@@ -1495,5 +1543,5 @@ class C007_3(base_config): # DONE 15041
   MASK_TYPE = "IRM"
   ReLU_MASK = False
 
-PARAM = C001_8_2_realPowDot5FixPSM
+PARAM = C001_8_2_addMusic
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)

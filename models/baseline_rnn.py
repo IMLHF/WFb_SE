@@ -179,15 +179,16 @@ class Model_Baseline(object):
         mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
 
     if FLAGS.PARAM.TRAINING_MASK_POSITION == 'mag':
-      self._y_estimation = self._mask*self._norm_x_mag_spec
+      self._y_estimation = self._mask*(self._norm_x_mag_spec+FLAGS.PARAM.SPEC_EST_BIAS)
     elif FLAGS.PARAM.TRAINING_MASK_POSITION == 'logmag':
-      self._y_estimation = self._mask*self._norm_x_logmag_spec
+      self._y_estimation = self._mask*(self._norm_x_logmag_spec+FLAGS.PARAM.SPEC_EST_BIAS)
 
     # region get infer spec
     if FLAGS.PARAM.DECODING_MASK_POSITION == 'mag':
-      self._y_mag_estimation = rm_norm_mag_spec(self._mask*self._norm_x_mag_spec, FLAGS.PARAM.MAG_NORM_MAX)
+      self._y_mag_estimation = rm_norm_mag_spec(self._mask*(self._norm_x_mag_spec+FLAGS.PARAM.SPEC_EST_BIAS),
+                                                FLAGS.PARAM.MAG_NORM_MAX)
     elif FLAGS.PARAM.DECODING_MASK_POSITION == 'logmag':
-      self._y_mag_estimation = rm_norm_logmag_spec(self._mask*self._norm_x_logmag_spec,
+      self._y_mag_estimation = rm_norm_logmag_spec(self._mask*(self._norm_x_logmag_spec+FLAGS.PARAM.SPEC_EST_BIAS),
                                                    FLAGS.PARAM.MAG_NORM_MAX,
                                                    self._log_bias, FLAGS.PARAM.MIN_LOG_BIAS)
     '''
