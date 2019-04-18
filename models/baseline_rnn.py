@@ -293,6 +293,10 @@ class Model_Baseline(object):
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE_USE_COS":
       self._loss = loss.cos_auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,
                                                                                 FLAGS.PARAM.COS_AUTO_RELATED_MSE_W)
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == 'MEL_AUTO_RELATED_MSE':
+      # type(y_estimation) = FLAGS.PARAM.LABEL_TYPE
+      self._loss = loss.MEL_AUTO_RELATIVE_MSE(self._y_estimation, self._norm_y_mag_spec,
+                                              FLAGS.PARAM.MEL_NUM, FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
     else:
       print('Loss type error.')
       exit(-1)

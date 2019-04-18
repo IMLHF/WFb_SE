@@ -46,6 +46,7 @@ class base_config:
     "RELATED_MSE" :
     "AUTO_RELATED_MSE" :
     "AUTO_RELATED_MSE_USE_COS" :
+    "MEL_AUTO_RELATED_MSE" :
   '''
   LOSS_FUNC_FOR_MAG_SPEC = "SPEC_MSE"
   '''
@@ -294,6 +295,17 @@ class C001_4_3(base_config): # DONE 15123
   LOSS_FUNC_FOR_MAG_SPEC = "MEL_MAG_MSE"
   SPEC_LOSS_COEF = 2.0
   MEL_LOSS_COEF = 8.0
+
+
+class C001_4_4(base_config): # RUNNING 15123
+  CHECK_POINT = 'nnet_C001_4_4'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "MEL_AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MEL_NUM = 80
 
 
 class C001_5(base_config): # DONE 15041
@@ -1546,5 +1558,5 @@ class C007_3(base_config): # DONE 15041
   MASK_TYPE = "IRM"
   ReLU_MASK = False
 
-PARAM = C001_9_1
+PARAM = C001_4_4
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)

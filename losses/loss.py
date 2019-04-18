@@ -4,6 +4,19 @@ import FLAGS
 from utils import tf_tool
 
 
+def MEL_AUTO_RELATIVE_MSE(spec_est,spec_label,mel_num,AFD):
+  '''
+  spec_est:
+    dim: [batch,time,frequence]
+  spec_label:
+    dim: [batch,time,frequence]
+  '''
+  mel_est = tf_tool.melspec_form_realStft(spec_est, FLAGS.PARAM.FS, mel_num)
+  mel_label = tf_tool.melspec_form_realStft(spec_label, FLAGS.PARAM.FS, mel_num)
+  mel_loss = auto_ingore_relative_reduce_sum_frame_batchsize_MSE(mel_est, mel_label, AFD)
+  return mel_loss
+
+
 def magnitude_weighted_cos_deltaTheta(theta1,theta2,mag_spec,index_=2.0):
   cost = tf.reduce_sum(tf.reduce_mean(tf.pow(tf.abs(tf.multiply(1.0-tf.cos(theta1-theta2), mag_spec*10.0)),
                                              index_),
@@ -51,7 +64,7 @@ def fair_reduce_sum_frame_batchsize_MSE(y1, y2):
   return cost
 
 def reduce_mean_MSE(y1, y2):
-  cost = tf.reduce_mean(tf.pow(y1-y2, 2))
+  cost = tf.reduce_mean(tf.pow(tf.abs(y1-y2), 2))
   return cost
 
 def balanced_MFCC_AND_SPEC_MSE(y1,y2,spec_est,spec_label):
@@ -79,7 +92,7 @@ def balanced_MEL_AND_SPEC_MSE(y1,y2,spec_est,spec_label):
   mel_est = tf_tool.melspec_form_realStft(spec_est, FLAGS.PARAM.FS, 80)
   mel_label = tf_tool.melspec_form_realStft(spec_label, FLAGS.PARAM.FS, 80)
   balance_coef = FLAGS.PARAM.MEL_BLANCE_COEF
-  mel_loss = reduce_mean_MSE(mel_est, mel_label) / balance_coef # loss1/loss2 ~=3.2e8
+  mel_loss = reduce_mean_MSE(mel_est, mel_label) / balance_coef # loss1/loss2 ~=3.2e7
   return spec_loss, mel_loss
 
 def reduce_sum_frame_batchsize_MSE_Recurrent_Train(y_est1, y_est2, y_label):
