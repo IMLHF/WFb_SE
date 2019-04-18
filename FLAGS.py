@@ -548,7 +548,7 @@ class C001_8_2_fourLayerRNN(base_config): # DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_2_reluPow2FixPSM(base_config): # RUNNING 15123
+class C001_8_2_reluPow2FixPSM(base_config): # DONE 15123
   '''
   C001_8_2_reluPow2FixPSM
   relative spectrum(mag) MSE
@@ -565,7 +565,7 @@ class C001_8_2_reluPow2FixPSM(base_config): # RUNNING 15123
   ReLU_MASK = True
 
 
-class C001_8_2_realPow2FixPSM(base_config): # RUNNING 15123
+class C001_8_2_realPow2FixPSM(base_config): # DONE 15123
   '''
   C001_8_2_realPow2FixPSM.
   relative spectrum(mag) MSE
@@ -580,6 +580,41 @@ class C001_8_2_realPow2FixPSM(base_config): # RUNNING 15123
   MASK_TYPE = "PowFixPSM"
   POW_FIX_PSM_COEF = 2.0
   ReLU_MASK = False
+
+
+class C001_8_2_reluPowDot5FixPSM(base_config): # RUNNING 15123
+  '''
+  nnet_C001_8_2_reluPowDot5FixPSM.
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_reluPowDot5FixPSM'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MASK_TYPE = "PowFixPSM"
+  POW_FIX_PSM_COEF = 0.5
+  ReLU_MASK = True
+
+
+class C001_8_2_realPowDot5FixPSM(base_config): # RUNNING 15123
+  '''
+  nnet_C001_8_2_realPowDot5FixPSM.
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_realPowDot5FixPSM'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MASK_TYPE = "PowFixPSM"
+  POW_FIX_PSM_COEF = 0.5
+  ReLU_MASK = False
+
 
 
 class C001_8_2_2(base_config):  # DONE 15043
@@ -1410,7 +1445,7 @@ class C007_2(base_config): # DONE 15123
   ReLU_MASK = False
 
 
-class C007_2_1(base_config): # RUNNING 15041
+class C007_2_1(base_config): # DONE 15041
   '''
   magnitude weighted cos
   '''
@@ -1436,7 +1471,7 @@ class C007_2_1(base_config): # RUNNING 15041
   ReLU_MASK = False
 
 
-class C007_3(base_config): # RUNNING 15041
+class C007_3(base_config): # DONE 15041
   '''
   rnn_size:1024
   '''
@@ -1460,5 +1495,5 @@ class C007_3(base_config): # RUNNING 15041
   MASK_TYPE = "IRM"
   ReLU_MASK = False
 
-PARAM = C001_8_2_realPow2FixPSM
+PARAM = C001_8_2_realPowDot5FixPSM
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
