@@ -252,7 +252,7 @@ class C001_3_2(base_config): # DONE 15041
   MFCC_LOSS_COEF = 0.2
 
 
-class C001_4_0(base_config): # RUNNING 15041
+class C001_4_0(base_config): # DONE 15041
   CHECK_POINT = 'nnet_C001_4_0'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -263,7 +263,7 @@ class C001_4_0(base_config): # RUNNING 15041
   MEL_LOSS_COEF = 10.0
 
 
-class C001_4_1(base_config): # RUNNING 15041
+class C001_4_1(base_config): # DONE 15041
   CHECK_POINT = 'nnet_C001_4_1'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -274,7 +274,7 @@ class C001_4_1(base_config): # RUNNING 15041
   MEL_LOSS_COEF = 5.0
 
 
-class C001_4_2(base_config): # RUNNING 15041
+class C001_4_2(base_config): # DONE 15041
   CHECK_POINT = 'nnet_C001_4_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -285,7 +285,7 @@ class C001_4_2(base_config): # RUNNING 15041
   MEL_LOSS_COEF = 2.0
 
 
-class C001_4_3(base_config): # RUNNING 15123
+class C001_4_3(base_config): # DONE 15123
   CHECK_POINT = 'nnet_C001_4_3'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -442,7 +442,7 @@ class C001_8_2(base_config): # *DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_2_logAndRelative(base_config): # RUNNING 15041
+class C001_8_2_logAndRelative(base_config): # DONE 15041
   '''
   C001_8_2_logAndRelative:
     log_bias = 1e4
@@ -631,7 +631,7 @@ class C001_8_2_realPow2FixPSM(base_config): # DONE 15123
   ReLU_MASK = False
 
 
-class C001_8_2_reluPowDot5FixPSM(base_config): # RUNNING 15123
+class C001_8_2_reluPowDot5FixPSM(base_config): # DONE 15123
   '''
   nnet_C001_8_2_reluPowDot5FixPSM.
   relative spectrum(mag) MSE
@@ -648,7 +648,7 @@ class C001_8_2_reluPowDot5FixPSM(base_config): # RUNNING 15123
   ReLU_MASK = True
 
 
-class C001_8_2_realPowDot5FixPSM(base_config): # RUNNING 15123
+class C001_8_2_realPowDot5FixPSM(base_config): # DONE 15123
   '''
   nnet_C001_8_2_realPowDot5FixPSM.
   relative spectrum(mag) MSE
@@ -920,7 +920,7 @@ class C001_8_13(base_config): # DONE 15041
   SELF_BN = False
 
 
-class C001_9_1(base_config): # prepare 15123
+class C001_9_1(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE.
   (y_spec_est+0.5)*mask.
@@ -931,11 +931,12 @@ class C001_9_1(base_config): # prepare 15123
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   SPEC_EST_BIAS = 0.5
   # MASK_TYPE = "PSM" # default
 
 
-class C001_9_2(base_config): # prepare 15123
+class C001_9_2(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE.
   (y_spec_est+1.0)*mask.
@@ -946,6 +947,7 @@ class C001_9_2(base_config): # prepare 15123
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   SPEC_EST_BIAS = 1.0
   # MASK_TYPE = "PSM" # default
 
@@ -1544,5 +1546,5 @@ class C007_3(base_config): # DONE 15041
   MASK_TYPE = "IRM"
   ReLU_MASK = False
 
-PARAM = C001_8_2_addMusic
+PARAM = C001_9_1
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
