@@ -267,5 +267,6 @@ if __name__ == '__main__':
   os.environ['CUDA_VISIBLE_DEVICES'] = sys.argv[1]
   tf.logging.set_verbosity(tf.logging.INFO)
   tf.app.run(main=main)
+  # OMP_NUM_THREADS=1
   # mkdir exp && mkdir exp/rnn_speech_enhancement && python3 1_normal_train.py 1 2>&1 | tee exp/rnn_speech_enhancement/nnet_CXXX_train_full.log
   # python3 1_normal_train.py 1 2>&1 | tee exp/rnn_speech_enhancement/nnet_CXXX_train_full.log
