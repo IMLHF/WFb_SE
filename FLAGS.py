@@ -923,7 +923,7 @@ class C001_8_13(base_config): # DONE 15041
 class C001_9_1(base_config): # prepare 15123
   '''
   relative spectrum(mag) MSE.
-  (y_spec_est+1.0)*mask.
+  (y_spec_est+0.5)*mask.
   '''
   CHECK_POINT = 'nnet_C001_9_1'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -935,18 +935,19 @@ class C001_9_1(base_config): # prepare 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C001_9_2(base_config): # DONE 15123
+class C001_9_2(base_config): # prepare 15123
   '''
-  cos relative spectrum(mag) MSE
+  relative spectrum(mag) MSE.
+  (y_spec_est+1.0)*mask.
   '''
-  PI = 3.1415927
   CHECK_POINT = 'nnet_C001_9_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE_USE_COS"
-  COS_AUTO_RELATED_MSE_W = PI*1.25
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  SPEC_EST_BIAS = 1.0
+  # MASK_TYPE = "PSM" # default
 
 
 class C002_1(base_config): # DONE 15043
