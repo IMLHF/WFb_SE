@@ -25,7 +25,7 @@ def magnitude_weighted_cos_deltaTheta(theta1,theta2,mag_spec,index_=2.0):
 
 
 def relative_reduce_sum_frame_batchsize_MSE(y1,y2,ignore_threshold):
-  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow((y1-y2)/tf.maximum(tf.abs(y1)+tf.abs(y2),ignore_threshold), 2), 1), 1))
+  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(tf.abs(y1-y2)/tf.maximum(tf.abs(y1)+tf.abs(y2),ignore_threshold), 2), 1), 1))
   return cost
 
 
@@ -47,7 +47,7 @@ def cos_auto_ingore_relative_reduce_sum_frame_batchsize_MSE(y1,y2,w,index_=2.0):
 
 
 def logbias_de_reduce_sum_frame_batchsize_MSE(y1,y2,logbias):
-  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(y1-y2, 2), -1), -1)+tf.pow(logbias/5000,2))
+  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(tf.abs(y1-y2), 2), -1), -1)+tf.pow(logbias/5000,2))
   return cost
 
 
@@ -56,7 +56,7 @@ def reduce_sum_frame_batchsize_MSE_EmphasizeLowerValue(y1, y2, pow_coef):
   return cost
 
 def reduce_sum_frame_batchsize_MSE(y1, y2):
-  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(y1-y2, 2), 1), 1))
+  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(tf.abs(y1-y2), 2), 1), 1))
   return cost
 
 def fair_reduce_sum_frame_batchsize_MSE(y1, y2):
