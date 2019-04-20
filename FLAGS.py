@@ -75,7 +75,7 @@ class base_config:
   start_halving_impr = 0.0003
   resume_training = 'false'  # set start_epoch = final model ID
   start_epoch = 0
-  min_epochs = 10  # Min number of epochs to run trainer without halving.
+  min_epochs = 15  # Min number of epochs to run trainer without halving.
   max_epochs = 15  # Max number of epochs to run trainer totally.
   halving_factor = 0.7  # Factor for halving.
   # Halving when ralative loss is lower than start_halving_impr.
@@ -297,7 +297,7 @@ class C001_4_3(base_config): # DONE 15123
   MEL_LOSS_COEF = 8.0
 
 
-class C001_4_4(base_config): # RUNNING 15123
+class C001_4_4(base_config): # DONE 15123
   CHECK_POINT = 'nnet_C001_4_4'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -440,6 +440,22 @@ class C001_8_1(base_config): # *DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
+class C001_8_1_realmask(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_1_realmask'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+
 class C001_8_2(base_config): # *DONE 15041
   '''
   relative spectrum(mag) MSE
@@ -451,6 +467,21 @@ class C001_8_2(base_config): # *DONE 15041
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  # MASK_TYPE = "PSM" # default
+
+
+class C001_8_2_realmask(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_2_realmask'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
 
 
@@ -589,12 +620,12 @@ class C001_8_2_fourLayerRNN(base_config): # DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_2_addMusic(base_config): # RUNNING 15043
+class C001_8_2_addMusic(base_config): # DONE 15043
   '''
   relative spectrum(mag) MSE
   '''
   RNN_LAYER = 4
-  GENERATE_TFRECORD = True
+  GENERATE_TFRECORD = False
   CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_1_8k'
   OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_2_8k'
   NOISE_DIR = '/home/student/work/lhf/alldata/many_noise_and_music_8k'
@@ -751,6 +782,21 @@ class C001_8_3(base_config): # DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
+class C001_8_3_realmask(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_3_realmask'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 10000
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
 class C001_8_4(base_config): # DONE 15041
   '''
   relative spectrum(mag) MSE
@@ -765,6 +811,21 @@ class C001_8_4(base_config): # DONE 15041
   # MASK_TYPE = "PSM" # default
 
 
+class C001_8_4_realmask(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_4_realmask'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 2000
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
 class C001_8_5(base_config): # DONE 15041
   '''
   relative spectrum(mag) MSE
@@ -776,6 +837,21 @@ class C001_8_5(base_config): # DONE 15041
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 5000
+  # MASK_TYPE = "PSM" # default
+
+
+class C001_8_5_realmask(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_5_realmask'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 5000
+  ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
 
 
@@ -804,6 +880,21 @@ class C001_8_7(base_config): # DONE 15041
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 500
+  # MASK_TYPE = "PSM" # default
+
+
+class C001_8_7_realmask(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C001_8_7_realmask'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 500
+  ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
 
 
@@ -1558,5 +1649,5 @@ class C007_3(base_config): # DONE 15041
   MASK_TYPE = "IRM"
   ReLU_MASK = False
 
-PARAM = C001_4_4
+PARAM = C001_8_5_realmask
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
