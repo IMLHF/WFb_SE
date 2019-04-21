@@ -167,7 +167,7 @@ def train():
     sess.run(iter_val.initializer)
     loss_mag_prev, loss_phase_prev, loss_prev = eval_one_epoch(sess,
                                                                val_model)
-    cross_val_msg = "CROSSVAL PRERUN AVG.LOSS (%.4F, %.4F, %.4F)  costime %dS" % (
+    cross_val_msg = "\n\nCROSSVAL PRERUN AVG.LOSS (%.4F, %.4F, %.4F)  costime %dn" % (
         loss_mag_prev, loss_phase_prev, loss_prev, time.time()-valstart_time)
     tf.logging.info(cross_val_msg)
     with open(os.path.join(PARAM.SAVE_DIR, PARAM.CHECK_POINT+'_train.log'), 'a+') as f:
