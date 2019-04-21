@@ -232,7 +232,7 @@ def train():
 
       # Stopping criterion
       if rel_impr < PARAM.end_halving_impr:
-        if epoch < PARAM.min_epochs:
+        if epoch < PARAM.min_epochs or (model_lr > PARAM.learning_rate*np.power(PARAM.halving_factor,2.5)):
           tf.logging.info(
               "we were supposed to finish, but we continue as "
               "min_epochs : %s" % PARAM.min_epochs)
