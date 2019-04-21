@@ -213,5 +213,5 @@ if __name__ == "__main__":
       print('%s:%s' % (key,val))
   print('\n'.join(['%s:%s' % item for item in PARAM.__dict__.items()]))
   test_CC_or_OC(str(sys.argv[2]))
-  # OMP_NUM_THREADS=1 python3 2_test_CC_and_OC.py "" test_cc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_XXXPhase_testcc.log
-  # OMP_NUM_THREADS=1 python3 2_test_CC_and_OC.py "" test_oc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CXXX_XXXPhase_testoc.log
+  # OMP_NUM_THREADS=1 python3 2_test_CC_and_OC.py "" test_cc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CX_mixedPhase_testcc.log
+  # OMP_NUM_THREADS=1 python3 2_test_CC_and_OC.py "" test_oc 2>&1 | tee  exp/rnn_speech_enhancement/nnet_CX_mixedPhase_testoc.log
