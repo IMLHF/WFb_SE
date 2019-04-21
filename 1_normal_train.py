@@ -173,6 +173,7 @@ def train():
     # endregion
 
     # epochs training
+    lr_halving_time = 0
     for epoch in range(PARAM.start_epoch, PARAM.max_epochs):
       sess.run([iter_train.initializer, iter_val.initializer])
       start_time = time.time()
@@ -228,18 +229,21 @@ def train():
       # Start halving when improvement is lower than start_halving_impr
       if rel_impr < PARAM.start_halving_impr:
         model_lr *= PARAM.halving_factor
+        lr_halving_time += 1
         tr_model.assign_lr(sess, model_lr)
 
       # Stopping criterion
       if rel_impr < PARAM.end_halving_impr:
-        if epoch < PARAM.min_epochs or (model_lr > PARAM.learning_rate*np.power(PARAM.halving_factor,2.5)):
+        if (epoch < PARAM.min_epochs) or (lr_halving_time<=PARAM.max_lr_halving_time):
           tf.logging.info(
               "we were supposed to finish, but we continue as "
-              "min_epochs : %s" % PARAM.min_epochs)
+              "now_epoch<=min_epochs(%s<=%s),"
+              " or lr_halving_time<=max_lr_halving_time(%s<=%s)"
+              "." % (epoch+1,PARAM.min_epochs,lr_halving_time,PARAM.max_lr_halving_time))
           continue
         else:
           tf.logging.info(
-              "finished, too small rel. improvement %g" % rel_impr)
+              "finished, too small retive improvement %g." % rel_impr)
           break
 
     sess.close()

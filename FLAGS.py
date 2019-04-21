@@ -76,7 +76,8 @@ class base_config:
   start_epoch = 0
   min_epochs = 15  # Min number of epochs to run trainer without halving.
   max_epochs = 50  # Max number of epochs to run trainer totally.
-  halving_factor = 0.7  # Factor for halving.
+  halving_factor = 0.5  # Factor for halving.
+  max_lr_halving_time = 4
   # Halving when ralative loss is lower than start_halving_impr.
   start_halving_impr = 0.003
   # Stop when relative loss is lower than end_halving_impr.
