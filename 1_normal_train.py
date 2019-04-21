@@ -168,11 +168,15 @@ def train():
     with open(os.path.join(PARAM.SAVE_DIR, PARAM.CHECK_POINT+'_train.log'), 'a+') as f:
       f.writelines(cross_val_msg+'\n')
 
-    tr_model.assign_lr(sess, PARAM.learning_rate)
     g.finalize()
     # endregion
 
     # epochs training
+    if PARAM.resume_training.lower() == 'true':
+      lr = tr_model.lr
+    else:
+      lr = PARAM.learning_rate
+      tr_model.assign_lr(sess, lr)
     lr_halving_time = 0
     for epoch in range(PARAM.start_epoch, PARAM.max_epochs):
       sess.run([iter_train.initializer, iter_val.initializer])
@@ -228,9 +232,9 @@ def train():
 
       # Start halving when improvement is lower than start_halving_impr
       if rel_impr < PARAM.start_halving_impr:
-        model_lr *= PARAM.halving_factor
+        lr *= PARAM.halving_factor
         lr_halving_time += 1
-        tr_model.assign_lr(sess, model_lr)
+        tr_model.assign_lr(sess, lr)
 
       # Stopping criterion
       if rel_impr < PARAM.end_halving_impr:
