@@ -47,7 +47,7 @@ class base_config:
     "AUTO_RELATED_MSE" :
       [(y-y_)/(abs(y)+abs(y_))]^2
     "AUTO_RELATED_MSE2" :
-      (y-y_)^2/(abs(y)+abs(y_))
+      (y-y_)^2/(abs(y)+abs(y_))^1.9
     "AUTO_RELATED_MSE3" :
       [(y-y_)/abs(y)]^2
     "AUTO_RELATED_MSE4" :
@@ -299,6 +299,21 @@ class C_RealPSM_RelativeLossAFD2000(base_config): # DONE 15123
   ReLU_MASK = False
 
 
+class C_RealIRM_RelativeLossAFD100(base_config): # prepare 15123
+  '''
+  relative spectrum(mag) MSE AFD100 + IRM
+  '''
+  CHECK_POINT = 'nnet_C_RealIRM_RelativeLossAFD100'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  ReLU_MASK = False
+  MASK_TYPE = "IRM"
+
+
 class C_ReluIRM(base_config): # DONE 15123
   CHECK_POINT = 'nnet_C_ReluIRM'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -318,7 +333,21 @@ class C_ReluPSM(base_config): # DONE 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C_ReluPSM_RelativeLossAFD100(base_config): # prepare 15041
+class C_ReluPSM_RelativeLossAFD50(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C_ReluPSM_RelativeLossAFD50'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 50
+  # MASK_TYPE = "PSM" # default
+
+
+class C_ReluPSM_RelativeLossAFD100(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE
   '''
@@ -330,6 +359,39 @@ class C_ReluPSM_RelativeLossAFD100(base_config): # prepare 15041
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
   # MASK_TYPE = "PSM" # default
+
+
+class C_ReluPSM_RelativeLossAFD1000(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C_ReluPSM_RelativeLossAFD1000'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  # MASK_TYPE = "PSM" # default
+
+
+class C_ReluIRM_RelativeLossAFD100(base_config): # prepare 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C_ReluIRM_RelativeLossAFD100'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  MASK_TYPE = "IRM" # default
+
+
+# improve PSM
+# real
+# relu
 
 
 class C_RealPSM_RelativeLoss2AFD100(base_config): # RUNNING 15123
@@ -390,6 +452,7 @@ class C_RealFixPSM_RelativeLoss4AFD100(base_config): # prepare 15123
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
   ReLU_MASK = False
   MASK_TYPE = 'fixPSM'
+
 
 PARAM = C_RealPSM_RelativeLoss2AFD100
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
