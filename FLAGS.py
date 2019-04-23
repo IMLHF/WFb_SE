@@ -45,6 +45,13 @@ class base_config:
     "SPEC_MSE_FLEXIBLE_POW_C" :
     "RELATED_MSE" :
     "AUTO_RELATED_MSE" :
+      [(y-y_)/(abs(y)+abs(y_))]^2
+    "AUTO_RELATED_MSE2" :
+      (y-y_)^2/(abs(y)+abs(y_))
+    "AUTO_RELATED_MSE3" :
+      [(y-y_)/abs(y)]^2
+    "AUTO_RELATED_MSE4" :
+      [(y-y_)/(abs(y)+relu(y_))]^2
     "AUTO_RELATED_MSE_USE_COS" :
     "MEL_AUTO_RELATED_MSE" :
   '''
@@ -86,11 +93,11 @@ class base_config:
   num_threads_processing_data = 16
   RESTORE_PHASE = 'MIXED'  # 'MIXED','GRIFFIN_LIM',"ESTIMATE".
   GRIFFIN_ITERNUM = 50
-  minibatch_size = 400  # batch num to show
+  minibatch_size = 200  # batch num to show
   CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_1_8k'
   OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_2_8k'
   NOISE_DIR = '/home/student/work/lhf/alldata/many_noise_8k'
-  TFRECORDS_DIR = '/home/student/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_8k_snrmix_wavespan32767'
+  TFRECORDS_DIR = '/home/student/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_8k_snrmix_wavespan32767_fixAmpBUG'
   DATA_DICT_DIR = '_data/mixed_aishell'
   GENERATE_TFRECORD = False
   PROCESS_NUM_GENERATE_TFERCORD = 16
@@ -153,39 +160,33 @@ class base_config:
 
   SPEC_EST_BIAS = 0.0
 
+class ZSX_TEST(base_config):
+  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_1_8k'
+  OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_2_8k'
+  NOISE_DIR = '/home/student/work/lhf/alldata/many_noise_8k'
+  TFRECORDS_DIR = '/home/student/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_8k_snrmix_wavespan32767_fixAmpBUG'
+  CHECK_POINT = 'nnet_ZSX_TEST'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  MASK_TYPE = "fixPSM"
+  ReLU_MASK = True
 
-class C001_1(base_config): # shutdown 15043
-  CHECK_POINT = 'nnet_C001_1'
+
+class C_RealIRM(base_config): # DONE 15123
+  CHECK_POINT = 'nnet_C_RealIRM'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   MASK_TYPE = "IRM"
   PIPLINE_GET_THETA = False
-
-
-class C001_1_2(base_config): # prepare 15123
-  CHECK_POINT = 'nnet_C001_1'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  MASK_TYPE = "IRM"
-  PIPLINE_GET_THETA = False
   ReLU_MASK = False
 
 
-class C001_2(base_config): # shutdown 15043
-  CHECK_POINT = 'nnet_C001_2'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  # MASK_TYPE = "PSM" # default
-
-
-class C001_2_2(base_config): # prepare 15123
-  CHECK_POINT = 'nnet_C001_2'
+class C_RealPSM(base_config): # DONE 15123
+  CHECK_POINT = 'nnet_C_RealPSM'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
@@ -194,25 +195,41 @@ class C001_2_2(base_config): # prepare 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_1(base_config): # shutdown 15041
+class C_RealPSM_RelativeLossAFD10(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
   '''
-  CHECK_POINT = 'nnet_C001_8_1'
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD10'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 10
+  ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_1_realmask(base_config): # prepare 15123
+class C_RealPSM_RelativeLossAFD50(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
   '''
-  CHECK_POINT = 'nnet_C001_8_1_realmask'
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD50'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 50
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+class C_RealPSM_RelativeLossAFD100(base_config): # DONE 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD100'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
@@ -223,141 +240,11 @@ class C001_8_1_realmask(base_config): # prepare 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_2(base_config): # shutdown 15041
+class C_RealPSM_RelativeLossAFD500(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
   '''
-  CHECK_POINT = 'nnet_C001_8_2'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
-  # MASK_TYPE = "PSM" # default
-
-
-class C001_8_2_realmask(base_config): # prepare 15123
-  '''
-  relative spectrum(mag) MSE
-  '''
-  CHECK_POINT = 'nnet_C001_8_2_realmask'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
-  ReLU_MASK = False
-  # MASK_TYPE = "PSM" # default
-
-
-class C001_8_3(base_config): # shutdown 15041
-  '''
-  relative spectrum(mag) MSE
-  '''
-  CHECK_POINT = 'nnet_C001_8_3'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 10000
-  # MASK_TYPE = "PSM" # default
-
-
-class C001_8_3_realmask(base_config): # prepare 15123
-  '''
-  relative spectrum(mag) MSE
-  '''
-  CHECK_POINT = 'nnet_C001_8_3_realmask'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 10000
-  ReLU_MASK = False
-  # MASK_TYPE = "PSM" # default
-
-
-class C001_8_4(base_config): # shutdown 15041
-  '''
-  relative spectrum(mag) MSE
-  '''
-  CHECK_POINT = 'nnet_C001_8_4'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 2000
-  # MASK_TYPE = "PSM" # default
-
-
-class C001_8_4_realmask(base_config): # prepare 15123
-  '''
-  relative spectrum(mag) MSE
-  '''
-  CHECK_POINT = 'nnet_C001_8_4_realmask'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 2000
-  ReLU_MASK = False
-  # MASK_TYPE = "PSM" # default
-
-
-class C001_8_5(base_config): # shutdown 15041
-  '''
-  relative spectrum(mag) MSE
-  '''
-  CHECK_POINT = 'nnet_C001_8_5'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 5000
-  # MASK_TYPE = "PSM" # default
-
-
-class C001_8_5_realmask(base_config): # prepare 15123
-  '''
-  relative spectrum(mag) MSE
-  '''
-  CHECK_POINT = 'nnet_C001_8_5_realmask'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 5000
-  ReLU_MASK = False
-  # MASK_TYPE = "PSM" # default
-
-
-class C001_8_7(base_config): # shutdown 15041
-  '''
-  relative spectrum(mag) MSE
-  '''
-  CHECK_POINT = 'nnet_C001_8_7'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 500
-  # MASK_TYPE = "PSM" # default
-
-
-class C001_8_7_realmask(base_config): # prepare 15123
-  '''
-  relative spectrum(mag) MSE
-  '''
-  CHECK_POINT = 'nnet_C001_8_7_realmask'
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD500'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
@@ -368,5 +255,141 @@ class C001_8_7_realmask(base_config): # prepare 15123
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C001_1_2
+class C_RealPSM_RelativeLossAFD1000(base_config): # DONE 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD1000'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+class C_RealPSM_RelativeLossAFD1500(base_config): # DONE 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD1500'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1500
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+class C_RealPSM_RelativeLossAFD2000(base_config): # DONE 15123
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD2000'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 2000
+  ReLU_MASK = False
+
+
+class C_ReluIRM(base_config): # DONE 15123
+  CHECK_POINT = 'nnet_C_ReluIRM'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  MASK_TYPE = "IRM"
+  PIPLINE_GET_THETA = False
+
+
+class C_ReluPSM(base_config): # DONE 15123
+  CHECK_POINT = 'nnet_C_ReluPSM'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  # MASK_TYPE = "PSM" # default
+
+
+class C_ReluPSM_RelativeLossAFD100(base_config): # prepare 15041
+  '''
+  relative spectrum(mag) MSE
+  '''
+  CHECK_POINT = 'nnet_C_ReluPSM_RelativeLossAFD100'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  # MASK_TYPE = "PSM" # default
+
+
+class C_RealPSM_RelativeLoss2AFD100(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE v2
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss2AFD100'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE2"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+class C_RealPSM_RelativeLoss3AFD100(base_config): # prepare 15123
+  '''
+  relative spectrum(mag) MSE v3
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss3AFD100'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE3"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+class C_RealPSM_RelativeLoss4AFD100(base_config): # prepare 15123
+  '''
+  relative spectrum(mag) MSE v4
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss4AFD100'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE4"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+class C_RealFixPSM_RelativeLoss4AFD100(base_config): # prepare 15123
+  '''
+  relative spectrum(mag) MSE v4
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss4AFD100'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE4"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  ReLU_MASK = False
+  MASK_TYPE = 'fixPSM'
+
+PARAM = C_RealPSM_RelativeLoss2AFD100
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
