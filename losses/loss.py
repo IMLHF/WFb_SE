@@ -32,23 +32,23 @@ def relative_reduce_sum_frame_batchsize_MSE(y1,y2,ignore_threshold):
 def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v4(y_est,y_true,axis_fit_degree,index_=2.0):
   refer_sum = tf.maximum(tf.abs(y_est)+tf.abs(y_true),1e-12)
   small_val_debuff = tf.pow(refer_sum*axis_fit_degree*1.0,-1.0)+1.0-tf.pow(axis_fit_degree*1.0,-1.0)
-  relative_loss = tf.abs(y_est-y_true)/tf.maximum(tf.abs(y_true)+tf.nn.relu(y_est),1e-12)/small_val_debuff
+  relative_loss = tf.abs(y_est-y_true)/tf.maximum(tf.abs(y_true)+tf.nn.relu(tf.sign(y_true)*y_est),1e-12)/small_val_debuff
   cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(relative_loss, index_), 1), 1))
   return cost
 
 
 def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v3(y_est,y_true,axis_fit_degree,index_=2.0):
-  refer_sum = tf.maximum(tf.abs(y_est)+tf.abs(y_true),1e-12)
+  refer_sum = tf.maximum(tf.abs(y_true),1e-12)
   small_val_debuff = tf.pow(refer_sum*axis_fit_degree*1.0,-1.0)+1.0-tf.pow(axis_fit_degree*1.0,-1.0)
-  relative_loss = tf.abs(y_est-y_true)/tf.maximum(2.0*tf.abs(y_true),1e-12)/small_val_debuff
+  relative_loss = tf.abs(y_est-y_true)/refer_sum/small_val_debuff
   cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(relative_loss, index_), 1), 1))
   return cost
 
 
-def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v2(y1,y2,axis_fit_degree,index_=2.0):
+def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v2(y1,y2,axis_fit_degree,linear_broker,index_=2.0):
   refer_sum = tf.maximum(tf.abs(y1)+tf.abs(y2),1e-12)
   small_val_debuff = tf.pow(refer_sum*axis_fit_degree*1.0,-1.0)+1.0-tf.pow(axis_fit_degree*1.0,-1.0)
-  relative_loss = tf.pow(tf.abs(y1-y2),1.05)/refer_sum/small_val_debuff
+  relative_loss = tf.pow(tf.abs(y1-y2),linear_broker)/refer_sum/small_val_debuff
   cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(relative_loss, index_), 1), 1))
   return cost
 
