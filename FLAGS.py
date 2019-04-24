@@ -47,15 +47,13 @@ class base_config:
     "AUTO_RELATED_MSE" :
       [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|)]^2
     "AUTO_RELATED_MSE2" :
-      [(y-y_)^lb/(|y|+|y_|)/ignore_coef(|y|+|y_|)]^2
+      [|y-y_|^lb/(|y|+|y_|)/ignore_coef(|y|+|y_|)]^2
     "AUTO_RELATED_MSE3" :
-      [(y-y_)/|y|/ignore_coef(|y|)]^2
+      [|y-y_|/(A*|y|+B)]^C
     "AUTO_RELATED_MSE4" :
       [(y-y_)/(|y|+relu(sign(y)*y_))/ignore_coef(|y|+|y_|)]^2
     "AUTO_RELATED_MSE5" :
       [relu(y-y_)/(2|y|+relu(y-y_))]^2+[relu(y-y_)/(|y|+relu(|y|-y+y_))]^2
-      ((0.5-(max(0,x-0.5)+0.5))/(0.5+abs(max(0,x-0.5)+0.5)))^(2)+((-0.5-(-max(0,-x+0.5)-0.5))/(0.5+abs(-max(0,-x+0.5)-0.5)))^(2)
-      (max(0,x-(-0.5))/(abs(0.5)+abs(max(0,x-(-0.5)+abs(0.5)))))^(2)+((-abs(0.5)-(-max(0,-x+(-0.5))-abs(0.5)))/(abs(0.5)+abs(-max(0,-x-0.5)-abs(0.5))))^(2)
     "AUTO_RELATED_MSE_USE_COS" :
     "MEL_AUTO_RELATED_MSE" :
   '''
@@ -74,7 +72,9 @@ class base_config:
   PI = 3.1415927
   AUTO_RELATED_MSE_AXIS_FIT_DEG = None # for "AUTO_RELATED_MSE"
   COS_AUTO_RELATED_MSE_W = None # for "AUTO_RELATED_MSE_USE_COS"
-  AUTO_RELATIVE_LOSS3_MIN_REFER = None # for "AUTO_RELATED_MSE3"
+  AUTO_RELATIVE_LOSS3_A = None # for "AUTO_RELATED_MSE3"
+  AUTO_RELATIVE_LOSS3_B = None
+  AUTO_RELATIVE_LOSS3_C = None
   KEEP_PROB = 0.8
   RNN_LAYER = 2
   CLIP_NORM = 5.0
@@ -444,7 +444,7 @@ class C_RealPSM_RelativeLoss2AFD100(base_config): # *DONE 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C_RealPSM_RelativeLoss2AFD100_LB1_2(base_config): # RUNNING 15123
+class C_RealPSM_RelativeLoss2AFD100_LB1_2(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE v2
   [(y-y_)^1.2/(|y|+|y_|)/ignore_coef(|y|+|y_|)]^2
@@ -461,18 +461,38 @@ class C_RealPSM_RelativeLoss2AFD100_LB1_2(base_config): # RUNNING 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C_RealPSM_RelativeLoss3MinRefer0_5(base_config): # RUNNING 15123
+class C_RealPSM_RelativeLoss3_001(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE v3
-  [(y-y_)/|y|+0.5]^2
+  [|y-y_|/(A*|y|+B)]^C
   '''
-  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss3AFD100'
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss3_001'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE3"
-  AUTO_RELATIVE_LOSS3_MIN_REFER = 0.5 #
+  AUTO_RELATIVE_LOSS3_A = 1.0 # A: [1左右] 控制关注程度的变化速度，越大损失函数的开口变化速度越快
+  AUTO_RELATIVE_LOSS3_B = 0.1 # B: [0.001-0.2] 控制|y|趋向于无穷小时的开口大小,B越小开口越小;开口太小不收敛,开口太大效果差(小值的关注度不够)
+  AUTO_RELATIVE_LOSS3_C = 2.0 # C: 次幂,越大容错率越大,容易收敛,收敛后效果较差;越小容错率越小,不以收敛,收敛后效果较好.
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+class C_RealPSM_RelativeLoss3_002(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE v3
+  [|y-y_|/(A*|y|+B)]^C
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss3_002'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE3"
+  AUTO_RELATIVE_LOSS3_A = 1.0 # A: [1左右] 控制关注程度的变化速度，越大损失函数的开口变化速度越快
+  AUTO_RELATIVE_LOSS3_B = 0.05 # B: [0.001-0.2] 控制|y|趋向于无穷小时的开口大小,B越小开口越小;开口太小不收敛,开口太大效果差(小值的关注度不够)
+  AUTO_RELATIVE_LOSS3_C = 2.0 # C: 次幂,越大容错率越大,容易收敛,收敛后效果较差;越小容错率越小,不以收敛,收敛后效果较好.
   ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
 
@@ -493,7 +513,7 @@ class C_RealPSM_RelativeLoss4AFD100(base_config): # DIRVERGE 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C_RealPSM_RelativeLoss5(base_config): # RUNNING 15123
+class C_RealPSM_RelativeLoss5(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE v5
   [relu(y-y_)/(2|y|+relu(y-y_))]^2+[relu(y-y_)/(|y|+relu(|y|-y+y_))]^2
@@ -508,5 +528,5 @@ class C_RealPSM_RelativeLoss5(base_config): # RUNNING 15123
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C_RealPSM_RelativeLoss3MinRefer0_5
+PARAM = C_RealPSM_RelativeLoss3_001
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)

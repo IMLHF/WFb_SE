@@ -46,10 +46,13 @@ def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v4(y_est,y_true,axis_fit
   return cost
 
 
-def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v3(y_est,y_true,min_refer,index_=2.0):
-  refer_true = tf.abs(y_true)+min_refer
+def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v3(y_est,y_true,A,B,C):
+  '''
+    [|y-y_|/(A*|y|+B)]^C
+  '''
+  refer_true = A*tf.abs(y_true)+B
   relative_loss = tf.abs(y_est-y_true)/refer_true
-  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(relative_loss, index_), 1), 1))
+  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(relative_loss, C), 1), 1))
   return cost
 
 

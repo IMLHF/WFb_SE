@@ -298,7 +298,8 @@ class Model_Baseline(object):
           FLAGS.PARAM.LINEAR_BROKER,)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE3":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v3(
-          self._y_estimation, self._y_labels, FLAGS.PARAM.AUTO_RELATIVE_LOSS3_MIN_REFER)
+          self._y_estimation, self._y_labels,
+          FLAGS.PARAM.AUTO_RELATIVE_LOSS3_A, FLAGS.PARAM.AUTO_RELATIVE_LOSS3_B, FLAGS.PARAM.AUTO_RELATIVE_LOSS3_C)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE4":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v4(
           self._y_estimation, self._y_labels, FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
