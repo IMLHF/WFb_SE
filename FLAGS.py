@@ -422,6 +422,21 @@ class C_ReluIRM_RelativeLossAFD100(base_config): # DONE 15123
   MASK_TYPE = "IRM" # default
 
 
+class C_ReluIRM_RelativeLossAFD500(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE
+  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|)]^2
+  '''
+  CHECK_POINT = 'nnet_C_ReluIRM_RelativeLossAFD500'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 500
+  MASK_TYPE = "IRM" # default
+
+
 # improve PSM
 # real
 # relu
@@ -513,7 +528,7 @@ class C_RealPSM_RelativeLoss4AFD100(base_config): # DIRVERGE 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C_RealPSM_RelativeLoss5(base_config): # DONE 15123
+class C_RealPSM_RelativeLoss5(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE v5
   [relu(y-y_)/(2|y|+relu(y-y_))]^2+[relu(y-y_)/(|y|+relu(|y|-y+y_))]^2
@@ -528,5 +543,5 @@ class C_RealPSM_RelativeLoss5(base_config): # DONE 15123
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C_RealPSM_RelativeLoss3_001
+PARAM = C_ReluIRM_RelativeLossAFD500
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
