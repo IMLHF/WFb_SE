@@ -168,20 +168,6 @@ class base_config:
   SPEC_EST_BIAS = 0.0
 
 
-class ZSX_TEST(base_config):
-  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_1_8k'
-  OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/student/work/lhf/alldata/aishell2_100speaker_list_2_8k'
-  NOISE_DIR = '/home/student/work/lhf/alldata/many_noise_8k'
-  TFRECORDS_DIR = '/home/student/work/lhf/alldata/irm_data/paper_tfrecords_utt03s_8k_snrmix_wavespan32767_fixAmpBUG'
-  CHECK_POINT = 'nnet_ZSX_TEST'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  MASK_TYPE = "fixPSM"
-  ReLU_MASK = True
-
-
 class C_RealIRM(base_config): # DONE 15123
   CHECK_POINT = 'nnet_C_RealIRM'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -191,17 +177,6 @@ class C_RealIRM(base_config): # DONE 15123
   MASK_TYPE = "IRM"
   PIPLINE_GET_THETA = False
   ReLU_MASK = False
-
-
-# class C_RealIRM_SME(base_config): # RUNNING 15123
-#   CHECK_POINT = 'nnet_C_RealIRM'
-#   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-#   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-#   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-#   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-#   MASK_TYPE = "IRM"
-#   PIPLINE_GET_THETA = False
-#   ReLU_MASK = False
 
 
 class C_RealPSM(base_config): # DONE 15123
