@@ -38,10 +38,10 @@ def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v5(y_est,y_true,index_=2
   return cost
 
 
-def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v4(y_est,y_true,axis_fit_degree,index_=2.0):
+def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v4(y_est,y_true,axis_fit_degree,min_refer,index_=2.0):
   refer_sum = tf.maximum(tf.abs(y_est)+tf.abs(y_true),1e-12)
   small_val_debuff = tf.pow(refer_sum*axis_fit_degree*1.0,-1.0)+1.0-tf.pow(axis_fit_degree*1.0,-1.0)
-  relative_loss = tf.abs(y_est-y_true)/tf.maximum(tf.abs(y_true)+tf.nn.relu(tf.sign(y_true)*y_est),1e-12)/small_val_debuff
+  relative_loss = tf.abs(y_est-y_true)/(tf.abs(y_true)+tf.nn.relu(tf.sign(y_true)*y_est)+min_refer)/small_val_debuff
   cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(relative_loss, index_), 1), 1))
   return cost
 

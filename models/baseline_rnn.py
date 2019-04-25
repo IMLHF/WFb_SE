@@ -302,7 +302,8 @@ class Model_Baseline(object):
           FLAGS.PARAM.AUTO_RELATIVE_LOSS3_A, FLAGS.PARAM.AUTO_RELATIVE_LOSS3_B, FLAGS.PARAM.AUTO_RELATIVE_LOSS3_C)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE4":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v4(
-          self._y_estimation, self._y_labels, FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
+          self._y_estimation, self._y_labels,
+          FLAGS.PARAM.AUTO_RELATIVE_LOSS4_MIN_REFER,FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE5":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v5(
           self._y_estimation, self._y_labels)
