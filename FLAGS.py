@@ -596,6 +596,7 @@ class C_RealPSM_RelativeLoss3_007(base_config): # RUNNING 15123
   ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
 
+# 初始的ReLoss_MSE，对应的A大一些，B也大一些，C1=1.0
 
 class C_RealPSM_RelativeLoss4AFD100_001(base_config): # DONE 15123
   '''
