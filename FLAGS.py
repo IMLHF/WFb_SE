@@ -570,8 +570,8 @@ class C_RealPSM_RelativeLoss3_006(base_config): # RUNNING 15123
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE3"
-  AUTO_RELATIVE_LOSS3_A = 1.2 # A: [1左右] 控制关注程度的变化速度，越大损失函数的开口变化速度越快
-  AUTO_RELATIVE_LOSS3_B = 0.05 # B: [0.001-0.2] 控制|y|趋向于无穷小时的开口大小,B越小开口越小;开口太小不收敛,开口太大效果差(小值的关注度不够)
+  AUTO_RELATIVE_LOSS3_A = 1.5 # A: [1左右] 控制关注程度的变化速度，越大损失函数的开口变化速度越快
+  AUTO_RELATIVE_LOSS3_B = 0.02 # B: [0.001-0.2] 控制|y|趋向于无穷小时的开口大小,B越小开口越小;开口太小不收敛,开口太大效果差(小值的关注度不够)
   AUTO_RELATIVE_LOSS3_C1 = 1.0 # C1: 为1时, 底部等高线为直线; 小于1时向外弯曲, 类似x^2; 大于1时向内弯曲.
   AUTO_RELATIVE_LOSS3_C2 = 2.0 # C2: 次幂,越大容错率越大,容易收敛,收敛后效果较差;越小容错率越小,不以收敛,收敛后效果较好.
   ReLU_MASK = False
@@ -589,28 +589,9 @@ class C_RealPSM_RelativeLoss3_007(base_config): # RUNNING 15123
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE3"
-  AUTO_RELATIVE_LOSS3_A = 1.7 # A: [1左右] 控制关注程度的变化速度，越大损失函数的开口变化速度越快
-  AUTO_RELATIVE_LOSS3_B = 0.05 # B: [0.001-0.2] 控制|y|趋向于无穷小时的开口大小,B越小开口越小;开口太小不收敛,开口太大效果差(小值的关注度不够)
-  AUTO_RELATIVE_LOSS3_C1 = 1.0 # C1: 为1时, 底部等高线为直线; 小于1时向外弯曲, 类似x^2; 大于1时向内弯曲.
-  AUTO_RELATIVE_LOSS3_C2 = 2.0 # C2: 次幂,越大容错率越大,容易收敛,收敛后效果较差;越小容错率越小,不以收敛,收敛后效果较好.
-  ReLU_MASK = False
-  # MASK_TYPE = "PSM" # default
-
-
-class C_RealPSM_RelativeLoss3_008(base_config): # RUNNING 15123
-  '''
-  relative spectrum(mag) MSE v3
-  [|y-y_|/((A*|y|)^C1+B)]^C2
-  '''
-  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss3_008'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE3"
   AUTO_RELATIVE_LOSS3_A = 1.5 # A: [1左右] 控制关注程度的变化速度，越大损失函数的开口变化速度越快
-  AUTO_RELATIVE_LOSS3_B = 0.05 # B: [0.001-0.2] 控制|y|趋向于无穷小时的开口大小,B越小开口越小;开口太小不收敛,开口太大效果差(小值的关注度不够)
-  AUTO_RELATIVE_LOSS3_C1 = 1.2 # C1: 为1时, 底部等高线为直线; 小于1时向外弯曲, 类似x^2; 大于1时向内弯曲.
+  AUTO_RELATIVE_LOSS3_B = 0.07 # B: [0.001-0.2] 控制|y|趋向于无穷小时的开口大小,B越小开口越小;开口太小不收敛,开口太大效果差(小值的关注度不够)
+  AUTO_RELATIVE_LOSS3_C1 = 1.0 # C1: 为1时, 底部等高线为直线; 小于1时向外弯曲, 类似x^2; 大于1时向内弯曲.
   AUTO_RELATIVE_LOSS3_C2 = 2.0 # C2: 次幂,越大容错率越大,容易收敛,收敛后效果较差;越小容错率越小,不以收敛,收敛后效果较好.
   ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
