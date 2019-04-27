@@ -267,7 +267,7 @@ def main(argv):
     else:
       print('%s:%s' % (key,val))
   # print('\n'.join(['%s:%s' % item for item in PARAM.supper().__dict__.items()]))
-  # print('\n'.join(['%s:%s' % item for item in PARAM.__dict__.items()]))
+  print('\n'.join(['%s:%s' % item for item in PARAM.__dict__.items()]))
   train()
 
 

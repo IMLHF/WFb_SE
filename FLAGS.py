@@ -95,7 +95,7 @@ class base_config:
   # Halving when ralative loss is lower than start_halving_impr.
   start_halving_impr = 0.003
   # Stop when relative loss is lower than end_halving_impr.
-  end_halving_impr = 0.0005
+  end_halving_impr = 0.00000
   # The num of threads to read tfrecords files.
   num_threads_processing_data = 16
   RESTORE_PHASE = 'MIXED'  # 'MIXED','GRIFFIN_LIM',"ESTIMATE".
@@ -481,7 +481,7 @@ class C_RealPSM_RelativeLoss2AFD1000_LB1_2(base_config): # DONE 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C_RealPSM_RelativeLoss2AFD2000_LB1_2(base_config): # RUNNING 15123
+class C_RealPSM_RelativeLoss2AFD2000_LB1_2(base_config): # RUNNING2 15123
   '''
   relative spectrum(mag) MSE v2
   [(y-y_)^1.2/(|y|+|y_|)/ignore_coef(|y|+|y_|)]^2
@@ -631,7 +631,7 @@ class C_RealPSM_RelativeLoss3_007(base_config): # DONE 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C_RealPSM_RelativeLoss3_008(base_config): # RUNNING 15123
+class C_RealPSM_RelativeLoss3_008(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE v3
   [|y-y_|/((A*|y|)^C1+B)]^C2
@@ -650,7 +650,7 @@ class C_RealPSM_RelativeLoss3_008(base_config): # RUNNING 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C_RealPSM_RelativeLoss3_009(base_config): # RUNNING 15123
+class C_RealPSM_RelativeLoss3_009(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE v3
   [|y-y_|/((A*|y|)^C1+B)]^C2
@@ -669,7 +669,7 @@ class C_RealPSM_RelativeLoss3_009(base_config): # RUNNING 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C_RealPSM_RelativeLoss3_010(base_config): # RUNNING 15123
+class C_RealPSM_RelativeLoss3_010(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE v3
   [|y-y_|/((A*|y|)^C1+B)]^C2
@@ -686,6 +686,45 @@ class C_RealPSM_RelativeLoss3_010(base_config): # RUNNING 15123
   AUTO_RELATIVE_LOSS3_C2 = 2.0 # C2: 次幂,越大容错率越大,容易收敛,收敛后效果较差;越小容错率越小,不以收敛,收敛后效果较好.
   ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
+
+
+class C_RealPSM_RelativeLoss3_011(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE v3
+  [|y-y_|/((A*|y|)^C1+B)]^C2
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss3_011'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE3"
+  AUTO_RELATIVE_LOSS3_A = 1.5 # A: [1左右] 控制关注程度的变化速度，越大损失函数的开口变化速度越快
+  AUTO_RELATIVE_LOSS3_B = 0.1 # B: [0.001-0.2] 控制|y|趋向于无穷小时的开口大小,B越小开口越小;开口太小不收敛,开口太大效果差(小值的关注度不够)
+  AUTO_RELATIVE_LOSS3_C1 = 1.1 # C1: 为1时, 底部等高线为直线; 小于1时向外弯曲, 类似x^2; 大于1时向内弯曲.
+  AUTO_RELATIVE_LOSS3_C2 = 2.0 # C2: 次幂,越大容错率越大,容易收敛,收敛后效果较差;越小容错率越小,不以收敛,收敛后效果较好.
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+class C_RealPSM_RelativeLoss3_012(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE v3
+  [|y-y_|/((A*|y|)^C1+B)]^C2
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss3_012'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE3"
+  AUTO_RELATIVE_LOSS3_A = 2 # A: [1左右] 控制关注程度的变化速度，越大损失函数的开口变化速度越快
+  AUTO_RELATIVE_LOSS3_B = 0.1 # B: [0.001-0.2] 控制|y|趋向于无穷小时的开口大小,B越小开口越小;开口太小不收敛,开口太大效果差(小值的关注度不够)
+  AUTO_RELATIVE_LOSS3_C1 = 1.2 # C1: 为1时, 底部等高线为直线; 小于1时向外弯曲, 类似x^2; 大于1时向内弯曲.
+  AUTO_RELATIVE_LOSS3_C2 = 1.8 # C2: 次幂,越大容错率越大,容易收敛,收敛后效果较差;越小容错率越小,不以收敛,收敛后效果较好.
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
 
 # 初始的ReLoss_MSE，对应的A大一些，B也大一些，C1=1.0
 
@@ -755,5 +794,5 @@ class C_RealPSM_RelativeLoss5(base_config): # DONE 15123
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C_RealPSM_RelativeLoss3_010
+PARAM = C_RealPSM_RelativeLoss3_012
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
