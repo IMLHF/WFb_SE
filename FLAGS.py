@@ -45,13 +45,13 @@ class base_config:
     "SPEC_MSE_FLEXIBLE_POW_C" :
     "RELATED_MSE" :
     "AUTO_RELATED_MSE" :
-      [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+      [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
     "AUTO_RELATED_MSE2" :
-      [|y-y_|^lb/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+      [|y-y_|^lb/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
     "AUTO_RELATED_MSE3" :
       [|y-y_|/((A*|y|)^C1+B)]^C2
     "AUTO_RELATED_MSE4" :
-      [(y-y_)/(|y|+relu(sign(y)*y_))/ignore_coef(|y|+|y_|;AFD)]^2
+      [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+relu(sign(y)*y_))]^2
     "AUTO_RELATED_MSE5" :
       [relu(y-y_)/(2|y|+relu(y-y_))]^2+[relu(y-y_)/(|y|+relu(|y|-y+y_))]^2
     "AUTO_RELATED_MSE6" :
@@ -207,7 +207,7 @@ class C_RealPSM(base_config): # DONE 15123
 class C_RealPSM_RelativeLossAFD10(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD10'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -223,7 +223,7 @@ class C_RealPSM_RelativeLossAFD10(base_config): # DONE 15123
 class C_RealPSM_RelativeLossAFD50(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD50'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -239,7 +239,7 @@ class C_RealPSM_RelativeLossAFD50(base_config): # DONE 15123
 class C_RealPSM_RelativeLossAFD100(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD100'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -255,7 +255,7 @@ class C_RealPSM_RelativeLossAFD100(base_config): # DONE 15123
 class C_RealPSM_RelativeLossAFD500(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD500'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -271,7 +271,7 @@ class C_RealPSM_RelativeLossAFD500(base_config): # DONE 15123
 class C_RealPSM_RelativeLossAFD1000(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD1000'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -287,7 +287,7 @@ class C_RealPSM_RelativeLossAFD1000(base_config): # DONE 15123
 class C_RealPSM_RelativeLossAFD1500(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD1500'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -303,7 +303,7 @@ class C_RealPSM_RelativeLossAFD1500(base_config): # DONE 15123
 class C_RealPSM_RelativeLossAFD2000(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLossAFD2000'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -318,7 +318,7 @@ class C_RealPSM_RelativeLossAFD2000(base_config): # DONE 15123
 class C_RealIRM_RelativeLossAFD100(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE AFD100 + IRM
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealIRM_RelativeLossAFD100'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -353,7 +353,7 @@ class C_ReluPSM(base_config): # DONE 15123
 class C_ReluPSM_RelativeLossAFD50(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_ReluPSM_RelativeLossAFD50'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -368,7 +368,7 @@ class C_ReluPSM_RelativeLossAFD50(base_config): # DONE 15123
 class C_ReluPSM_RelativeLossAFD100(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_ReluPSM_RelativeLossAFD100'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -383,7 +383,7 @@ class C_ReluPSM_RelativeLossAFD100(base_config): # DONE 15123
 class C_ReluPSM_RelativeLossAFD500(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_ReluPSM_RelativeLossAFD500'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -398,7 +398,7 @@ class C_ReluPSM_RelativeLossAFD500(base_config): # DONE 15123
 class C_ReluPSM_RelativeLossAFD1000(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_ReluPSM_RelativeLossAFD1000'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -413,7 +413,7 @@ class C_ReluPSM_RelativeLossAFD1000(base_config): # DONE 15123
 class C_ReluIRM_RelativeLossAFD100(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_ReluIRM_RelativeLossAFD100'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -428,7 +428,7 @@ class C_ReluIRM_RelativeLossAFD100(base_config): # DONE 15123
 class C_ReluIRM_RelativeLossAFD500(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
-  [(y-y_)/(|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_ReluIRM_RelativeLossAFD500'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -448,7 +448,7 @@ class C_ReluIRM_RelativeLossAFD500(base_config): # DONE 15123
 class C_RealPSM_RelativeLoss2AFD100(base_config): # *DONE 15123
   '''
   relative spectrum(mag) MSE v2
-  [(y-y_)^1.05/(|y|+|y_|)/ignore_coef(|y|+|y_|)]^2
+  [|y-y_|^lb/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss2AFD100'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -465,7 +465,7 @@ class C_RealPSM_RelativeLoss2AFD100(base_config): # *DONE 15123
 class C_RealPSM_RelativeLoss2AFD100_LB1_2(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE v2
-  [(y-y_)^1.2/(|y|+|y_|)/ignore_coef(|y|+|y_|)]^2
+  [|y-y_|^lb/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss2AFD100_LB1_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -482,7 +482,7 @@ class C_RealPSM_RelativeLoss2AFD100_LB1_2(base_config): # DONE 15123
 class C_RealPSM_RelativeLoss2AFD1000_LB1_2(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE v2
-  [(y-y_)^1.2/(|y|+|y_|)/ignore_coef(|y|+|y_|)]^2
+  [|y-y_|^lb/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss2AFD1000_LB1_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -499,7 +499,7 @@ class C_RealPSM_RelativeLoss2AFD1000_LB1_2(base_config): # DONE 15123
 class C_RealPSM_RelativeLoss2AFD2000_LB1_2(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE v2
-  [(y-y_)^1.2/(|y|+|y_|)/ignore_coef(|y|+|y_|)]^2
+  [|y-y_|^lb/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss2AFD2000_LB1_2'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -516,7 +516,7 @@ class C_RealPSM_RelativeLoss2AFD2000_LB1_2(base_config): # DONE 15123
 class C_RealPSM_RelativeLoss2AFD1000_LB1_1(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE v2
-  [(y-y_)^1.2/(|y|+|y_|)/ignore_coef(|y|+|y_|)]^2
+  [|y-y_|^lb/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss2AFD1000_LB1_1'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -837,7 +837,7 @@ class C_RealPSM_RelativeLoss3_016(base_config): # prepare 15123
 class C_RealPSM_RelativeLoss4AFD100(base_config): # prepare 15123
   '''
   relative spectrum(mag) MSE v4
-  [(y-y_)/(|y|+relu(sign(y)*y_))/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+relu(sign(y)*y_))]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss4AFD100_001'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -853,7 +853,7 @@ class C_RealPSM_RelativeLoss4AFD100(base_config): # prepare 15123
 class C_RealPSM_RelativeLoss4AFD500(base_config): # prepare 15123
   '''
   relative spectrum(mag) MSE v4
-  [(y-y_)/(|y|+relu(sign(y)*y_))/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+relu(sign(y)*y_))]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss4AFD100_002'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -869,7 +869,7 @@ class C_RealPSM_RelativeLoss4AFD500(base_config): # prepare 15123
 class C_RealPSM_RelativeLoss4AFD1000(base_config): # prepare 15123
   '''
   relative spectrum(mag) MSE v4
-  [(y-y_)/(|y|+relu(sign(y)*y_))/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+relu(sign(y)*y_))]^2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss4AFD100_003'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
