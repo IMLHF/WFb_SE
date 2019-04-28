@@ -29,6 +29,22 @@ def relative_reduce_sum_frame_batchsize_MSE(y1,y2,ignore_threshold):
   return cost
 
 
+def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v7(y1,y2,axis_fit_degree,index_=2.0):
+  refer_sum = tf.maximum(tf.abs(y1)+tf.abs(y2),1e-18)
+  refer_mul = tf.maximum(tf.sqrt(tf.abs(y1)*tf.abs(y2)),1e-18)
+  small_val_debuff = tf.pow(refer_sum*axis_fit_degree*1.0,-1.0)+1.0-tf.pow(axis_fit_degree*1.0,-1.0)
+  relative_loss = tf.abs(y1-y2)/refer_mul/small_val_debuff
+  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(relative_loss, index_), 1), 1))
+  return cost
+
+
+def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v6(y1,y2,min_refer,index_=2.0):
+  refer_mul = tf.add(tf.abs(y1)*tf.abs(y2),min_refer)
+  relative_loss = tf.abs(y1-y2)/refer_mul
+  cost = tf.reduce_sum(tf.reduce_mean(tf.reduce_sum(tf.pow(relative_loss, index_), 1), 1))
+  return cost
+
+
 # AUTO_RELATED_MSE5
 def auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v5(y_est,y_true,index_=2.0):
   reluYsubY_ = tf.nn.relu(y_true-y_est)
