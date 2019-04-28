@@ -314,7 +314,9 @@ class Model_Baseline(object):
           FLAGS.PARAM.AUTO_RELATIVE_LOSS6_C1, FLAGS.PARAM.AUTO_RELATIVE_LOSS6_C2)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE7":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v7(
-          self._y_estimation, self._y_labels, FLAGS.PARAM.AUTO_RELATIVE_LOSS7_AFD)
+          self._y_estimation, self._y_labels,
+          FLAGS.PARAM.AUTO_RELATIVE_LOSS7_A1, FLAGS.PARAM.AUTO_RELATIVE_LOSS7_A2,
+          FLAGS.PARAM.AUTO_RELATIVE_LOSS7_B, FLAGS.PARAM.AUTO_RELATIVE_LOSS7_C1, FLAGS.PARAM.AUTO_RELATIVE_LOSS7_C2)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE8":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v8(
           self._y_estimation, self._y_labels,

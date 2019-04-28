@@ -57,8 +57,7 @@ class base_config:
     "AUTO_RELATED_MSE6" :
       [(y-y_)/(A*sqrt(|y|*|y_|)^C1+B)]^C2
     "AUTO_RELATED_MSE7" :
-      [(y-y_)/(sqrt(|y|*|y_|)+|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
-      #[(y-y_)/(|y|*|y_|)/ignore_coef(|y|*|y_|)]^2
+      [(y-y_)/((A1*sqrt(|y|*|y_|)+A2*(|y|+|y_|)^C1+B)]^C2
     "AUTO_RELATED_MSE8" :
       [|y-y_|/((A*(|y|+|y_|)^C1+B)]^C2
     "AUTO_RELATED_MSE_USE_COS" :
@@ -87,7 +86,11 @@ class base_config:
   AUTO_RELATIVE_LOSS6_B = None
   AUTO_RELATIVE_LOSS6_C1 = None
   AUTO_RELATIVE_LOSS6_C2 = None
-  AUTO_RELATIVE_LOSS7_AFD = None
+  AUTO_RELATIVE_LOSS7_A1 = None
+  AUTO_RELATIVE_LOSS7_A2 = None
+  AUTO_RELATIVE_LOSS7_B = None
+  AUTO_RELATIVE_LOSS7_C1 = None
+  AUTO_RELATIVE_LOSS7_C2 = None
   AUTO_RELATIVE_LOSS8_A = None
   AUTO_RELATIVE_LOSS8_B = None
   AUTO_RELATIVE_LOSS8_C1 = None
@@ -939,7 +942,7 @@ class C_RealPSM_RelativeLoss6_002(base_config): # prepare 15123
 class C_RealPSM_RelativeLoss7_AFD100(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE v7
-  [(y-y_)/(sqrt(|y|*|y_|)+|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/((A1*sqrt(|y|*|y_|)+A2*(|y|+|y_|)^C1+B)]^C2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss7_AFD100'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -947,7 +950,11 @@ class C_RealPSM_RelativeLoss7_AFD100(base_config): # RUNNING 15123
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE7"
-  AUTO_RELATIVE_LOSS7_AFD = 100
+  AUTO_RELATIVE_LOSS7_A1 = 1.0
+  AUTO_RELATIVE_LOSS7_A2 = 1.0
+  AUTO_RELATIVE_LOSS7_B = 0.001
+  AUTO_RELATIVE_LOSS7_C1 = 1.0
+  AUTO_RELATIVE_LOSS7_C2 = 2.0
   ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
 
