@@ -303,17 +303,23 @@ class Model_Baseline(object):
           FLAGS.PARAM.AUTO_RELATIVE_LOSS3_C1, FLAGS.PARAM.AUTO_RELATIVE_LOSS3_C2)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE4":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v4(
-          self._y_estimation, self._y_labels,
-          FLAGS.PARAM.AUTO_RELATIVE_LOSS4_MIN_REFER,FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
+          self._y_estimation, self._y_labels, FLAGS.PARAM.AUTO_RELATED_MSE_AXIS_FIT_DEG)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE5":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v5(
           self._y_estimation, self._y_labels)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE6":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v6(
-          self._y_estimation, self._y_labels, FLAGS.PARAM.AUTO_RELATIVE_LOSS6_MIN_REFER)
+          self._y_estimation, self._y_labels,
+          FLAGS.PARAM.AUTO_RELATIVE_LOSS6_A, FLAGS.PARAM.AUTO_RELATIVE_LOSS6_B,
+          FLAGS.PARAM.AUTO_RELATIVE_LOSS6_C1, FLAGS.PARAM.AUTO_RELATIVE_LOSS6_C2)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE7":
       self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v7(
           self._y_estimation, self._y_labels, FLAGS.PARAM.AUTO_RELATIVE_LOSS7_AFD)
+    elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE8":
+      self._loss = loss.auto_ingore_relative_reduce_sum_frame_batchsize_MSE_v8(
+          self._y_estimation, self._y_labels,
+          FLAGS.PARAM.AUTO_RELATIVE_LOSS8_A, FLAGS.PARAM.AUTO_RELATIVE_LOSS8_B,
+          FLAGS.PARAM.AUTO_RELATIVE_LOSS8_C1, FLAGS.PARAM.AUTO_RELATIVE_LOSS8_C2)
     elif FLAGS.PARAM.LOSS_FUNC_FOR_MAG_SPEC == "AUTO_RELATED_MSE_USE_COS":
       self._loss = loss.cos_auto_ingore_relative_reduce_sum_frame_batchsize_MSE(self._y_estimation,self._y_labels,
                                                                                 FLAGS.PARAM.COS_AUTO_RELATED_MSE_W)

@@ -55,10 +55,12 @@ class base_config:
     "AUTO_RELATED_MSE5" :
       [relu(y-y_)/(2|y|+relu(y-y_))]^2+[relu(y-y_)/(|y|+relu(|y|-y+y_))]^2
     "AUTO_RELATED_MSE6" :
-      [(y-y_)/(|y|*|y_|+min_refer)]^2
+      [(y-y_)/(A*sqrt(|y|*|y_|)^C1+B)]^C2
     "AUTO_RELATED_MSE7" :
-      [(y-y_)/(|y|*|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+      [(y-y_)/(sqrt(|y|*|y_|)+|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
       #[(y-y_)/(|y|*|y_|)/ignore_coef(|y|*|y_|)]^2
+    "AUTO_RELATED_MSE8" :
+      [|y-y_|/((A*(|y|+|y_|)^C1+B)]^C2
     "AUTO_RELATED_MSE_USE_COS" :
     "MEL_AUTO_RELATED_MSE" :
   '''
@@ -81,9 +83,15 @@ class base_config:
   AUTO_RELATIVE_LOSS3_B = None
   AUTO_RELATIVE_LOSS3_C1 = None
   AUTO_RELATIVE_LOSS3_C2 = None
-  AUTO_RELATIVE_LOSS4_MIN_REFER = None
-  AUTO_RELATIVE_LOSS6_MIN_REFER = None
+  AUTO_RELATIVE_LOSS6_A = None
+  AUTO_RELATIVE_LOSS6_B = None
+  AUTO_RELATIVE_LOSS6_C1 = None
+  AUTO_RELATIVE_LOSS6_C2 = None
   AUTO_RELATIVE_LOSS7_AFD = None
+  AUTO_RELATIVE_LOSS8_A = None
+  AUTO_RELATIVE_LOSS8_B = None
+  AUTO_RELATIVE_LOSS8_C1 = None
+  AUTO_RELATIVE_LOSS8_C2 = None
   KEEP_PROB = 0.8
   RNN_LAYER = 2
   CLIP_NORM = 5.0
@@ -807,7 +815,7 @@ class C_RealPSM_RelativeLoss3_015(base_config): # RUNNING 15123
 
 # 初始的ReLoss_MSE，对应的A大一些，B也大一些，C1=1.0
 
-class C_RealPSM_RelativeLoss4AFD100_001(base_config): # DONE 15123
+class C_RealPSM_RelativeLoss4AFD100(base_config): # prepare 15123
   '''
   relative spectrum(mag) MSE v4
   [(y-y_)/(|y|+relu(sign(y)*y_))/ignore_coef(|y|+|y_|;AFD)]^2
@@ -819,12 +827,11 @@ class C_RealPSM_RelativeLoss4AFD100_001(base_config): # DONE 15123
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE4"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
-  AUTO_RELATIVE_LOSS4_MIN_REFER = 0.01
   ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
 
 
-class C_RealPSM_RelativeLoss4AFD100_002(base_config): # DONE 15123
+class C_RealPSM_RelativeLoss4AFD500(base_config): # prepare 15123
   '''
   relative spectrum(mag) MSE v4
   [(y-y_)/(|y|+relu(sign(y)*y_))/ignore_coef(|y|+|y_|;AFD)]^2
@@ -835,13 +842,12 @@ class C_RealPSM_RelativeLoss4AFD100_002(base_config): # DONE 15123
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE4"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
-  AUTO_RELATIVE_LOSS4_MIN_REFER = 0.1
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 500
   ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
 
 
-class C_RealPSM_RelativeLoss4AFD100_003(base_config): # DONE 15123
+class C_RealPSM_RelativeLoss4AFD1000(base_config): # prepare 15123
   '''
   relative spectrum(mag) MSE v4
   [(y-y_)/(|y|+relu(sign(y)*y_))/ignore_coef(|y|+|y_|;AFD)]^2
@@ -852,8 +858,7 @@ class C_RealPSM_RelativeLoss4AFD100_003(base_config): # DONE 15123
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE4"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
-  AUTO_RELATIVE_LOSS4_MIN_REFER = 0.0001
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
 
@@ -873,28 +878,50 @@ class C_RealPSM_RelativeLoss5(base_config): # DONE 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C_RealPSM_RelativeLoss6(base_config): # RUNNING 15123
+class C_RealPSM_RelativeLoss6_001(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE v6
-  [(y-y_)/(|y|*|y_|+min_refer)]^2
+  [(y-y_)/(sqrt(|y|*|y_|)+min_refer)]^2
   '''
-  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss6'
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss6_001'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE6"
-  AUTO_RELATIVE_LOSS6_MIN_REFER = 0.05
+  AUTO_RELATIVE_LOSS6_A = 1.0
+  AUTO_RELATIVE_LOSS6_B = 0.05
+  AUTO_RELATIVE_LOSS6_C1 = 1.0
+  AUTO_RELATIVE_LOSS6_C2 = 2.0
   ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
 
 
-class C_RealPSM_RelativeLoss7(base_config): # RUNNING 15123
+class C_RealPSM_RelativeLoss6_002(base_config): # prepare 15123
+  '''
+  relative spectrum(mag) MSE v6
+  [(y-y_)/(sqrt(|y|*|y_|)+min_refer)]^2
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss6_002'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE6"
+  AUTO_RELATIVE_LOSS6_A = 1.5
+  AUTO_RELATIVE_LOSS6_B = 0.05
+  AUTO_RELATIVE_LOSS6_C1 = 1.0
+  AUTO_RELATIVE_LOSS6_C2 = 2.0
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+class C_RealPSM_RelativeLoss7_AFD100(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE v7
-  [(y-y_)/(|y|*|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
+  [(y-y_)/(sqrt(|y|*|y_|)+|y|+|y_|)/ignore_coef(|y|+|y_|;AFD)]^2
   '''
-  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss7'
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss7_AFD100'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
@@ -905,5 +932,55 @@ class C_RealPSM_RelativeLoss7(base_config): # RUNNING 15123
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C_RealPSM_RelativeLoss3_015
+class C_RealPSM_RelativeLoss8_001(base_config): # prepare 15123
+  '''
+  relative spectrum(mag) MSE v8 (transition of v1)
+  [|y-y_|/(A*(|y|+|y_|)^C1+B)]^C2
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss8_001'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE8"
+  AUTO_RELATIVE_LOSS8_A = 1.5
+  AUTO_RELATIVE_LOSS8_B = 0.01
+  AUTO_RELATIVE_LOSS8_C1 = 1.0
+  AUTO_RELATIVE_LOSS8_C2 = 2.0
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+class C_RealPSM_RelativeLoss8_002(base_config): # prepare 15123
+  '''
+  relative spectrum(mag) MSE v8 (transition of v1)
+  [|y-y_|/(A*(|y|+|y_|)^C1+B)]^C2
+  '''
+  CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss8_002'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE8"
+  AUTO_RELATIVE_LOSS8_A = 0.5
+  AUTO_RELATIVE_LOSS8_B = 0.01
+  AUTO_RELATIVE_LOSS8_C1 = 1.0
+  AUTO_RELATIVE_LOSS8_C2 = 2.0
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+class C001_7_3_retest(base_config): # RUNNING 15433
+  CHECK_POINT = 'nnet_CC001_7_3_retest'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "RELATED_MSE"
+  RELATED_MSE_IGNORE_TH = 0.0001
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+
+PARAM = C001_7_3_retest
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
