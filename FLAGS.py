@@ -881,7 +881,8 @@ class C_RealPSM_RelativeLoss5(base_config): # DONE 15123
 class C_RealPSM_RelativeLoss6_001(base_config): # RUNNING 15123
   '''
   relative spectrum(mag) MSE v6
-  [(y-y_)/(sqrt(|y|*|y_|)+min_refer)]^2
+  # [(y-y_)/(sqrt(|y|*|y_|)+min_refer)]^2
+  [(y-y_)/(A*sqrt(|y|*|y_|)^C1+B)]^C2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss6_001'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -900,7 +901,7 @@ class C_RealPSM_RelativeLoss6_001(base_config): # RUNNING 15123
 class C_RealPSM_RelativeLoss6_002(base_config): # prepare 15123
   '''
   relative spectrum(mag) MSE v6
-  [(y-y_)/(sqrt(|y|*|y_|)+min_refer)]^2
+  [(y-y_)/(A*sqrt(|y|*|y_|)^C1+B)]^C2
   '''
   CHECK_POINT = 'nnet_C_RealPSM_RelativeLoss6_002'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -982,5 +983,5 @@ class C001_7_3_retest(base_config): # RUNNING 15433
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C001_7_3_retest
+PARAM = C_RealPSM_RelativeLoss6_001
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
