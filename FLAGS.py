@@ -334,6 +334,22 @@ class C_RealIRM_RelativeLossAFD100(base_config): # DONE 15123
   MASK_TYPE = "IRM"
 
 
+class C_RealIRM_RelativeLossAFD500(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE AFD500 + IRM
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
+  '''
+  CHECK_POINT = 'nnet_C_RealIRM_RelativeLossAFD500'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 500
+  ReLU_MASK = False
+  MASK_TYPE = "IRM"
+
+
 class C_ReluIRM(base_config): # DONE 15123
   CHECK_POINT = 'nnet_C_ReluIRM'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
@@ -1074,5 +1090,5 @@ class C001_7_3_retest(base_config): # DONE 15043
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C_RealPSM_RelativeLoss8_003
+PARAM = C_RealIRM_RelativeLossAFD500
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
