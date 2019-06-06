@@ -114,7 +114,6 @@ def get_batch_pesq_improvement(x_wav,y_wav,y_wav_est,batch_num,set_name):
   pesq_ref_cleaned_vec = np.array(pesq_ref_cleaned_list)
   pesq_ref_mixed_vec = np.array(pesq_ref_mixed_list)
   pesq_imp_vec = pesq_ref_cleaned_vec - pesq_ref_mixed_vec
-  return np.array([pesq_ref_mixed_vec, pesq_ref_cleaned_vec, pesq_imp_vec])
 
   if FLAGS.PARAM.GET_AUDIO_IN_TEST:
     decode_ans_file = os.path.join(FLAGS.PARAM.SAVE_DIR,'decode_'+FLAGS.PARAM.CHECK_POINT, set_name)
@@ -129,6 +128,8 @@ def get_batch_pesq_improvement(x_wav,y_wav,y_wav_est,batch_num,set_name):
                   cleaned, FLAGS.PARAM.FS)
       write_audio(os.path.join(decode_ans_file, "%04d_%03d_mixed.wav" % (batch_num, i)),
                   mixed, FLAGS.PARAM.FS)
+
+  return np.array([pesq_ref_mixed_vec, pesq_ref_cleaned_vec, pesq_imp_vec])
 
 
 def get_batch_stoi_improvement(x_wav,y_wav,y_wav_est):
