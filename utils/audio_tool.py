@@ -106,19 +106,6 @@ def get_batch_pesq_improvement(x_wav,y_wav,y_wav_est,batch_num,set_name):
   return:
      mixture pesq, enhanced pesq, pesq improvement: [batch]
   '''
-  if FLAGS.PARAM.GET_AUDIO_IN_TEST:
-    decode_ans_file = os.path.join(FLAGS.PARAM.SAVE_DIR,'decode_'+FLAGS.PARAM.CHECK_POINT, set_name)
-    if os.path.exists(decode_ans_file) and batch_num == 1:
-      shutil.rmtree(decode_ans_file)
-    if not os.path.exists(decode_ans_file):
-      os.makedirs(decode_ans_file)
-    for i, ref, cleaned, mixed in zip(range(len(y_wav)), y_wav, y_wav_est, x_wav):
-      write_audio(os.path.join(decode_ans_file, "%04d_%03d_ref.wav" % (batch_num, i)),
-                  ref, FLAGS.PARAM.FS)
-      write_audio(os.path.join(decode_ans_file, "%04d_%03d_cleaned.wav" % (batch_num, i)),
-                  cleaned, FLAGS.PARAM.FS)
-      write_audio(os.path.join(decode_ans_file, "%04d_%03d_mixed.wav" % (batch_num, i)),
-                  mixed, FLAGS.PARAM.FS)
   # calculate PESQ improvement
   pesq_ref_cleaned_list = [calc_pesq(ref, cleaned, FLAGS.PARAM.FS)
                            for ref, cleaned in zip(y_wav, y_wav_est)]
@@ -128,6 +115,20 @@ def get_batch_pesq_improvement(x_wav,y_wav,y_wav_est,batch_num,set_name):
   pesq_ref_mixed_vec = np.array(pesq_ref_mixed_list)
   pesq_imp_vec = pesq_ref_cleaned_vec - pesq_ref_mixed_vec
   return np.array([pesq_ref_mixed_vec, pesq_ref_cleaned_vec, pesq_imp_vec])
+
+  if FLAGS.PARAM.GET_AUDIO_IN_TEST:
+    decode_ans_file = os.path.join(FLAGS.PARAM.SAVE_DIR,'decode_'+FLAGS.PARAM.CHECK_POINT, set_name)
+    if os.path.exists(decode_ans_file) and batch_num == 1:
+      shutil.rmtree(decode_ans_file)
+    if not os.path.exists(decode_ans_file):
+      os.makedirs(decode_ans_file)
+    for i, ref, cleaned, mixed, pesqi in zip(range(len(y_wav)), y_wav, y_wav_est, x_wav, pesq_imp_vec):
+      write_audio(os.path.join(decode_ans_file, "%04d_%03d_ref.wav" % (batch_num, i)),
+                  ref, FLAGS.PARAM.FS)
+      write_audio(os.path.join(decode_ans_file, "%04d_%03d_cleaned_%.2f.wav" % (batch_num, i, pesqi)),
+                  cleaned, FLAGS.PARAM.FS)
+      write_audio(os.path.join(decode_ans_file, "%04d_%03d_mixed.wav" % (batch_num, i)),
+                  mixed, FLAGS.PARAM.FS)
 
 
 def get_batch_stoi_improvement(x_wav,y_wav,y_wav_est):
