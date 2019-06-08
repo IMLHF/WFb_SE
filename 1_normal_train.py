@@ -173,7 +173,7 @@ def train():
 
     # epochs training
     if PARAM.resume_training.lower() == 'true':
-      lr = tr_model.lr
+      lr = sess.run(tr_model.lr)
     else:
       lr = PARAM.learning_rate
       tr_model.assign_lr(sess, lr)
