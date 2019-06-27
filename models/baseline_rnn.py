@@ -106,7 +106,6 @@ class Model_Baseline(object):
 
     if FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
       with tf.variable_scope('BGRU'):
-
         gru_fw_cell = tf.contrib.rnn.MultiRNNCell(
             [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
                            FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
@@ -123,6 +122,12 @@ class Model_Baseline(object):
             dtype=tf.float32,
             sequence_length=self._lengths)
         outputs, fw_final_states, bw_final_states = result
+
+    self.fw_final_state = fw_final_states
+    self.bw_final_state = bw_final_states
+    # print(fw_final_states[0][0].get_shape().as_list())
+
+    # print(np.shape(fw_final_states),np.shape(bw_final_states))
 
     # region full connection get mask
     # calcu rnn output size
@@ -339,7 +344,7 @@ class Model_Baseline(object):
       val model cannot train.
       '''
       return
-    self._lr = tf.Variable(0.0, trainable=False)
+    self._lr = tf.Variable(0.0, trainable=False) #TODO
     tvars = tf.trainable_variables()
     grads, _ = tf.clip_by_global_norm(tf.gradients(self.loss, tvars),
                                       FLAGS.PARAM.CLIP_NORM)

@@ -172,11 +172,13 @@ def train():
     # endregion
 
     # epochs training
-    if PARAM.resume_training.lower() == 'true':
-      lr = sess.run(tr_model.lr)
-    else:
-      lr = PARAM.learning_rate
-      tr_model.assign_lr(sess, lr)
+    lr = PARAM.learning_rate
+    tr_model.assign_lr(sess, lr)
+    # if PARAM.resume_training.lower() == 'true':
+    #   lr = sess.run(tr_model.lr)
+    # else:
+    #   lr = PARAM.learning_rate
+    #   tr_model.assign_lr(sess, lr)
     lr_halving_time = 0
     for epoch in range(PARAM.start_epoch, PARAM.max_epochs):
       sess.run([iter_train.initializer, iter_val.initializer])
