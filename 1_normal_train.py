@@ -171,7 +171,7 @@ def train():
     g.finalize()
     # endregion
 
-    # epochs training
+    # epochs training # TODO resume lr form model_name
     lr = PARAM.learning_rate
     tr_model.assign_lr(sess, lr)
     # if PARAM.resume_training.lower() == 'true':
