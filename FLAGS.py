@@ -213,6 +213,35 @@ class C001_8_2_full(base_config):
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
 
+class C001_8_2_full_en_ac(base_config):
+  resume_training = 'true'
+  start_epoch = 15
+  min_epochs = 35
+  batch_size = 360
+  PROCESS_NUM_GENERATE_TFERCORD = 16
+  GENERATE_TFRECORD = False
+  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/fast/worklhf/lhf/alldata/accept_data_16k/speakerlist'
+  OPEN_CONDATION_SPEAKER_LIST_DIR = '/fast/worklhf/lhf/alldata/accept_data_16k/speakerlist'
+  NOISE_DIR = '/fast/worklhf/lhf/alldata/accept_data_16k/noise'
+  TFRECORDS_DIR = '/data/datalhf/irm_data/accept_tfrecord'
+  DATA_DICT_DIR = '_data/mixed_aishell'
+  UTT_SEG_FOR_MIX = [2, 4]
+  # DATASET_NAMES = ['train', 'validation', 'test_cc', 'test_oc']
+  DATASET_SIZES = [360000, 720, 600, 600]
+  FS = 16000
+  LEN_WAWE_PAD_TO = FS*3
+  NFFT = 512
+  FFT_DOT = 257
+  INPUT_SIZE = FFT_DOT
+  OUTPUT_SIZE = FFT_DOT
+  OVERLAP = 256
+  CHECK_POINT = 'nnet_C001_8_2_full_en_ac'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
 
 class C_RealIRM(base_config): # DONE 15123
   CHECK_POINT = 'nnet_C_RealIRM'
@@ -1141,5 +1170,5 @@ class C001_7_3_retest(base_config): # DONE 15043
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C_ReluIRM_NOAFD
+PARAM = C001_8_2_full_en_ac
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
