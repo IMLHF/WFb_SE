@@ -194,46 +194,59 @@ if __name__=='__main__':
   sess, model = build_session(ckpt, 1)
 
   if len(sys.argv)<=1:
+    # print(np.shape(model.fw_final_state),np.shape(model.bw_final_state))
+    # exit(0)
     decode_file_list_8k = [
-        "exp/rnn_speech_enhancement/8k/2_00_8k_raw.wav",
-        "exp/rnn_speech_enhancement/8k/8_01_8k_raw.wav",
-        "exp/rnn_speech_enhancement/8k/8_21_8k_raw.wav",
-        "exp/rnn_speech_enhancement/8k/_M1002_MIX_1_airplane_8k.wav",
-        "exp/rnn_speech_enhancement/8k/_M1002_MIX_2_clapping_8k.wav",
-        "exp/rnn_speech_enhancement/8k/_M1002_MIX_3_motor_8k.wav",
-        "exp/rnn_speech_enhancement/8k/_M1002_MIX_4_market_8k.wav",
-        "exp/rnn_speech_enhancement/8k/_M1002_MIX_5_wind_8k.wav",
-        "exp/rnn_speech_enhancement/8k/_M1002_MIX_6_factory_8k.wav",
-        "exp/rnn_speech_enhancement/8k/_M1002_MIX_7_rainning_8k.wav",
-        "exp/rnn_speech_enhancement/8k/s_2_00_MIX_1_clapping.wav",
-        "exp/rnn_speech_enhancement/8k/s_8_01_MIX_4_rainning_8k.wav",
-        "exp/rnn_speech_enhancement/8k/s_8_21_MIX_3_factory_8k.wav",
-        "exp/rnn_speech_enhancement/8k/speech0_8k.wav",
-        "exp/rnn_speech_enhancement/8k/speech1_8k.wav",
-        "exp/rnn_speech_enhancement/8k/speech5_8k.wav",
-        "exp/rnn_speech_enhancement/8k/speech6_8k.wav",
-        "exp/rnn_speech_enhancement/8k/speech7_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/2_00_8k_raw.wav",
+        # "exp/rnn_speech_enhancement/8k/8_01_8k_raw.wav",
+        # "exp/rnn_speech_enhancement/8k/8_21_8k_raw.wav",
+        # "exp/rnn_speech_enhancement/8k/_M1002_MIX_1_airplane_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/_M1002_MIX_2_clapping_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/_M1002_MIX_3_motor_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/_M1002_MIX_4_market_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/_M1002_MIX_5_wind_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/_M1002_MIX_6_factory_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/_M1002_MIX_7_rainning_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/s_2_00_MIX_1_clapping.wav",
+        # "exp/rnn_speech_enhancement/8k/s_8_01_MIX_4_rainning_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/s_8_21_MIX_3_factory_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/speech0_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/speech1_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/speech5_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/speech6_8k.wav",
+        # "exp/rnn_speech_enhancement/8k/speech7_8k.wav",
+        # "exp/rnn_speech_enhancement/_other/003.wav",
+        # "exp/rnn_speech_enhancement/_other/004.wav",
+        # "exp/rnn_speech_enhancement/_other/005.wav",
     ]
 
+
     decode_file_list_16k = [
-        "exp/rnn_speech_enhancement/16k/2_00_16k_raw.wav",
-        "exp/rnn_speech_enhancement/16k/8_01_16k_raw.wav",
-        "exp/rnn_speech_enhancement/16k/8_21_16k_raw.wav",
-        "exp/rnn_speech_enhancement/16k/_M1002_MIX_1_airplane_16k.wav",
-        "exp/rnn_speech_enhancement/16k/_M1002_MIX_2_clapping_16k.wav",
-        "exp/rnn_speech_enhancement/16k/_M1002_MIX_3_motor_16k.wav",
-        "exp/rnn_speech_enhancement/16k/_M1002_MIX_4_market_16k.wav",
-        "exp/rnn_speech_enhancement/16k/_M1002_MIX_5_wind_16k.wav",
-        "exp/rnn_speech_enhancement/16k/_M1002_MIX_6_factory_16k.wav",
-        "exp/rnn_speech_enhancement/16k/_M1002_MIX_7_rainning_16k.wav",
-        "exp/rnn_speech_enhancement/16k/s_2_00_MIX_1_clapping.wav",
-        "exp/rnn_speech_enhancement/16k/s_8_01_MIX_4_rainning_16k.wav",
-        "exp/rnn_speech_enhancement/16k/s_8_21_MIX_3_factory_16k.wav",
-        "exp/rnn_speech_enhancement/16k/speech0_16k.wav",
-        "exp/rnn_speech_enhancement/16k/speech1_16k.wav",
-        "exp/rnn_speech_enhancement/16k/speech5_16k.wav",
-        "exp/rnn_speech_enhancement/16k/speech6_16k.wav",
-        "exp/rnn_speech_enhancement/16k/speech7_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/2_00_16k_raw.wav",
+        # "exp/rnn_speech_enhancement/16k/8_01_16k_raw.wav",
+        # "exp/rnn_speech_enhancement/16k/8_21_16k_raw.wav",
+        # "exp/rnn_speech_enhancement/16k/_M1002_MIX_1_airplane_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/_M1002_MIX_2_clapping_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/_M1002_MIX_3_motor_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/_M1002_MIX_4_market_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/_M1002_MIX_5_wind_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/_M1002_MIX_6_factory_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/_M1002_MIX_7_rainning_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/s_2_00_MIX_1_clapping.wav",
+        # "exp/rnn_speech_enhancement/16k/s_8_01_MIX_4_rainning_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/s_8_21_MIX_3_factory_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/speech0_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/speech1_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/speech5_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/speech6_16k.wav",
+        # "exp/rnn_speech_enhancement/16k/speech7_16k.wav",
+        # "exp/rnn_speech_enhancement/_other/003.wav",
+        # "exp/rnn_speech_enhancement/_other/004.wav",
+        # "exp/rnn_speech_enhancement/_other/005.wav",
+        # "exp/rnn_speech_enhancement/16k/合并.wav",
+        "exp/test_oc/refer_wav/hebing2_ref.wav",
+        "exp/test_oc/refer_wav/test1_ref.wav",
+
     ]
     if PARAM.FS == 8000:
       decode_file_list = decode_file_list_8k
@@ -251,6 +264,36 @@ if __name__=='__main__':
       reY = np.where(reY<-abs_max,-abs_max,reY)
       utils.audio_tool.write_audio(os.path.join(decode_ans_file,
                                                 (ckpt+'_%03d_' % (i+1))+mixed_dir[mixed_dir.rfind('/')+1:]),
+                                   reY,
+                                   sr)
+      file_name = mixed_dir[mixed_dir.rfind('/')+1:mixed_dir.rfind('.')]
+      spectrum_tool.picture_spec(mask,
+                                 os.path.join(decode_ans_file,
+                                              (ckpt+'_%03d_' % (i+1))+file_name))
+  elif sys.argv[1]=='paper':
+    mixed = os.listdir(os.path.join('exp','test_oc_for_paper_mixed'))
+    decode_file_list = [os.path.join('exp','test_oc_for_paper_mixed',file) for file in list(mixed)]
+    decode_file_list.sort()
+    ref = os.listdir(os.path.join('exp','test_oc_for_paper_ref'))
+    ref_file_list = [os.path.join('exp','test_oc_for_paper_ref',file) for file in list(ref)]
+    ref_file_list.sort()
+
+    for i, dirs in enumerate(zip(decode_file_list,ref_file_list)):
+      mixed_dir,ref_dir = dirs
+      print('\n',i+1,"\nmixed:",mixed_dir)
+      print("ref:",ref_dir)
+      waveData, sr = utils.audio_tool.read_audio(mixed_dir)
+      reY, mask = decode_one_wav(sess,model,waveData)
+      print(np.max(reY))
+      abs_max = (2 ** (PARAM.AUDIO_BITS - 1) - 1)
+      reY = np.where(reY>abs_max,abs_max,reY)
+      reY = np.where(reY<-abs_max,-abs_max,reY)
+
+      refwave, _ =utils.audio_tool.read_audio(ref_dir)
+      pesqi = pesqexe.audio_tool.calc_pesq(refwave,reY,PARAM.FS) - pesqexe.audio_tool.calc_pesq(refwave,waveData,PARAM.FS)
+
+      utils.audio_tool.write_audio(os.path.join(decode_ans_file,
+                                                (ckpt+'_%03d_pesqi_%.2f_' % (i+1,pesqi))+mixed_dir[mixed_dir.rfind('/')+1:]),
                                    reY,
                                    sr)
       file_name = mixed_dir[mixed_dir.rfind('/')+1:mixed_dir.rfind('.')]
@@ -276,7 +319,7 @@ if __name__=='__main__':
     #   if ref.find('clean') != -1 or ref.find('mixed.wav')!=-1:
     #     os.remove(ref)
 
-    decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, False, 'test_oc.txt')
+    decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, True, 'test_oc.txt')
   elif int(sys.argv[1])==1: # decode exp/real_test_fair
     start_time = time.time()
     mixed_dirs = os.path.join('exp','real_test_fair','ITU_T_Test', 'mixed_wav')
