@@ -185,15 +185,48 @@ class base_config:
 
   SPEC_EST_BIAS = 0.0
 
-
-class C001_8_2_full(base_config):
+class C001_8_2_full_adddevnoise_enac(base_config):
+  resume_training = 'true'
+  start_epoch = 25
+  min_epochs = 26
+  max_epochs = 26
   batch_size = 360
-  PROCESS_NUM_GENERATE_TFERCORD = 32
+  PROCESS_NUM_GENERATE_TFERCORD = 16
   GENERATE_TFRECORD = False
-  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/home/root1/worklhf/alldata/full_speaker_aishell2/aishell2_1891speaker_list_1_16k'
-  OPEN_CONDATION_SPEAKER_LIST_DIR = '/home/root1/worklhf/alldata/full_speaker_aishell2/aishell2_100speaker_list_2_16k'
-  NOISE_DIR = '/home/root1/worklhf/alldata/many_noise_16k'
-  TFRECORDS_DIR = '/home/root1/worklhf/alldata/paper_se/paper_tfrecords_utt03s_16k_fullspeaker_snrmix_wavespan32767'
+  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/fast/worklhf/lhf/alldata/accept_data_16k/speakerlist'
+  OPEN_CONDATION_SPEAKER_LIST_DIR = '/fast/worklhf/lhf/alldata/accept_data_16k/speakerlist'
+  NOISE_DIR = '/fast/worklhf/lhf/alldata/accept_data_16k/noise'
+  TFRECORDS_DIR = '/data/datalhf/irm_data/accept_tfrecord'
+  DATA_DICT_DIR = '_data/mixed_aishell'
+  UTT_SEG_FOR_MIX = [2, 4]
+  # DATASET_NAMES = ['train', 'validation', 'test_cc', 'test_oc']
+  DATASET_SIZES = [360000, 720, 600, 600]
+  FS = 16000
+  LEN_WAWE_PAD_TO = FS*3
+  NFFT = 512
+  FFT_DOT = 257
+  INPUT_SIZE = FFT_DOT
+  OUTPUT_SIZE = FFT_DOT
+  OVERLAP = 256
+  CHECK_POINT = 'nnet_C001_8_2_full_adddevnoise_enac'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MAX_TFRECORD_FILES_USED = 16
+  learning_rate = 0.0001
+
+class C001_8_2_full_adddevnoise(base_config):
+  # ls awk -F ' ' '{print $1,$1}' || ls awk -F ' ' '{print $1" "$1}'
+  batch_size = 360
+  PROCESS_NUM_GENERATE_TFERCORD = 16
+  GENERATE_TFRECORD = False
+  CLOSE_CONDATION_SPEAKER_LIST_DIR = '/data/datalhf/full_speaker_aishell2/aishell2_1891speaker_list_1_16k'
+  OPEN_CONDATION_SPEAKER_LIST_DIR = '/data/datalhf/full_speaker_aishell2/aishell2_100speaker_list_2_16k'
+  NOISE_DIR = '/data/datalhf/many_noise_16k_adddev'
+  TFRECORDS_DIR = '/data/datalhf/irm_data/tfrecords_utt03s_16k_fullspeaker_snrmix_wavespan32767_adddevnoise'
   DATA_DICT_DIR = '_data/mixed_aishell'
   UTT_SEG_FOR_MIX = [400, 460]
   # DATASET_NAMES = ['train', 'validation', 'test_cc', 'test_oc']
@@ -205,7 +238,7 @@ class C001_8_2_full(base_config):
   INPUT_SIZE = FFT_DOT
   OUTPUT_SIZE = FFT_DOT
   OVERLAP = 256
-  CHECK_POINT = 'nnet_C001_8_2_full'
+  CHECK_POINT = 'nnet_C001_8_2_full_adddevnoise'
   INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
   LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
   TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
@@ -216,7 +249,8 @@ class C001_8_2_full(base_config):
 class C001_8_2_full_en_ac(base_config):
   resume_training = 'true'
   start_epoch = 15
-  min_epochs = 35
+  min_epochs = 16
+  max_epochs = 16
   batch_size = 360
   PROCESS_NUM_GENERATE_TFERCORD = 16
   GENERATE_TFRECORD = False
@@ -242,6 +276,8 @@ class C001_8_2_full_en_ac(base_config):
   DECODING_MASK_POSITION = TRAINING_MASK_POSITION
   LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
+  MAX_TFRECORD_FILES_USED = 16
+  learning_rate = 0.0001
 
 class C_RealIRM(base_config): # DONE 15123
   CHECK_POINT = 'nnet_C_RealIRM'
@@ -1170,5 +1206,5 @@ class C001_7_3_retest(base_config): # DONE 15043
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C001_8_2_full_en_ac
+PARAM = C001_8_2_full_adddevnoise_enac
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
