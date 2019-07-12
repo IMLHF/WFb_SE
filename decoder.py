@@ -16,6 +16,7 @@ from pystoi import stoi
 
 
 def build_session(ckpt_dir,batch_size,finalizeG=True):
+  batch_size = None # None is OK
   g = tf.Graph()
   with g.as_default():
     with tf.device('/cpu:0'):
@@ -301,12 +302,12 @@ if __name__=='__main__':
                                  os.path.join(decode_ans_file,
                                               (ckpt+'_%03d_' % (i+1))+file_name))
   elif int(sys.argv[1])==0: # decode exp/test_oc
-    mixed_dir = 'exp/test_oc/mixed_wav'
+    mixed_dir = 'exp/test_oc/mixed_wav2'
     decode_file_list = os.listdir(mixed_dir)
     decode_file_list = [os.path.join(mixed_dir,mixed) for mixed in decode_file_list]
     decode_file_list.sort()
 
-    ref_dir = 'exp/test_oc/refer_wav'
+    ref_dir = 'exp/test_oc/refer_wav2'
     ref_list = os.listdir(ref_dir)
     ref_list = [os.path.join(ref_dir,ref) for ref in ref_list]
     ref_list.sort()
