@@ -60,15 +60,6 @@ class Model_Baseline(object):
       self._y_labels = self._norm_y_logmag_spec
 
     outputs = self.net_input
-    if FLAGS.PARAM.INPUT_BN:
-      with tf.variable_scope('Batch_Norm_Layer'):
-        if_BRN = (FLAGS.PARAM.MVN_TYPE == 'BRN')
-        if FLAGS.PARAM.SELF_BN:
-          outputs = tf.layers.batch_normalization(outputs, training=True, renorm=if_BRN)
-        else:
-          outputs = tf.layers.batch_normalization(outputs,
-                                                  training=(behavior == self.train or behavior == self.validation),
-                                                  renorm=if_BRN)
 
     lstm_attn_cell = lstm_cell
     if behavior != self.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
@@ -146,24 +137,7 @@ class Model_Baseline(object):
       biases = tf.get_variable('biases1', [out_size],
                                initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL))
 
-    if FLAGS.PARAM.POST_BN:
-      linear_out = tf.matmul(outputs, weights)
-      with tf.variable_scope('POST_Batch_Norm_Layer'):
-        if_BRN = (FLAGS.PARAM.MVN_TYPE == 'BRN')
-        if FLAGS.PARAM.SELF_BN:
-          linear_out = tf.layers.batch_normalization(linear_out, training=True, renorm=if_BRN)
-        else:
-          linear_out = tf.layers.batch_normalization(linear_out,
-                                                      training=(
-                                                          behavior == self.train or behavior == self.validation),
-                                                      renorm=if_BRN)
-        weights2 = tf.get_variable('weights1', [out_size, out_size],
-                                    initializer=tf.random_normal_initializer(stddev=0.01))
-        biases2 = tf.get_variable('biases1', [out_size],
-                                  initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL))
-        linear_out = tf.matmul(linear_out,weights2) + biases2
-    else:
-      linear_out = tf.matmul(outputs, weights) + biases
+    linear_out = tf.matmul(outputs, weights) + biases
     mask = linear_out
     if FLAGS.PARAM.ReLU_MASK:
       mask = tf.nn.relu(linear_out)

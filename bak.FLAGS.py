@@ -30,10 +30,6 @@ class base_config:
   POW_FIX_PSM_COEF = None # for MASK_TYPE = "PowFixPSM"
   PIPLINE_GET_THETA = True
   ReLU_MASK = True
-  INPUT_BN = False
-  POST_BN =False
-  MVN_TYPE = 'BN' # 'BN' or 'BRN'
-  SELF_BN = False # if true: batch_normalization(training=True) both when training and decoding
 
   '''
   LOSS_FUNC_FOR_MAG_SPEC:
@@ -895,51 +891,6 @@ class C001_8_7_realmask(base_config): # DONE 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C001_8_8(base_config): # *DONE 15123
-  '''
-  relative spectrum(mag) MSE with INPUT_BN
-  '''
-  CHECK_POINT = 'nnet_C001_8_8'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
-  INPUT_BN = True
-  SELF_BN = True
-
-
-class C001_8_9(base_config): # DONE 15041
-  '''
-  relative spectrum(mag) MSE with INPUT_BN
-  '''
-  CHECK_POINT = 'nnet_C001_8_9'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
-  INPUT_BN = True
-  SELF_BN = True
-
-
-class C001_8_10(base_config): # DONE 15041
-  '''
-  relative spectrum(mag) MSE with INPUT_BReN
-  '''
-  CHECK_POINT = 'nnet_C001_8_10'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
-  INPUT_BN = True
-  MVN_TYPE = 'BRN' # 'BN' or 'BRN'
-  SELF_BN = True
-
 
 class C001_8_11(base_config): # DONE 15123
   '''
@@ -1003,21 +954,6 @@ class C001_8_12_2(base_config): # CKPT Same To C001_8_11_2
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
   USE_ESTIMATED_MEAN_VAR = True
   BN_KEEP_DIMS=[-1]
-
-
-class C001_8_13(base_config): # DONE 15041
-  '''
-  relative spectrum(mag) MSE with POST_BN
-  '''
-  CHECK_POINT = 'nnet_C001_8_13'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-  AUTO_RELATED_MSE_AXIS_FIT_DEG = 1000
-  POST_BN = True
-  SELF_BN = False
 
 
 class C001_9_1(base_config): # DONE 15123

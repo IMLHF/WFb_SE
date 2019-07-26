@@ -30,10 +30,6 @@ class base_config:
   POW_FIX_PSM_COEF = None # for MASK_TYPE = "PowFixPSM"
   PIPLINE_GET_THETA = True
   ReLU_MASK = True
-  INPUT_BN = False
-  POST_BN =False
-  MVN_TYPE = 'BN' # 'BN' or 'BRN'
-  SELF_BN = False # if true: batch_normalization(training=True) both when training and decoding
 
   '''
   LOSS_FUNC_FOR_MAG_SPEC:
