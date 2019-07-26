@@ -131,7 +131,6 @@ class base_config:
 
   GET_AUDIO_IN_TEST = False
 
-  TIME_NOSOFTMAX_ATTENTION = False
 
   # fixed param
   SQUARE_FADE = 'square_fade'
@@ -1260,18 +1259,6 @@ class C002_8_2(base_config): # DONE 15041
   THRESHOLD_POS = base_config.THRESHOLD_ON_SPEC
   INIT_THRESHOLD_RECIPROCAL = 1e6
   max_epochs = 15
-
-
-class C003_1(base_config): # DONE 15041
-  '''
-  time-nosoftmax-attention
-  '''
-  CHECK_POINT = 'nnet_C003_1'
-  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-  TIME_NOSOFTMAX_ATTENTION = True
 
 
 class C004_1(base_config): # DONE 15041

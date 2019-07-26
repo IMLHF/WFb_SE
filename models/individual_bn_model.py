@@ -133,18 +133,8 @@ class INDIVIDUAL_BN_MODEL(object):
                                 initializer=tf.random_normal_initializer(stddev=0.01))
       biases = tf.get_variable('biases1', [out_size],
                                initializer=tf.constant_initializer(FLAGS.PARAM.INIT_MASK_VAL))
-    if FLAGS.PARAM.TIME_NOSOFTMAX_ATTENTION:
-      with tf.variable_scope('fullconnectCoef'):
-        weights_coef = tf.get_variable('weights_coef', [in_size, 1],
-                                       initializer=tf.random_normal_initializer(mean=1.0, stddev=0.01))
-        biases_coef = tf.get_variable('biases_coef', [1],
-                                      initializer=tf.constant_initializer(0.0))
-      raw_mask = tf.reshape(tf.matmul(outputs, weights) + biases, [self._batch_size,-1,FLAGS.PARAM.OUTPUT_SIZE]) # [batch,time,fre]
-      batch_coef_vec = tf.nn.relu(tf.reshape(tf.matmul(outputs, weights_coef) + biases_coef, [self._batch_size,-1])) # [batch, time]
-      mask = tf.multiply(raw_mask,
-                         tf.reshape(batch_coef_vec,[self._batch_size,-1,1]))
-    else:
-      mask = tf.nn.relu(tf.matmul(outputs, weights) + biases)
+
+    mask = tf.nn.relu(tf.matmul(outputs, weights) + biases)
     # endregion
 
     self._mask = tf.reshape(

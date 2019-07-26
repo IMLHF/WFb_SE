@@ -156,16 +156,8 @@ class Trainable_Logbias_Model(object):
                                 initializer=tf.random_normal_initializer(stddev=0.01))
       biases = tf.get_variable('biases1', [out_size],
                                initializer=tf.constant_initializer(0.0))
-    if FLAGS.PARAM.TIME_NOSOFTMAX_ATTENTION:
-      with tf.variable_scope('fullconnectCoef'):
-        weights_coef = tf.get_variable('weights_coef', [in_size, 1],
-                                       initializer=tf.random_normal_initializer(mean=1.0, stddev=0.01))
-        biases_coef = tf.get_variable('biases_coef', [1],
-                                      initializer=tf.constant_initializer(0.0))
-      mask = tf.multiply(tf.nn.softmax(tf.reshape(tf.matmul(outputs, weights) + biases, [self._batch_size,-1])),
-                         tf.nn.relu(tf.reduce_sum(tf.matmul(outputs, weights_coef) + biases_coef, axis=[-1,-2])))
-    else:
-      mask = tf.nn.relu(tf.matmul(outputs, weights) + biases)
+
+    mask = tf.nn.relu(tf.matmul(outputs, weights) + biases)
     self._mask = tf.reshape(
         mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
     # endregion

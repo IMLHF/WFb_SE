@@ -164,8 +164,6 @@ class base_config:
 
   GET_AUDIO_IN_TEST = False
 
-  TIME_NOSOFTMAX_ATTENTION = False
-
   # fixed param
   SQUARE_FADE = 'square_fade'
   EXPONENTIAL_FADE = 'exponential_fade'
