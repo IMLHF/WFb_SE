@@ -7,7 +7,6 @@ import models.trainable_logbias_model
 import models.training_in_turn_model
 import models.individual_bn_model
 import models.plural_mask_model
-import models.individual_plural_model
 
 
 class base_config:
@@ -24,7 +23,7 @@ class base_config:
   MFCC_BLANCE_COEF = 40
   LSTM_num_proj = None
   RNN_SIZE = 512
-  MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU"
+  MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU" OR "TRANSFORMER"
   LSTM_ACTIVATION = 'tanh'
   MASK_TYPE = "PSM"  # "PSM" or "IRM" or "fixPSM" or "AcutePM" or "PowFixPSM"
   POW_FIX_PSM_COEF = None # for MASK_TYPE = "PowFixPSM"
@@ -178,6 +177,11 @@ class base_config:
   USE_CBHG_POST_PROCESSING = False
 
   SPEC_EST_BIAS = 0.0
+
+  # for transfomer
+  n_self_att_blocks = 4
+  num_att_heads = 8
+  d_positionwise_FC = 1024
 
 class C001_8_2_full_adddevnoise_enac(base_config):
   resume_training = 'true'
@@ -340,6 +344,30 @@ class C_RealPSM_RelativeLossAFD100(base_config): # DONE 15123
   AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
   ReLU_MASK = False
   # MASK_TYPE = "PSM" # default
+
+
+class C_TRANS_RealPSM_RelativeLossAFD100(base_config): # RUNNING
+  '''
+  relative spectrum(mag) MSE
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
+  transformer
+  '''
+  CHECK_POINT = 'nnet_C_TRANS_RealPSM_RelativeLossAFD100'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  ReLU_MASK = False
+  # MASK_TYPE = "PSM" # default
+
+  MODEL_TYPE = "TRANSFORMER"
+  num_att_heads = 8
+  n_self_att_blocks = 3
+  learning_rate = 0.0003
+  max_lr_halving_time = 10
+  d_positionwise_FC = 512
 
 
 class C_RealPSM_RelativeLossAFD500(base_config): # DONE 15123
@@ -1200,5 +1228,5 @@ class C001_7_3_retest(base_config): # DONE 15043
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C001_8_2_full_adddevnoise_enac
+PARAM = C_TRANS_RealPSM_RelativeLossAFD100
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)

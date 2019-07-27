@@ -9,6 +9,7 @@ from losses import loss
 from utils.tf_tool import norm_mag_spec, norm_logmag_spec, rm_norm_mag_spec, rm_norm_logmag_spec
 from utils.tf_tool import normedLogmag2normedMag, normedMag2normedLogmag
 from utils.tf_tool import lstm_cell, GRU_cell, CBHG, FrameProjection
+from utils import transformer_utils
 import FLAGS
 import numpy as np
 
@@ -59,76 +60,121 @@ class Model_Baseline(object):
     elif FLAGS.PARAM.LABEL_TYPE == 'logmag':
       self._y_labels = self._norm_y_logmag_spec
 
-    outputs = self.net_input
+    outputs = self.net_input #[batch, time, ...]
 
-    lstm_attn_cell = lstm_cell
-    if behavior != self.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
-      def lstm_attn_cell(n_units, n_proj, act):
-        return tf.contrib.rnn.DropoutWrapper(lstm_cell(n_units, n_proj, act),
-                                             output_keep_prob=FLAGS.PARAM.KEEP_PROB)
+    if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM' or FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
+      # in: outputs [batch, time, ...]
+      # out: outputs [batch, time, ...], insize: shape(outputs)[-1]
+      lstm_attn_cell = lstm_cell
+      if behavior != self.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
+        def lstm_attn_cell(n_units, n_proj, act):
+          return tf.contrib.rnn.DropoutWrapper(lstm_cell(n_units, n_proj, act),
+                                               output_keep_prob=FLAGS.PARAM.KEEP_PROB)
 
-    GRU_attn_cell = GRU_cell
-    if behavior != self.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
-      def GRU_attn_cell(n_units, act):
-        return tf.contrib.rnn.DropoutWrapper(GRU_cell(n_units, act),
-                                             output_keep_prob=FLAGS.PARAM.KEEP_PROB)
+      GRU_attn_cell = GRU_cell
+      if behavior != self.infer and FLAGS.PARAM.KEEP_PROB < 1.0:
+        def GRU_attn_cell(n_units, act):
+          return tf.contrib.rnn.DropoutWrapper(GRU_cell(n_units, act),
+                                               output_keep_prob=FLAGS.PARAM.KEEP_PROB)
 
-    if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM':
-      with tf.variable_scope('BLSTM'):
+      if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM':
+        with tf.variable_scope('BLSTM'):
 
-        lstm_fw_cell = tf.contrib.rnn.MultiRNNCell(
-            [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
-                            FLAGS.PARAM.LSTM_num_proj,
-                            FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
-        lstm_bw_cell = tf.contrib.rnn.MultiRNNCell(
-            [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
-                            FLAGS.PARAM.LSTM_num_proj,
-                            FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+          lstm_fw_cell = tf.contrib.rnn.MultiRNNCell(
+              [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                              FLAGS.PARAM.LSTM_num_proj,
+                              FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+          lstm_bw_cell = tf.contrib.rnn.MultiRNNCell(
+              [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                              FLAGS.PARAM.LSTM_num_proj,
+                              FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
 
-        fw_cell = lstm_fw_cell._cells
-        bw_cell = lstm_bw_cell._cells
-        result = rnn.stack_bidirectional_dynamic_rnn(
-            cells_fw=fw_cell,
-            cells_bw=bw_cell,
-            inputs=outputs,
-            dtype=tf.float32,
-            sequence_length=self._lengths)
-        outputs, fw_final_states, bw_final_states = result
+          fw_cell = lstm_fw_cell._cells
+          bw_cell = lstm_bw_cell._cells
+          result = rnn.stack_bidirectional_dynamic_rnn(
+              cells_fw=fw_cell,
+              cells_bw=bw_cell,
+              inputs=outputs,
+              dtype=tf.float32,
+              sequence_length=self._lengths)
+          outputs, fw_final_states, bw_final_states = result
 
-    if FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
-      with tf.variable_scope('BGRU'):
-        gru_fw_cell = tf.contrib.rnn.MultiRNNCell(
-            [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
-                           FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
-        gru_bw_cell = tf.contrib.rnn.MultiRNNCell(
-            [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
-                           FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+      if FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
+        with tf.variable_scope('BGRU'):
+          gru_fw_cell = tf.contrib.rnn.MultiRNNCell(
+              [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                             FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+          gru_bw_cell = tf.contrib.rnn.MultiRNNCell(
+              [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                             FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
 
-        fw_cell = gru_fw_cell._cells
-        bw_cell = gru_bw_cell._cells
-        result = rnn.stack_bidirectional_dynamic_rnn(
-            cells_fw=fw_cell,
-            cells_bw=bw_cell,
-            inputs=outputs,
-            dtype=tf.float32,
-            sequence_length=self._lengths)
-        outputs, fw_final_states, bw_final_states = result
+          fw_cell = gru_fw_cell._cells
+          bw_cell = gru_bw_cell._cells
+          result = rnn.stack_bidirectional_dynamic_rnn(
+              cells_fw=fw_cell,
+              cells_bw=bw_cell,
+              inputs=outputs,
+              dtype=tf.float32,
+              sequence_length=self._lengths)
+          outputs, fw_final_states, bw_final_states = result
 
-    self.fw_final_state = fw_final_states
-    self.bw_final_state = bw_final_states
-    # print(fw_final_states[0][0].get_shape().as_list())
+      self.fw_final_state = fw_final_states
+      self.bw_final_state = bw_final_states
+      # print(fw_final_states[0][0].get_shape().as_list())
 
-    # print(np.shape(fw_final_states),np.shape(bw_final_states))
+      # print(np.shape(fw_final_states),np.shape(bw_final_states))
+
+      # calcu rnn output size
+      in_size = FLAGS.PARAM.RNN_SIZE
+      mask = None
+      if self._model_type.upper()[0] == 'B':  # bidirection
+        rnn_output_num = FLAGS.PARAM.RNN_SIZE*2
+        if FLAGS.PARAM.MODEL_TYPE == 'BLSTM' and (not (FLAGS.PARAM.LSTM_num_proj is None)):
+          rnn_output_num = 2*FLAGS.PARAM.LSTM_num_proj
+        in_size = rnn_output_num
+    elif FLAGS.PARAM.MODEL_TYPE.upper() == 'TRANSFORMER':
+      # in: outputs [batch, time, ...]
+      # out: outputs [batch, time, ...], insize: shape(outputs)[-1]
+      is_training = (behavior == self.train)
+      n_self_att_blocks = FLAGS.PARAM.n_self_att_blocks
+      d_model = FLAGS.PARAM.RNN_SIZE
+      num_att_heads = FLAGS.PARAM.num_att_heads
+      d_positionwise_FC = FLAGS.PARAM.d_positionwise_FC
+      with tf.variable_scope("transformer", reuse=tf.AUTO_REUSE):
+        # inputs embedding
+        trans = outputs
+        trans *= FLAGS.PARAM.FFT_DOT**0.5 # scale
+
+        trans += transformer_utils.positional_encoding(trans, 2000) # TODO fixed length?
+        trans = tf.layers.dropout(trans, 1.0-FLAGS.PARAM.KEEP_PROB,
+                                  training=is_training)
+
+        trans = tf.layers.dense(trans, d_model, use_bias=False)
+
+        ## Blocks,
+        for i in range(n_self_att_blocks):
+          with tf.variable_scope("blocks_{}".format(i), reuse=tf.AUTO_REUSE):
+            # self-attention
+            trans = transformer_utils.multihead_attention(queries=trans,
+                                                          keys=trans,
+                                                          values=trans,
+                                                          d_model=d_model,
+                                                          KV_lengths=self.lengths,
+                                                          Q_lengths=self.lengths,
+                                                          num_heads=num_att_heads,
+                                                          dropout_rate=1.0-FLAGS.PARAM.KEEP_PROB,
+                                                          training=is_training,
+                                                          causality=False)
+
+            # position-wise feedforward
+            trans = transformer_utils.positionwise_FC(trans, num_units=[d_positionwise_FC, d_model])
+      outputs = trans # [batch, time_src, d_model]
+      in_size = d_model
+    else:
+      raise ValueError('Unknown model type %s.' %
+                       FLAGS.PARAM.MODEL_TYPE)
 
     # region full connection get mask
-    # calcu rnn output size
-    in_size = FLAGS.PARAM.RNN_SIZE
-    mask = None
-    if self._model_type.upper()[0] == 'B':  # bidirection
-      rnn_output_num = FLAGS.PARAM.RNN_SIZE*2
-      if FLAGS.PARAM.MODEL_TYPE == 'BLSTM' and (not (FLAGS.PARAM.LSTM_num_proj is None)):
-        rnn_output_num = 2*FLAGS.PARAM.LSTM_num_proj
-      in_size = rnn_output_num
     outputs = tf.reshape(outputs, [-1, in_size])
     out_size = FLAGS.PARAM.OUTPUT_SIZE
     with tf.variable_scope('fullconnectOut'):
@@ -141,8 +187,7 @@ class Model_Baseline(object):
     mask = linear_out
     if FLAGS.PARAM.ReLU_MASK:
       mask = tf.nn.relu(linear_out)
-
-    # endregion
+    # endregion full connection
 
     self._mask = tf.reshape(
         mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
