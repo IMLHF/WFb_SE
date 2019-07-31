@@ -17,7 +17,7 @@ from utils.audio_tool import _mix_wav_by_randomSNR, _mix_wav_randomLINEAR
 import FLAGS
 
 '''
-BUG:
+BUG: FIXED
   label wav should multiply a mix-coef.
   for example, mixed_wave = (clean_wave*a+noise*b)/(a+b), label = clean_wave*a/(a+b).
 '''
