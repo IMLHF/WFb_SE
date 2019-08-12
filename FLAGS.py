@@ -346,21 +346,21 @@ class C_RealPSM_RelativeLossAFD100(base_config): # DONE 15123
   # MASK_TYPE = "PSM" # default
 
 
-  class C_UNIGRU_RealPSM_RelativeLossAFD100(base_config): # RUNNING 15123
-    '''
-    relative spectrum(mag) MSE
-    [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
-    '''
-    CHECK_POINT = 'nnet_C_UNIGRU_RealPSM_RelativeLossAFD100'
-    INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
-    LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
-    TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
-    DECODING_MASK_POSITION = TRAINING_MASK_POSITION
-    LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
-    AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
-    ReLU_MASK = False
-    MODEL_TYPE = "UNIGRU"
-    # MASK_TYPE = "PSM" # default
+class C_UNIGRU_RealPSM_RelativeLossAFD100(base_config): # RUNNING 15123
+  '''
+  relative spectrum(mag) MSE
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
+  '''
+  CHECK_POINT = 'nnet_C_UNIGRU_RealPSM_RelativeLossAFD100'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  ReLU_MASK = False
+  MODEL_TYPE = "UNIGRU"
+  # MASK_TYPE = "PSM" # default
 
 
 class C_TRANS_RealPSM_RelativeLossAFD100(base_config): # RUNNING
@@ -1246,5 +1246,5 @@ class C001_7_3_retest(base_config): # DONE 15043
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C_TRANS_RealPSM_RelativeLossAFD100
+PARAM = C_UNIGRU_RealPSM_RelativeLossAFD100
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
