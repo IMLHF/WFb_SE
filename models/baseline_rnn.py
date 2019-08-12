@@ -83,12 +83,11 @@ class Model_Baseline(object):
               [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
                              FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
 
-          _cell = gru_cell._cells
+          # _cell = gru_cell._cells
           result = tf.nn.dynamic_rnn(
-                    _cell, outputs,
+                    gru_cell, outputs,
                     dtype=tf.float32,
-                    sequence_length=self._lengths,
-                    initial_state=self.initial_state)
+                    sequence_length=self._lengths,)
           outputs, final_states = result
 
       if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM':
