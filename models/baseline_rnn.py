@@ -131,8 +131,8 @@ class Model_Baseline(object):
               sequence_length=self._lengths)
           outputs, fw_final_states, bw_final_states = result
 
-      self.fw_final_state = fw_final_states
-      self.bw_final_state = bw_final_states
+      # self.fw_final_state = fw_final_states
+      # self.bw_final_state = bw_final_states
       # print(fw_final_states[0][0].get_shape().as_list())
 
       # print(np.shape(fw_final_states),np.shape(bw_final_states))
