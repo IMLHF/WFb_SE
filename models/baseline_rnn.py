@@ -60,9 +60,9 @@ class Model_Baseline(object):
     elif FLAGS.PARAM.LABEL_TYPE == 'logmag':
       self._y_labels = self._norm_y_logmag_spec
 
-    outputs = self.net_input #[batch, time, ...]
+    outputs = self.net_input # [batch, time, ...]
 
-    if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM' or FLAGS.PARAM.MODEL_TYPE.upper() == 'BGRU':
+    if FLAGS.PARAM.MODEL_TYPE.upper() in ["BGRU", "BLSTM", "UNIGRU"]:
       # in: outputs [batch, time, ...]
       # out: outputs [batch, time, ...], insize: shape(outputs)[-1]
       lstm_attn_cell = lstm_cell
@@ -76,6 +76,20 @@ class Model_Baseline(object):
         def GRU_attn_cell(n_units, act):
           return tf.contrib.rnn.DropoutWrapper(GRU_cell(n_units, act),
                                                output_keep_prob=FLAGS.PARAM.KEEP_PROB)
+
+      if FLAGS.PARAM.MODEL_TYPE.upper() == 'UNIGRU':
+        with tf.variable_scope('UNI_GRU'):
+          gru_cell = tf.contrib.rnn.MultiRNNCell(
+              [GRU_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                             FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+
+          _cell = gru_cell._cells
+          result = tf.nn.dynamic_rnn(
+                    _cell, outputs,
+                    dtype=tf.float32,
+                    sequence_length=self._lengths,
+                    initial_state=self.initial_state)
+          outputs, final_states = result
 
       if FLAGS.PARAM.MODEL_TYPE.upper() == 'BLSTM':
         with tf.variable_scope('BLSTM'):
@@ -353,7 +367,7 @@ class Model_Baseline(object):
       val model cannot train.
       '''
       return
-    self._lr = tf.Variable(0.0, trainable=False) #TODO
+    self._lr = tf.Variable(0.0, trainable=False) # TODO
     tvars = tf.trainable_variables()
     grads, _ = tf.clip_by_global_norm(tf.gradients(self.loss, tvars),
                                       FLAGS.PARAM.CLIP_NORM)
