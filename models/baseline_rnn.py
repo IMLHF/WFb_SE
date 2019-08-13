@@ -61,6 +61,11 @@ class Model_Baseline(object):
       self._y_labels = self._norm_y_logmag_spec
 
     outputs = self.net_input # [batch, time, ...]
+    if FLAGS.PARAM.OUTPUTS_LATER_SHIFT_FRAMES > 0:
+      padding_zeros = tf.zeros([self._batch_size,
+                                FLAGS.PARAM.OUTPUTS_LATER_SHIFT_FRAMES,
+                                tf.shape(outputs)[-1]])
+      outputs = tf.concat([outputs, padding_zeros], -2)
 
     if FLAGS.PARAM.MODEL_TYPE.upper() in ["BGRU", "BLSTM", "UNIGRU", "UNILSTM"]:
       # in: outputs [batch, time, ...]
@@ -216,8 +221,11 @@ class Model_Baseline(object):
       mask = tf.nn.relu(linear_out)
     # endregion full connection
 
-    self._mask = tf.reshape(
+    _mask = tf.reshape(
         mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
+    if FLAGS.PARAM.OUTPUTS_LATER_SHIFT_FRAMES > 0:
+      _mask = tf.slice(_mask, [0, FLAGS.PARAM.OUTPUTS_LATER_SHIFT_FRAMES, 0], [-1, -1, -1])
+    self._mask = _mask
 
     if FLAGS.PARAM.TRAINING_MASK_POSITION == 'mag':
       self._y_estimation = self._mask*(self._norm_x_mag_spec+FLAGS.PARAM.SPEC_EST_BIAS)

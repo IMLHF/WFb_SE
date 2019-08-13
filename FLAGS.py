@@ -24,6 +24,7 @@ class base_config:
   LSTM_num_proj = None
   RNN_SIZE = 512
   MODEL_TYPE = "BLSTM"  # "BLSTM" OR "BGRU" OR "UNIGRU" OR "UNILSTM" OR "TRANSFORMER"
+  OUTPUTS_LATER_SHIFT_FRAMES = 0 # for RNN,
   LSTM_ACTIVATION = 'tanh'
   MASK_TYPE = "PSM"  # "PSM" or "IRM" or "fixPSM" or "AcutePM" or "PowFixPSM"
   POW_FIX_PSM_COEF = None # for MASK_TYPE = "PowFixPSM"
@@ -363,7 +364,58 @@ class C_UNIGRU_RealPSM_RelativeLossAFD100(base_config): # DONE 15123
   # MASK_TYPE = "PSM" # default
 
 
-class C_4layer_UNIGRU_RealPSM_RelativeLossAFD100(base_config): # RUNNING 15123
+class C_UNIGRUshiftmask5_RealPSM_RelativeLossAFD100(base_config): # DONE 15123
+  '''
+  relative spectrum(mag) MSE
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
+  '''
+  CHECK_POINT = 'nnet_C_UNIGRUshiftmask5_RealPSM_RelativeLossAFD100'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  ReLU_MASK = False
+  MODEL_TYPE = "UNIGRU"
+  OUTPUTS_LATER_SHIFT_FRAMES = 5
+
+
+class C_UNIGRUshiftmask10_RealPSM_RelativeLossAFD100(base_config): # DONE 15123
+  '''
+  relative spectrum(mag) MSE
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
+  '''
+  CHECK_POINT = 'nnet_C_UNIGRUshiftmask10_RealPSM_RelativeLossAFD100'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  ReLU_MASK = False
+  MODEL_TYPE = "UNIGRU"
+  OUTPUTS_LATER_SHIFT_FRAMES = 10
+
+
+class C_UNIGRUshiftmask20_RealPSM_RelativeLossAFD100(base_config): # DONE 15123
+  '''
+  relative spectrum(mag) MSE
+  [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
+  '''
+  CHECK_POINT = 'nnet_C_UNIGRUshiftmask20_RealPSM_RelativeLossAFD100'
+  INPUT_TYPE = 'mag'  # 'mag' or 'logmag'
+  LABEL_TYPE = 'mag'  # 'mag' or 'logmag'
+  TRAINING_MASK_POSITION = 'mag'  # 'mag' or 'logmag'
+  DECODING_MASK_POSITION = TRAINING_MASK_POSITION
+  LOSS_FUNC_FOR_MAG_SPEC = "AUTO_RELATED_MSE"
+  AUTO_RELATED_MSE_AXIS_FIT_DEG = 100
+  ReLU_MASK = False
+  MODEL_TYPE = "UNIGRU"
+  OUTPUTS_LATER_SHIFT_FRAMES = 20
+
+
+class C_4layer_UNIGRU_RealPSM_RelativeLossAFD100(base_config): # DONE 15123
   '''
   relative spectrum(mag) MSE
   [(y-y_)/(1/AFD+(1-1/AFD)*(|y|+|y_|)]^2
@@ -1280,5 +1332,5 @@ class C001_7_3_retest(base_config): # DONE 15043
   # MASK_TYPE = "PSM" # default
 
 
-PARAM = C_UNILSTM_RealPSM_RelativeLossAFD100
+PARAM = C_UNIGRUshiftmask5_RealPSM_RelativeLossAFD100
 # print(PARAM.TRAINING_MASK_POSITION != PARAM.LABEL_TYPE)
