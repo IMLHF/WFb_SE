@@ -62,7 +62,7 @@ class Model_Baseline(object):
 
     outputs = self.net_input # [batch, time, ...]
 
-    if FLAGS.PARAM.MODEL_TYPE.upper() in ["BGRU", "BLSTM", "UNIGRU"]:
+    if FLAGS.PARAM.MODEL_TYPE.upper() in ["BGRU", "BLSTM", "UNIGRU", "UNILSTM"]:
       # in: outputs [batch, time, ...]
       # out: outputs [batch, time, ...], insize: shape(outputs)[-1]
       lstm_attn_cell = lstm_cell
@@ -86,6 +86,20 @@ class Model_Baseline(object):
           # _cell = gru_cell._cells
           result = tf.nn.dynamic_rnn(
                     gru_cell, outputs,
+                    dtype=tf.float32,
+                    sequence_length=self._lengths,)
+          outputs, final_states = result
+
+      if FLAGS.PARAM.MODEL_TYPE.upper() == 'UNILSTM':
+        with tf.variable_scope('UNI_LSTM'):
+          lstm_cells__t = tf.contrib.rnn.MultiRNNCell(
+              [lstm_attn_cell(FLAGS.PARAM.RNN_SIZE,
+                              FLAGS.PARAM.LSTM_num_proj,
+                              FLAGS.PARAM.LSTM_ACTIVATION) for _ in range(FLAGS.PARAM.RNN_LAYER)], state_is_tuple=True)
+
+          # _cell = lstm_cell._cells
+          result = tf.nn.dynamic_rnn(
+                    lstm_cells__t, outputs,
                     dtype=tf.float32,
                     sequence_length=self._lengths,)
           outputs, final_states = result
