@@ -219,6 +219,7 @@ if __name__=='__main__':
         # "exp/rnn_speech_enhancement/_other/003.wav",
         # "exp/rnn_speech_enhancement/_other/004.wav",
         # "exp/rnn_speech_enhancement/_other/005.wav",
+        "exp/_other/20180829_191732_mono_8k.wav"
     ]
 
 
@@ -320,7 +321,7 @@ if __name__=='__main__':
     #   if ref.find('clean') != -1 or ref.find('mixed.wav')!=-1:
     #     os.remove(ref)
 
-    decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, True, 'test_oc.txt')
+    decode_and_getMeature(decode_file_list, ref_list, sess, model, decode_ans_file, False, 'test_oc.txt')
   elif int(sys.argv[1])==1: # decode exp/real_test_fair
     start_time = time.time()
     mixed_dirs = os.path.join('exp','real_test_fair','ITU_T_Test', 'mixed_wav')

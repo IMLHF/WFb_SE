@@ -156,7 +156,7 @@ def get_batch_stoi_improvement(x_wav,y_wav,y_wav_est):
 
 
 def get_batch_sdr_improvement(x_wav,y_wav,y_wav_est):
-  # calculate STOI improvement
+  # calculate SDR improvement
   sdr_ref_cleaned_list = [cal_SDR(ref/AMP_MAX,
                                   cleaned/AMP_MAX)[0]
                           for ref, cleaned in zip(y_wav, y_wav_est)]
