@@ -68,7 +68,7 @@ def calc_pesq(ref_sig, deg_sig, samplerate, is_file=False):
     # exit(0)
     # print(score)
     if len(score)<=1:
-      print('error')
+      print('calculate error.')
       return 2.0
     return float(score[1][:-1])
 
