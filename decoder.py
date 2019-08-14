@@ -219,7 +219,7 @@ if __name__=='__main__':
         # "exp/rnn_speech_enhancement/_other/003.wav",
         # "exp/rnn_speech_enhancement/_other/004.wav",
         # "exp/rnn_speech_enhancement/_other/005.wav",
-        "exp/_other/20180829_191732_mono_8k.wav"
+        "exp/rnn_speech_enhancement/_other/20180829_191732_mono_8k.wav"
     ]
 
 

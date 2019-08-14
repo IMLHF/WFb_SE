@@ -138,6 +138,7 @@ def train():
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = PARAM.GPU_RAM_ALLOW_GROWTH
     config.allow_soft_placement = False
+    # config.gpu_options.per_process_gpu_memory_fraction = 0.55
     sess = tf.Session(config=config)
     sess.run(init)
 
