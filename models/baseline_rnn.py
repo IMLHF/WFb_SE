@@ -206,6 +206,13 @@ class Model_Baseline(object):
       raise ValueError('Unknown model type %s.' %
                        FLAGS.PARAM.MODEL_TYPE)
 
+    if FLAGS.PARAM.OUTPUTS_LATER_SHIFT_FRAMES > 0:
+      outputs = tf.slice(outputs, [0, FLAGS.PARAM.OUTPUTS_LATER_SHIFT_FRAMES, 0], [-1, -1, -1])
+    if FLAGS.PARAM.POST_1D_CNN:
+      outputs = tf.layers.conv1d(outputs, filters=in_size, use_bias=True,
+                                 kernel_size=FLAGS.PARAM.CNN_1D_WIDTH,
+                                 padding="same", reuse=tf.AUTO_REUSE)
+
     # region full connection get mask
     outputs = tf.reshape(outputs, [-1, in_size])
     out_size = FLAGS.PARAM.OUTPUT_SIZE
@@ -221,11 +228,8 @@ class Model_Baseline(object):
       mask = tf.nn.relu(linear_out)
     # endregion full connection
 
-    _mask = tf.reshape(
+    self._mask = tf.reshape(
         mask, [self._batch_size, -1, FLAGS.PARAM.OUTPUT_SIZE])
-    if FLAGS.PARAM.OUTPUTS_LATER_SHIFT_FRAMES > 0:
-      _mask = tf.slice(_mask, [0, FLAGS.PARAM.OUTPUTS_LATER_SHIFT_FRAMES, 0], [-1, -1, -1])
-    self._mask = _mask
 
     if FLAGS.PARAM.TRAINING_MASK_POSITION == 'mag':
       self._y_estimation = self._mask*(self._norm_x_mag_spec+FLAGS.PARAM.SPEC_EST_BIAS)
