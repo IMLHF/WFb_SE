@@ -68,8 +68,8 @@ def cal_SDR(src_ref, src_deg):
     """Calculate Source-to-Distortion Ratio(SDR).
     NOTE: bss_eval_sources is very very slow.
     Args:
-        src_ref: numpy.ndarray, [C, T]
-        src_deg: numpy.ndarray, [C, T], reordered by best PIT permutation
+        src_ref: numpy.ndarray, [C, T] or [T], src_ref and src_deg must be same dimention.
+        src_deg: numpy.ndarray, [C, T] or [T], reordered by best PIT permutation
     Returns:
         SDR
     """
